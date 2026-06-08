@@ -1,12 +1,105 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from 'firebase/auth'
-import { auth } from '../lib/firebase'
+import { ref, uploadBytes, getDownloadURL, listAll } from 'firebase/storage'
+import { auth, storage } from '../lib/firebase'
 
 type User = { uid: string; email: string | null }
 import { getEnquiries, updateEnquiry, getCRMContacts, enquiryToContact, deleteCRMContact, updateCRMContact } from '../lib/firestore'
 import type { Enquiry, CRMContact } from '../types'
 import { toast } from 'sonner'
-import { LogOut, Users, MessageSquare, RefreshCw, UserPlus, Trash2, Phone, Mail, Tag, ChevronDown, ChevronUp } from 'lucide-react'
+import { LogOut, Users, MessageSquare, RefreshCw, UserPlus, Trash2, Phone, Mail, Tag, ChevronDown, ChevronUp, ImageIcon, Upload } from 'lucide-react'
+
+const CATEGORIES = ['Starters', 'Mains', 'Burgers', 'Thai Food', 'Kids Menu', 'Desserts', 'Drinks']
+
+// ── Menu Images ────────────────────────────────────────────────────────────────
+function MenuImages() {
+  const [images, setImages] = useState<Record<string, string>>({})
+  const [uploading, setUploading] = useState<string | null>(null)
+  const inputRefs = useRef<Record<string, HTMLInputElement | null>>({})
+
+  const loadImages = async () => {
+    try {
+      const folderRef = ref(storage, 'menu-categories')
+      const result = await listAll(folderRef)
+      const entries = await Promise.all(
+        result.items.map(async (item: any) => {
+          const url = await getDownloadURL(item)
+          // match filename back to category name
+          const name = item.name.replace(/\.[^.]+$/, '').replace(/-/g, ' ')
+          const category = CATEGORIES.find(c => c.toLowerCase() === name.toLowerCase()) || name
+          return [category, url] as [string, string]
+        })
+      )
+      setImages(Object.fromEntries(entries))
+    } catch {
+      // folder empty or doesn't exist yet — fine
+    }
+  }
+
+  useEffect(() => { loadImages() }, [])
+
+  const handleUpload = async (category: string, file: File) => {
+    setUploading(category)
+    try {
+      const ext = file.name.split('.').pop()
+      const slug = category.toLowerCase().replace(/ /g, '-')
+      const storageRef = ref(storage, `menu-categories/${slug}.${ext}`)
+      await uploadBytes(storageRef, file)
+      const url = await getDownloadURL(storageRef)
+      setImages(prev => ({ ...prev, [category]: url }))
+      toast.success(`${category} image updated`)
+    } catch {
+      toast.error('Upload failed')
+    } finally {
+      setUploading(null)
+    }
+  }
+
+  return (
+    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      {CATEGORIES.map(cat => (
+        <div key={cat} className="bg-[#141414] border border-white/5 rounded-xl overflow-hidden">
+          <div className="aspect-video relative bg-white/3">
+            {images[cat] ? (
+              <img src={images[cat]} alt={cat} className="w-full h-full object-cover" />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center">
+                <ImageIcon size={28} className="text-gray-700" />
+              </div>
+            )}
+            {uploading === cat && (
+              <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
+                <RefreshCw size={20} className="text-[#c9a84c] animate-spin" />
+              </div>
+            )}
+          </div>
+          <div className="p-3">
+            <p className="text-white text-sm font-medium mb-2">{cat}</p>
+            <input
+              type="file"
+              accept="image/*"
+              className="hidden"
+              ref={el => { inputRefs.current[cat] = el }}
+              onChange={e => {
+                const file = e.target.files?.[0]
+                if (file) handleUpload(cat, file)
+                e.target.value = ''
+              }}
+            />
+            <button
+              onClick={() => inputRefs.current[cat]?.click()}
+              disabled={uploading === cat}
+              className="w-full flex items-center justify-center gap-2 py-1.5 rounded-lg bg-white/5 text-gray-400 hover:text-white text-xs transition-colors disabled:opacity-50"
+            >
+              <Upload size={12} />
+              {images[cat] ? 'Replace' : 'Upload'}
+            </button>
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+}
 
 // ── Login ──────────────────────────────────────────────────────────────────────
 const googleProvider = new GoogleAuthProvider()
@@ -284,7 +377,7 @@ function ContactCard({ contact, onRefresh }: { contact: CRMContact; onRefresh: (
 // ── Main Admin ─────────────────────────────────────────────────────────────────
 export default function Admin() {
   const [user, setUser] = useState<User | null>(null)
-  const [tab, setTab] = useState<'enquiries' | 'crm'>('enquiries')
+  const [tab, setTab] = useState<'enquiries' | 'crm' | 'menu'>('enquiries')
   const [enquiries, setEnquiries] = useState<Enquiry[]>([])
   const [contacts, setContacts] = useState<CRMContact[]>([])
   const [loading, setLoading] = useState(false)
@@ -367,6 +460,7 @@ export default function Admin() {
           {[
             { key: 'enquiries', label: 'Enquiries', icon: MessageSquare },
             { key: 'crm', label: 'CRM Contacts', icon: Users },
+            { key: 'menu', label: 'Menu Images', icon: ImageIcon },
           ].map(({ key, label, icon: Icon }) => (
             <button
               key={key}
@@ -423,6 +517,9 @@ export default function Admin() {
             )}
           </div>
         )}
+
+        {/* Menu Images */}
+        {tab === 'menu' && <MenuImages />}
       </div>
     </div>
   )
