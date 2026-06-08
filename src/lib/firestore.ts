@@ -5,6 +5,7 @@ import {
   addDoc,
   updateDoc,
   deleteDoc,
+  setDoc,
   doc,
   query,
   where,
@@ -12,6 +13,18 @@ import {
 } from 'firebase/firestore'
 import { db } from './firebase'
 import type { MenuItem, Event, Special, BlogPost, SportsFixture, PoolPackage, Enquiry, CRMContact } from '../types'
+
+// ── Menu Images ───────────────────────────────────────────────────────────────
+export const getMenuImages = async (): Promise<Record<string, string>> => {
+  const snap = await getDocs(collection(db, 'menu_images'))
+  const result: Record<string, string> = {}
+  snap.docs.forEach((d: any) => { result[d.id] = d.data().imageUrl })
+  return result
+}
+
+export const saveMenuImage = async (slug: string, imageUrl: string) => {
+  return setDoc(doc(db, 'menu_images', slug), { imageUrl, updatedAt: new Date().toISOString() })
+}
 
 // ── Menu ──────────────────────────────────────────────────────────────────────
 export const getMenuItems = async (): Promise<MenuItem[]> => {

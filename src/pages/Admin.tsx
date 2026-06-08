@@ -1,10 +1,10 @@
 import { useState, useEffect, useRef } from 'react'
 import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from 'firebase/auth'
-import { ref, uploadBytes, getDownloadURL, listAll } from 'firebase/storage'
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
 import { auth, storage } from '../lib/firebase'
 
 type User = { uid: string; email: string | null }
-import { getEnquiries, updateEnquiry, getCRMContacts, enquiryToContact, deleteCRMContact, updateCRMContact, getBlogPosts, saveBlogPost, updateBlogPost, deleteBlogPost } from '../lib/firestore'
+import { getEnquiries, updateEnquiry, getCRMContacts, enquiryToContact, deleteCRMContact, updateCRMContact, getBlogPosts, saveBlogPost, updateBlogPost, deleteBlogPost, getMenuImages, saveMenuImage } from '../lib/firestore'
 import type { Enquiry, CRMContact, BlogPost } from '../types'
 import { toast } from 'sonner'
 import { LogOut, Users, MessageSquare, RefreshCw, UserPlus, Trash2, Phone, Mail, Tag, ChevronDown, ChevronUp, ImageIcon, Upload, ExternalLink, FileText, Edit2, Plus, X, Eye, EyeOff } from 'lucide-react'
@@ -23,25 +23,8 @@ function MenuImages() {
     setLoadingImages(true)
     setLoadError(null)
     try {
-      const folderRef = ref(storage, 'menu-categories')
-      const result = await listAll(folderRef)
-      if (result.items.length === 0) {
-        setImages({})
-        return
-      }
-      const entries = await Promise.all(
-        result.items.map(async (item: any) => {
-          try {
-            const url = await getDownloadURL(item)
-            const name = item.name.replace(/\.[^.]+$/, '').replace(/-/g, ' ')
-            const category = CATEGORIES.find(c => c.toLowerCase() === name.toLowerCase()) || name
-            return [category, url] as [string, string]
-          } catch {
-            return null
-          }
-        })
-      )
-      setImages(Object.fromEntries(entries.filter(Boolean) as [string, string][]))
+      const data = await getMenuImages()
+      setImages(data)
     } catch (err: any) {
       console.error('MenuImages loadImages error:', err)
       setLoadError(err?.message || String(err))
@@ -60,6 +43,8 @@ function MenuImages() {
       const storageRef = ref(storage, `menu-categories/${slug}.${ext}`)
       await uploadBytes(storageRef, file)
       const url = await getDownloadURL(storageRef)
+      // Save URL to Firestore so it's retrievable without listAll
+      await saveMenuImage(slug, url)
       setImages(prev => ({ ...prev, [category]: url }))
       toast.success(`${category} image updated`)
     } catch {
@@ -84,11 +69,14 @@ function MenuImages() {
         </button>
       </div>
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-      {CATEGORIES.map(cat => (
+      {CATEGORIES.map(cat => {
+        const slug = cat.toLowerCase().replace(/ /g, '-')
+        const imgUrl = images[slug] || images[cat]
+        return (
         <div key={cat} className="bg-[#141414] border border-white/5 rounded-xl overflow-hidden">
           <div className="aspect-video relative bg-white/3">
-            {images[cat] ? (
-              <img src={images[cat]} alt={cat} className="w-full h-full object-cover" />
+            {imgUrl ? (
+              <img src={imgUrl} alt={cat} className="w-full h-full object-cover" />
             ) : (
               <div className="w-full h-full flex items-center justify-center">
                 <ImageIcon size={28} className="text-gray-700" />
@@ -119,11 +107,12 @@ function MenuImages() {
               className="w-full flex items-center justify-center gap-2 py-1.5 rounded-lg bg-white/5 text-gray-400 hover:text-white text-xs transition-colors disabled:opacity-50"
             >
               <Upload size={12} />
-              {images[cat] ? 'Replace' : 'Upload'}
+              {imgUrl ? 'Replace' : 'Upload'}
             </button>
           </div>
         </div>
-      ))}
+        )
+      })}
       </div>
     </div>
   )
