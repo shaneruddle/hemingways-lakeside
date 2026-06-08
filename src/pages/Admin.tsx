@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from 'firebase/auth'
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
+import { ref, uploadBytes, getDownloadURL, listAll } from 'firebase/storage'
 import { auth, storage } from '../lib/firebase'
 
 type User = { uid: string; email: string | null }
@@ -33,6 +33,37 @@ function MenuImages() {
     }
   }
 
+  const syncFromStorage = async () => {
+    setLoadingImages(true)
+    setLoadError(null)
+    try {
+      const folderRef = ref(storage, 'menu-categories')
+      const result = await listAll(folderRef)
+      if (result.items.length === 0) {
+        toast.error('No images found in storage folder')
+        return
+      }
+      let synced = 0
+      for (const item of result.items) {
+        try {
+          const url = await getDownloadURL(item)
+          const slug = item.name.replace(/\.[^.]+$/, '') // strip extension
+          await saveMenuImage(slug, url)
+          synced++
+        } catch {
+          // skip items that fail
+        }
+      }
+      toast.success(`Synced ${synced} image${synced !== 1 ? 's' : ''} from Storage`)
+      await loadImages()
+    } catch (err: any) {
+      console.error('syncFromStorage error:', err)
+      toast.error(`Sync failed: ${err?.message || err}`)
+    } finally {
+      setLoadingImages(false)
+    }
+  }
+
   useEffect(() => { loadImages() }, [])
 
   const handleUpload = async (category: string, file: File) => {
@@ -60,13 +91,23 @@ function MenuImages() {
         <p className="text-gray-500 text-sm">
           {loadingImages ? 'Loading...' : loadError ? <span className="text-red-400">Error: {loadError}</span> : `${Object.keys(images).length} of ${CATEGORIES.length} images loaded`}
         </p>
-        <button
-          onClick={loadImages}
-          disabled={loadingImages}
-          className="flex items-center gap-2 px-3 py-1.5 bg-white/5 text-gray-400 hover:text-white text-xs rounded-lg transition-colors"
-        >
-          <RefreshCw size={12} className={loadingImages ? 'animate-spin' : ''} /> Reload
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={syncFromStorage}
+            disabled={loadingImages}
+            title="Scan the Storage folder and import all existing images into Firestore"
+            className="flex items-center gap-2 px-3 py-1.5 bg-[#c9a84c]/10 text-[#c9a84c] hover:bg-[#c9a84c]/20 text-xs rounded-lg transition-colors disabled:opacity-50"
+          >
+            <Upload size={12} /> Sync from Storage
+          </button>
+          <button
+            onClick={loadImages}
+            disabled={loadingImages}
+            className="flex items-center gap-2 px-3 py-1.5 bg-white/5 text-gray-400 hover:text-white text-xs rounded-lg transition-colors"
+          >
+            <RefreshCw size={12} className={loadingImages ? 'animate-spin' : ''} /> Reload
+          </button>
+        </div>
       </div>
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
       {CATEGORIES.map(cat => {
