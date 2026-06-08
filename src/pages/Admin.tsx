@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from 'firebase/auth'
-import { ref, uploadBytes, getDownloadURL, listAll } from 'firebase/storage'
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
 import { auth, storage } from '../lib/firebase'
 
 type User = { uid: string; email: string | null }
@@ -37,24 +37,32 @@ function MenuImages() {
     setLoadingImages(true)
     setLoadError(null)
     try {
-      const folderRef = ref(storage, 'menu-categories')
-      const result = await listAll(folderRef)
-      if (result.items.length === 0) {
-        toast.error('No images found in storage folder')
-        return
-      }
+      const EXTS = ['jpg', 'jpeg', 'png', 'webp']
       let synced = 0
-      for (const item of result.items) {
-        try {
-          const url = await getDownloadURL(item)
-          const slug = item.name.replace(/\.[^.]+$/, '') // strip extension
-          await saveMenuImage(slug, url)
-          synced++
-        } catch {
-          // skip items that fail
+      for (const cat of CATEGORIES) {
+        const slug = cat.toLowerCase().replace(/ /g, '-')
+        let found = false
+        for (const ext of EXTS) {
+          try {
+            const storageRef = ref(storage, `menu-categories/${slug}.${ext}`)
+            const url = await getDownloadURL(storageRef)
+            await saveMenuImage(slug, url)
+            synced++
+            found = true
+            break
+          } catch {
+            // try next extension
+          }
+        }
+        if (!found) {
+          console.log(`No image found for ${slug}`)
         }
       }
-      toast.success(`Synced ${synced} image${synced !== 1 ? 's' : ''} from Storage`)
+      if (synced === 0) {
+        toast.error('No images found — upload them via the panel below')
+      } else {
+        toast.success(`Synced ${synced} image${synced !== 1 ? 's' : ''} from Storage`)
+      }
       await loadImages()
     } catch (err: any) {
       console.error('syncFromStorage error:', err)
