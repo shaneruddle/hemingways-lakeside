@@ -68,8 +68,11 @@ export const deleteEvent = async (id: string) => {
 }
 
 // ── Specials ──────────────────────────────────────────────────────────────────
-export const getSpecials = async (): Promise<Special[]> => {
-  const snap = await getDocs(query(collection(db, 'specials'), where('active', '==', true)))
+export const getSpecials = async (activeOnly = true): Promise<Special[]> => {
+  const q = activeOnly
+    ? query(collection(db, 'specials'), where('active', '==', true))
+    : query(collection(db, 'specials'), orderBy('order'))
+  const snap = await getDocs(q)
   return snap.docs.map((d: any) => ({ id: d.id, ...d.data() } as Special))
 }
 

@@ -24,11 +24,13 @@ export interface Event {
 export interface Special {
   id: string
   title: string
-  description: string
-  price?: number
-  day: string // 'Monday' | 'Tuesday' etc or 'Daily'
   imageUrl?: string
+  order?: number
   active: boolean
+  // legacy fields kept for backward compat
+  description?: string
+  price?: number
+  day?: string
 }
 
 export interface BlogPost {

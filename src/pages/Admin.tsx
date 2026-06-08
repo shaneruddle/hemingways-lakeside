@@ -4,10 +4,10 @@ import { ref, uploadBytes, getDownloadURL, listAll } from 'firebase/storage'
 import { auth, storage } from '../lib/firebase'
 
 type User = { uid: string; email: string | null }
-import { getEnquiries, updateEnquiry, getCRMContacts, enquiryToContact, deleteCRMContact, updateCRMContact, getBlogPosts, saveBlogPost, updateBlogPost, deleteBlogPost, getMenuImages, saveMenuImage } from '../lib/firestore'
-import type { Enquiry, CRMContact, BlogPost } from '../types'
+import { getEnquiries, updateEnquiry, getCRMContacts, enquiryToContact, deleteCRMContact, updateCRMContact, getBlogPosts, saveBlogPost, updateBlogPost, deleteBlogPost, getMenuImages, saveMenuImage, getSpecials, saveSpecial, updateSpecial, deleteSpecial } from '../lib/firestore'
+import type { Enquiry, CRMContact, BlogPost, Special } from '../types'
 import { toast } from 'sonner'
-import { LogOut, Users, MessageSquare, RefreshCw, UserPlus, Trash2, Phone, Mail, Tag, ChevronDown, ChevronUp, ImageIcon, Upload, ExternalLink, FileText, Edit2, Plus, X, Eye, EyeOff } from 'lucide-react'
+import { LogOut, Users, MessageSquare, RefreshCw, UserPlus, Trash2, Phone, Mail, Tag, ChevronDown, ChevronUp, ImageIcon, Upload, ExternalLink, FileText, Edit2, Plus, X, Eye, EyeOff, Star } from 'lucide-react'
 
 const CATEGORIES = ['Starters', 'Mains', 'Burgers', 'Thai Food', 'Kids Menu', 'Desserts', 'Drinks']
 
@@ -476,6 +476,199 @@ function BlogManager() {
   )
 }
 
+// ── Specials Manager ───────────────────────────────────────────────────────────
+function SpecialsManager() {
+  const [specials, setSpecials] = useState<Special[]>([])
+  const [loading, setLoading] = useState(true)
+  const [uploading, setUploading] = useState(false)
+  const [editing, setEditing] = useState<Special | null>(null)
+  const [form, setForm] = useState({ title: '', imageUrl: '' })
+  const [imageFile, setImageFile] = useState<File | null>(null)
+  const [imagePreview, setImagePreview] = useState<string | null>(null)
+  const fileRef = useRef<HTMLInputElement | null>(null)
+
+  const load = async () => {
+    setLoading(true)
+    try {
+      const data = await getSpecials(false)
+      setSpecials(data.sort((a, b) => (a.order ?? 999) - (b.order ?? 999)))
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => { load() }, [])
+
+  const openNew = () => {
+    setEditing(null)
+    setForm({ title: '', imageUrl: '' })
+    setImageFile(null)
+    setImagePreview(null)
+  }
+
+  const openEdit = (s: Special) => {
+    setEditing(s)
+    setForm({ title: s.title, imageUrl: s.imageUrl || '' })
+    setImageFile(null)
+    setImagePreview(s.imageUrl || null)
+  }
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setImageFile(file)
+    setImagePreview(URL.createObjectURL(file))
+  }
+
+  const handleSave = async () => {
+    if (!form.title.trim()) { toast.error('Title required'); return }
+    setUploading(true)
+    try {
+      let imageUrl = form.imageUrl
+      if (imageFile) {
+        const id = editing?.id || Date.now().toString()
+        const ext = imageFile.name.split('.').pop()
+        const storageRef = ref(storage, `specials/${id}.${ext}`)
+        await uploadBytes(storageRef, imageFile)
+        imageUrl = await getDownloadURL(storageRef)
+      }
+      if (editing) {
+        await updateSpecial(editing.id, { title: form.title, imageUrl, active: editing.active })
+        toast.success('Updated')
+      } else {
+        await saveSpecial({ title: form.title, imageUrl, active: true, order: specials.length })
+        toast.success('Added')
+      }
+      setEditing(null)
+      setForm({ title: '', imageUrl: '' })
+      setImageFile(null)
+      setImagePreview(null)
+      await load()
+    } catch (err: any) {
+      toast.error(err?.message || 'Save failed')
+    } finally {
+      setUploading(false)
+    }
+  }
+
+  const toggleActive = async (s: Special) => {
+    await updateSpecial(s.id, { active: !s.active })
+    setSpecials(prev => prev.map(x => x.id === s.id ? { ...x, active: !x.active } : x))
+  }
+
+  const handleDelete = async (s: Special) => {
+    if (!confirm(`Delete "${s.title}"?`)) return
+    await deleteSpecial(s.id)
+    toast.success('Deleted')
+    setSpecials(prev => prev.filter(x => x.id !== s.id))
+  }
+
+  const isFormOpen = editing !== null || (form.title !== '' || imageFile !== null || imagePreview !== null)
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h2 className="text-xl font-bold text-white">Specials</h2>
+        <button
+          onClick={openNew}
+          className="flex items-center gap-2 bg-[#c9a84c] text-black px-4 py-2 rounded-lg text-sm font-semibold hover:bg-[#d4b05a] transition-colors"
+        >
+          <Plus size={15} /> Add Special
+        </button>
+      </div>
+
+      {/* Form */}
+      {(editing !== null || form.title !== '' || imageFile || imagePreview) && (
+        <div className="bg-[#141414] border border-white/10 rounded-xl p-6 space-y-4">
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="text-white font-semibold">{editing ? 'Edit Special' : 'New Special'}</h3>
+            <button onClick={() => { setEditing(null); setForm({ title: '', imageUrl: '' }); setImageFile(null); setImagePreview(null) }} className="text-gray-500 hover:text-white">
+              <X size={16} />
+            </button>
+          </div>
+          <div>
+            <label className="block text-xs text-gray-500 mb-1 uppercase tracking-wider">Title</label>
+            <input
+              value={form.title}
+              onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
+              placeholder="e.g. Tuesday Burger Night"
+              className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#c9a84c]/50"
+            />
+          </div>
+          <div>
+            <label className="block text-xs text-gray-500 mb-1 uppercase tracking-wider">Image</label>
+            <div
+              onClick={() => fileRef.current?.click()}
+              className="border-2 border-dashed border-white/10 rounded-xl overflow-hidden cursor-pointer hover:border-white/20 transition-colors"
+            >
+              {imagePreview ? (
+                <img src={imagePreview} alt="" className="w-full max-h-64 object-cover" />
+              ) : (
+                <div className="flex flex-col items-center justify-center py-10 text-gray-600">
+                  <ImageIcon size={32} className="mb-2" />
+                  <span className="text-sm">Click to upload image</span>
+                </div>
+              )}
+            </div>
+            <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleFileChange} />
+          </div>
+          <button
+            onClick={handleSave}
+            disabled={uploading}
+            className="w-full bg-[#c9a84c] text-black py-2.5 rounded-lg font-semibold text-sm hover:bg-[#d4b05a] transition-colors disabled:opacity-50"
+          >
+            {uploading ? 'Saving…' : editing ? 'Update Special' : 'Add Special'}
+          </button>
+        </div>
+      )}
+
+      {/* List */}
+      {loading ? (
+        <div className="space-y-3">
+          {[1, 2, 3].map(i => <div key={i} className="bg-[#141414] rounded-xl h-20 animate-pulse" />)}
+        </div>
+      ) : specials.length === 0 ? (
+        <p className="text-center text-gray-600 py-16">No specials yet. Add one above.</p>
+      ) : (
+        <div className="space-y-3">
+          {specials.map(s => (
+            <div key={s.id} className="bg-[#141414] border border-white/5 rounded-xl p-4 flex items-center gap-4">
+              {s.imageUrl ? (
+                <img src={s.imageUrl} alt="" className="w-16 h-16 rounded-lg object-cover shrink-0" />
+              ) : (
+                <div className="w-16 h-16 rounded-lg bg-white/5 flex items-center justify-center shrink-0">
+                  <ImageIcon size={18} className="text-gray-600" />
+                </div>
+              )}
+              <div className="flex-1 min-w-0">
+                <span className="text-white font-semibold truncate block">{s.title}</span>
+                <span className={`text-xs mt-0.5 ${s.active ? 'text-green-400' : 'text-gray-500'}`}>
+                  {s.active ? 'Active' : 'Hidden'}
+                </span>
+              </div>
+              <div className="flex items-center gap-1 shrink-0">
+                <button
+                  onClick={() => toggleActive(s)}
+                  title={s.active ? 'Hide' : 'Show'}
+                  className={`p-2 transition-colors ${s.active ? 'text-green-400 hover:text-gray-400' : 'text-gray-600 hover:text-green-400'}`}
+                >
+                  {s.active ? <Eye size={15} /> : <EyeOff size={15} />}
+                </button>
+                <button onClick={() => openEdit(s)} className="p-2 text-gray-600 hover:text-white transition-colors">
+                  <Edit2 size={15} />
+                </button>
+                <button onClick={() => handleDelete(s)} className="p-2 text-gray-600 hover:text-red-400 transition-colors">
+                  <Trash2 size={15} />
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
 // ── Login ──────────────────────────────────────────────────────────────────────
 const googleProvider = new GoogleAuthProvider()
 
@@ -752,7 +945,7 @@ function ContactCard({ contact, onRefresh }: { contact: CRMContact; onRefresh: (
 // ── Main Admin ─────────────────────────────────────────────────────────────────
 export default function Admin() {
   const [user, setUser] = useState<User | null>(null)
-  const [tab, setTab] = useState<'enquiries' | 'crm' | 'menu' | 'blog'>('enquiries')
+  const [tab, setTab] = useState<'enquiries' | 'crm' | 'menu' | 'blog' | 'specials'>('enquiries')
   const [enquiries, setEnquiries] = useState<Enquiry[]>([])
   const [contacts, setContacts] = useState<CRMContact[]>([])
   const [loading, setLoading] = useState(false)
@@ -845,6 +1038,7 @@ export default function Admin() {
             { key: 'crm', label: 'CRM Contacts', icon: Users },
             { key: 'menu', label: 'Menu Images', icon: ImageIcon },
             { key: 'blog', label: 'Blog', icon: FileText },
+            { key: 'specials', label: 'Specials', icon: Star },
           ].map(({ key, label, icon: Icon }) => (
             <button
               key={key}
@@ -907,6 +1101,9 @@ export default function Admin() {
 
         {/* Blog */}
         {tab === 'blog' && <BlogManager />}
+
+        {/* Specials */}
+        {tab === 'specials' && <SpecialsManager />}
       </div>
     </div>
   )

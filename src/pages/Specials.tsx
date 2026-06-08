@@ -2,30 +2,20 @@ import { useState, useEffect } from 'react'
 import { getSpecials } from '../lib/firestore'
 import type { Special } from '../types'
 
-const fallback: Special[] = [
-  { id: '1', title: 'Monday Wing Night', description: 'Buy 8 wings get 8 free — all day Monday', day: 'Monday', active: true },
-  { id: '2', title: 'Steak Tuesday', description: 'Sirloin steak + fries + sauce for ฿299', day: 'Tuesday', active: true },
-  { id: '3', title: 'Burger Wednesday', description: 'Any burger + pint for ฿259', day: 'Wednesday', active: true },
-  { id: '4', title: 'Fish Friday', description: 'Traditional fish & chips for ฿199 — all day Friday', day: 'Friday', active: true },
-  { id: '5', title: 'Sunday Roast', description: "A proper Sunday roast. Beef, chicken or pork. ฿279. Starts noon — book early as it sells out!", day: 'Sunday', active: true, price: 279 },
-  { id: '6', title: 'Happy Hour', description: 'All draught beers at ฿79 per pint', day: 'Daily', active: true },
-]
-
-const dayOrder = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday', 'Daily']
-
 export default function Specials() {
-  const [specials, setSpecials] = useState<Special[]>(fallback)
+  const [specials, setSpecials] = useState<Special[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     getSpecials()
-      .then(data => { if (data.length) setSpecials(data) })
+      .then(data => setSpecials(data))
       .catch(() => {})
       .finally(() => setLoading(false))
   }, [])
 
-  const today = new Date().toLocaleDateString('en-GB', { weekday: 'long' })
-  const sorted = [...specials].sort((a, b) => dayOrder.indexOf(a.day) - dayOrder.indexOf(b.day))
+  const active = specials
+    .filter(s => s.active)
+    .sort((a, b) => (a.order ?? 999) - (b.order ?? 999))
 
   return (
     <div>
@@ -40,44 +30,42 @@ export default function Specials() {
         </div>
       </section>
 
-      {/* Specials */}
+      {/* Specials grid */}
       <section className="py-20 px-4">
-        <div className="max-w-5xl mx-auto">
+        <div className="max-w-6xl mx-auto">
           {loading ? (
-            <div className="space-y-4">
-              {[...Array(5)].map((_, i) => <div key={i} className="bg-[#141414] rounded-2xl h-28 animate-pulse" />)}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[...Array(6)].map((_, i) => (
+                <div key={i} className="bg-[#141414] rounded-2xl aspect-[4/3] animate-pulse" />
+              ))}
             </div>
+          ) : active.length === 0 ? (
+            <p className="text-center text-gray-600 py-20">No specials at the moment. Check back soon.</p>
           ) : (
-            <div className="space-y-4">
-              {sorted.map(special => {
-                const isToday = special.day === today || special.day === 'Daily'
-                return (
-                  <div
-                    key={special.id}
-                    className={`rounded-2xl p-8 border flex flex-col sm:flex-row sm:items-center gap-4 ${
-                      isToday
-                        ? 'bg-[#c9a84c]/10 border-[#c9a84c]/40'
-                        : 'bg-[#141414] border-white/5'
-                    }`}
-                  >
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-1">
-                        <span className={`text-xs tracking-widest uppercase font-bold ${isToday ? 'text-[#c9a84c]' : 'text-gray-600'}`}>
-                          {special.day}
-                        </span>
-                        {isToday && (
-                          <span className="text-xs bg-[#c9a84c] text-black px-2 py-0.5 rounded-full font-bold">Today</span>
-                        )}
-                      </div>
-                      <h3 className="text-white font-bold text-lg">{special.title}</h3>
-                      <p className="text-gray-400 text-sm mt-1">{special.description}</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {active.map(special => (
+                <div
+                  key={special.id}
+                  className="group relative rounded-2xl overflow-hidden border border-white/5 bg-[#141414]"
+                >
+                  {special.imageUrl ? (
+                    <div className="aspect-[4/3] overflow-hidden">
+                      <img
+                        src={special.imageUrl}
+                        alt={special.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
                     </div>
-                    {special.price && (
-                      <div className="text-2xl font-bold text-[#c9a84c]">฿{special.price}</div>
-                    )}
+                  ) : (
+                    <div className="aspect-[4/3] bg-white/3 flex items-center justify-center">
+                      <span className="text-gray-700 text-sm">No image</span>
+                    </div>
+                  )}
+                  <div className="p-5">
+                    <h3 className="text-white font-bold text-lg tracking-wide">{special.title}</h3>
                   </div>
-                )
-              })}
+                </div>
+              ))}
             </div>
           )}
         </div>
