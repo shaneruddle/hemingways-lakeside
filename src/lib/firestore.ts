@@ -26,6 +26,10 @@ export const saveMenuImage = async (slug: string, imageUrl: string) => {
   return setDoc(doc(db, 'menu_images', slug), { imageUrl, updatedAt: new Date().toISOString() })
 }
 
+export const deleteMenuImage = async (slug: string) => {
+  return deleteDoc(doc(db, 'menu_images', slug))
+}
+
 // ── Menu ──────────────────────────────────────────────────────────────────────
 export const getMenuItems = async (): Promise<MenuItem[]> => {
   const snap = await getDocs(query(collection(db, 'menu'), orderBy('category')))

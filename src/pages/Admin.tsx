@@ -4,165 +4,125 @@ import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
 import { auth, storage } from '../lib/firebase'
 
 type User = { uid: string; email: string | null }
-import { getEnquiries, updateEnquiry, getCRMContacts, enquiryToContact, deleteCRMContact, updateCRMContact, getBlogPosts, saveBlogPost, updateBlogPost, deleteBlogPost, getMenuImages, saveMenuImage, getSpecials, saveSpecial, updateSpecial, deleteSpecial } from '../lib/firestore'
+import { getEnquiries, updateEnquiry, getCRMContacts, enquiryToContact, deleteCRMContact, updateCRMContact, getBlogPosts, saveBlogPost, updateBlogPost, deleteBlogPost, getMenuImages, saveMenuImage, deleteMenuImage, getSpecials, saveSpecial, updateSpecial, deleteSpecial } from '../lib/firestore'
 import type { Enquiry, CRMContact, BlogPost, Special } from '../types'
 import { toast } from 'sonner'
 import { LogOut, Users, MessageSquare, RefreshCw, UserPlus, Trash2, Phone, Mail, Tag, ChevronDown, ChevronUp, ImageIcon, Upload, ExternalLink, FileText, Edit2, Plus, X, Eye, EyeOff, Star } from 'lucide-react'
 
-const CATEGORIES = ['Starters', 'Mains', 'Burgers', 'Thai Food', 'Kids Menu', 'Desserts', 'Drinks']
-
 // ── Menu Images ────────────────────────────────────────────────────────────────
 function MenuImages() {
   const [images, setImages] = useState<Record<string, string>>({})
-  const [uploading, setUploading] = useState<string | null>(null)
-  const [loadError, setLoadError] = useState<string | null>(null)
-  const [loadingImages, setLoadingImages] = useState(true)
-  const inputRefs = useRef<Record<string, HTMLInputElement | null>>({})
+  const [loading, setLoading] = useState(true)
+  const [uploading, setUploading] = useState(false)
+  const [newName, setNewName] = useState('')
+  const [newFile, setNewFile] = useState<File | null>(null)
+  const [newPreview, setNewPreview] = useState<string | null>(null)
+  const fileRef = useRef<HTMLInputElement | null>(null)
 
-  const loadImages = async () => {
-    setLoadingImages(true)
-    setLoadError(null)
-    try {
-      const data = await getMenuImages()
-      setImages(data)
-    } catch (err: any) {
-      console.error('MenuImages loadImages error:', err)
-      setLoadError(err?.message || String(err))
-    } finally {
-      setLoadingImages(false)
-    }
+  const load = async () => {
+    setLoading(true)
+    try { setImages(await getMenuImages()) } finally { setLoading(false) }
   }
 
-  const syncFromStorage = async () => {
-    setLoadingImages(true)
-    setLoadError(null)
-    try {
-      const EXTS = ['jpg', 'jpeg', 'png', 'webp']
-      let synced = 0
-      for (const cat of CATEGORIES) {
-        const slug = cat.toLowerCase().replace(/ /g, '-')
-        let found = false
-        for (const ext of EXTS) {
-          try {
-            const storageRef = ref(storage, `menu-categories/${slug}.${ext}`)
-            const url = await getDownloadURL(storageRef)
-            await saveMenuImage(slug, url)
-            synced++
-            found = true
-            break
-          } catch {
-            // try next extension
-          }
-        }
-        if (!found) {
-          console.log(`No image found for ${slug}`)
-        }
-      }
-      if (synced === 0) {
-        toast.error('No images found — upload them via the panel below')
-      } else {
-        toast.success(`Synced ${synced} image${synced !== 1 ? 's' : ''} from Storage`)
-      }
-      await loadImages()
-    } catch (err: any) {
-      console.error('syncFromStorage error:', err)
-      toast.error(`Sync failed: ${err?.message || err}`)
-    } finally {
-      setLoadingImages(false)
-    }
+  useEffect(() => { load() }, [])
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setNewFile(file)
+    setNewPreview(URL.createObjectURL(file))
   }
 
-  useEffect(() => { loadImages() }, [])
-
-  const handleUpload = async (category: string, file: File) => {
-    setUploading(category)
+  const handleAdd = async () => {
+    if (!newName.trim()) { toast.error('Category name required'); return }
+    if (!newFile) { toast.error('Image required'); return }
+    setUploading(true)
     try {
-      const ext = file.name.split('.').pop()
-      const slug = category.toLowerCase().replace(/ /g, '-')
+      const slug = newName.trim().toLowerCase().replace(/ /g, '-')
+      const ext = newFile.name.split('.').pop()
       const storageRef = ref(storage, `menu-categories/${slug}.${ext}`)
-      await uploadBytes(storageRef, file)
+      await uploadBytes(storageRef, newFile)
       const url = await getDownloadURL(storageRef)
-      // Save URL to Firestore so it's retrievable without listAll
       await saveMenuImage(slug, url)
-      setImages(prev => ({ ...prev, [category]: url }))
-      toast.success(`${category} image updated`)
-    } catch {
-      toast.error('Upload failed')
-    } finally {
-      setUploading(null)
-    }
+      toast.success(`${newName} added`)
+      setNewName('')
+      setNewFile(null)
+      setNewPreview(null)
+      await load()
+    } catch { toast.error('Upload failed') } finally { setUploading(false) }
   }
+
+  const handleDelete = async (slug: string) => {
+    if (!confirm(`Delete "${slug}"?`)) return
+    await deleteMenuImage(slug)
+    toast.success('Deleted')
+    setImages(prev => { const n = { ...prev }; delete n[slug]; return n })
+  }
+
+  const entries = Object.entries(images)
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-4">
-        <p className="text-gray-500 text-sm">
-          {loadingImages ? 'Loading...' : loadError ? <span className="text-red-400">Error: {loadError}</span> : `${Object.keys(images).length} of ${CATEGORIES.length} images loaded`}
-        </p>
-        <div className="flex gap-2">
-          <button
-            onClick={syncFromStorage}
-            disabled={loadingImages}
-            title="Scan the Storage folder and import all existing images into Firestore"
-            className="flex items-center gap-2 px-3 py-1.5 bg-[#c9a84c]/10 text-[#c9a84c] hover:bg-[#c9a84c]/20 text-xs rounded-lg transition-colors disabled:opacity-50"
-          >
-            <Upload size={12} /> Sync from Storage
-          </button>
-          <button
-            onClick={loadImages}
-            disabled={loadingImages}
-            className="flex items-center gap-2 px-3 py-1.5 bg-white/5 text-gray-400 hover:text-white text-xs rounded-lg transition-colors"
-          >
-            <RefreshCw size={12} className={loadingImages ? 'animate-spin' : ''} /> Reload
-          </button>
-        </div>
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h2 className="text-xl font-bold text-white">Menu Categories</h2>
       </div>
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-      {CATEGORIES.map(cat => {
-        const slug = cat.toLowerCase().replace(/ /g, '-')
-        const imgUrl = images[slug] || images[cat]
-        return (
-        <div key={cat} className="bg-[#141414] border border-white/5 rounded-xl overflow-hidden">
-          <div className="aspect-video relative bg-white/3">
-            {imgUrl ? (
-              <img src={imgUrl} alt={cat} className="w-full h-full object-cover" />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center">
-                <ImageIcon size={28} className="text-gray-700" />
-              </div>
-            )}
-            {uploading === cat && (
-              <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
-                <RefreshCw size={20} className="text-[#c9a84c] animate-spin" />
-              </div>
-            )}
-          </div>
-          <div className="p-3">
-            <p className="text-white text-sm font-medium mb-2">{cat}</p>
-            <input
-              type="file"
-              accept="image/*"
-              className="hidden"
-              ref={el => { inputRefs.current[cat] = el }}
-              onChange={e => {
-                const file = e.target.files?.[0]
-                if (file) handleUpload(cat, file)
-                e.target.value = ''
-              }}
-            />
-            <button
-              onClick={() => inputRefs.current[cat]?.click()}
-              disabled={uploading === cat}
-              className="w-full flex items-center justify-center gap-2 py-1.5 rounded-lg bg-white/5 text-gray-400 hover:text-white text-xs transition-colors disabled:opacity-50"
-            >
-              <Upload size={12} />
-              {imgUrl ? 'Replace' : 'Upload'}
-            </button>
-          </div>
+
+      {/* Add new */}
+      <div className="bg-[#141414] border border-white/10 rounded-xl p-6 space-y-4">
+        <h3 className="text-white font-semibold">Add Category</h3>
+        <input
+          value={newName}
+          onChange={e => setNewName(e.target.value)}
+          placeholder="Category name (e.g. Starters)"
+          className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#c9a84c]/50"
+        />
+        <div
+          onClick={() => fileRef.current?.click()}
+          className="border-2 border-dashed border-white/10 rounded-xl overflow-hidden cursor-pointer hover:border-white/20 transition-colors"
+        >
+          {newPreview ? (
+            <img src={newPreview} alt="" className="w-full max-h-48 object-cover" />
+          ) : (
+            <div className="flex flex-col items-center justify-center py-8 text-gray-600">
+              <ImageIcon size={28} className="mb-2" />
+              <span className="text-sm">Click to select image</span>
+            </div>
+          )}
         </div>
-        )
-      })}
+        <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleFileChange} />
+        <button
+          onClick={handleAdd}
+          disabled={uploading}
+          className="w-full bg-[#c9a84c] text-black py-2.5 rounded-lg font-semibold text-sm hover:bg-[#d4b05a] transition-colors disabled:opacity-50"
+        >
+          {uploading ? 'Uploading…' : 'Add Category'}
+        </button>
       </div>
+
+      {/* Existing */}
+      {loading ? (
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+          {[1,2,3].map(i => <div key={i} className="bg-[#141414] rounded-xl aspect-video animate-pulse" />)}
+        </div>
+      ) : entries.length === 0 ? (
+        <p className="text-center text-gray-600 py-10">No categories yet.</p>
+      ) : (
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+          {entries.map(([slug, url]) => (
+            <div key={slug} className="bg-[#141414] border border-white/5 rounded-xl overflow-hidden">
+              <div className="aspect-video">
+                <img src={url} alt={slug} className="w-full h-full object-cover" />
+              </div>
+              <div className="p-3 flex items-center justify-between">
+                <p className="text-white text-sm font-medium capitalize">{slug.replace(/-/g, ' ')}</p>
+                <button onClick={() => handleDelete(slug)} className="p-1 text-gray-600 hover:text-red-400 transition-colors">
+                  <Trash2 size={14} />
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   )
 }
