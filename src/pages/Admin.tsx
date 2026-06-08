@@ -15,23 +15,38 @@ const CATEGORIES = ['Starters', 'Mains', 'Burgers', 'Thai Food', 'Kids Menu', 'D
 function MenuImages() {
   const [images, setImages] = useState<Record<string, string>>({})
   const [uploading, setUploading] = useState<string | null>(null)
+  const [loadError, setLoadError] = useState<string | null>(null)
+  const [loadingImages, setLoadingImages] = useState(true)
   const inputRefs = useRef<Record<string, HTMLInputElement | null>>({})
 
   const loadImages = async () => {
+    setLoadingImages(true)
+    setLoadError(null)
     try {
       const folderRef = ref(storage, 'menu-categories')
       const result = await listAll(folderRef)
+      if (result.items.length === 0) {
+        setImages({})
+        return
+      }
       const entries = await Promise.all(
         result.items.map(async (item: any) => {
-          const url = await getDownloadURL(item)
-          const name = item.name.replace(/\.[^.]+$/, '').replace(/-/g, ' ')
-          const category = CATEGORIES.find(c => c.toLowerCase() === name.toLowerCase()) || name
-          return [category, url] as [string, string]
+          try {
+            const url = await getDownloadURL(item)
+            const name = item.name.replace(/\.[^.]+$/, '').replace(/-/g, ' ')
+            const category = CATEGORIES.find(c => c.toLowerCase() === name.toLowerCase()) || name
+            return [category, url] as [string, string]
+          } catch {
+            return null
+          }
         })
       )
-      setImages(Object.fromEntries(entries))
-    } catch {
-      // folder empty or doesn't exist yet
+      setImages(Object.fromEntries(entries.filter(Boolean) as [string, string][]))
+    } catch (err: any) {
+      console.error('MenuImages loadImages error:', err)
+      setLoadError(err?.message || String(err))
+    } finally {
+      setLoadingImages(false)
     }
   }
 
@@ -55,7 +70,20 @@ function MenuImages() {
   }
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+    <div>
+      <div className="flex items-center justify-between mb-4">
+        <p className="text-gray-500 text-sm">
+          {loadingImages ? 'Loading...' : loadError ? <span className="text-red-400">Error: {loadError}</span> : `${Object.keys(images).length} of ${CATEGORIES.length} images loaded`}
+        </p>
+        <button
+          onClick={loadImages}
+          disabled={loadingImages}
+          className="flex items-center gap-2 px-3 py-1.5 bg-white/5 text-gray-400 hover:text-white text-xs rounded-lg transition-colors"
+        >
+          <RefreshCw size={12} className={loadingImages ? 'animate-spin' : ''} /> Reload
+        </button>
+      </div>
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
       {CATEGORIES.map(cat => (
         <div key={cat} className="bg-[#141414] border border-white/5 rounded-xl overflow-hidden">
           <div className="aspect-video relative bg-white/3">
@@ -96,6 +124,7 @@ function MenuImages() {
           </div>
         </div>
       ))}
+      </div>
     </div>
   )
 }
