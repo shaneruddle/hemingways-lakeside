@@ -4,10 +4,10 @@ import { ref, uploadBytes, getDownloadURL, listAll } from 'firebase/storage'
 import { auth, storage } from '../lib/firebase'
 
 type User = { uid: string; email: string | null }
-import { getEnquiries, updateEnquiry, getCRMContacts, enquiryToContact, deleteCRMContact, updateCRMContact } from '../lib/firestore'
-import type { Enquiry, CRMContact } from '../types'
+import { getEnquiries, updateEnquiry, getCRMContacts, enquiryToContact, deleteCRMContact, updateCRMContact, getBlogPosts, saveBlogPost, updateBlogPost, deleteBlogPost } from '../lib/firestore'
+import type { Enquiry, CRMContact, BlogPost } from '../types'
 import { toast } from 'sonner'
-import { LogOut, Users, MessageSquare, RefreshCw, UserPlus, Trash2, Phone, Mail, Tag, ChevronDown, ChevronUp, ImageIcon, Upload } from 'lucide-react'
+import { LogOut, Users, MessageSquare, RefreshCw, UserPlus, Trash2, Phone, Mail, Tag, ChevronDown, ChevronUp, ImageIcon, Upload, ExternalLink, FileText, Edit2, Plus, X, Eye, EyeOff } from 'lucide-react'
 
 const CATEGORIES = ['Starters', 'Mains', 'Burgers', 'Thai Food', 'Kids Menu', 'Desserts', 'Drinks']
 
@@ -24,7 +24,6 @@ function MenuImages() {
       const entries = await Promise.all(
         result.items.map(async (item: any) => {
           const url = await getDownloadURL(item)
-          // match filename back to category name
           const name = item.name.replace(/\.[^.]+$/, '').replace(/-/g, ' ')
           const category = CATEGORIES.find(c => c.toLowerCase() === name.toLowerCase()) || name
           return [category, url] as [string, string]
@@ -32,7 +31,7 @@ function MenuImages() {
       )
       setImages(Object.fromEntries(entries))
     } catch {
-      // folder empty or doesn't exist yet — fine
+      // folder empty or doesn't exist yet
     }
   }
 
@@ -97,6 +96,323 @@ function MenuImages() {
           </div>
         </div>
       ))}
+    </div>
+  )
+}
+
+// ── Blog Manager ───────────────────────────────────────────────────────────────
+function BlogManager() {
+  const [posts, setPosts] = useState<BlogPost[]>([])
+  const [loading, setLoading] = useState(true)
+  const [editing, setEditing] = useState<BlogPost | null>(null)
+  const [creating, setCreating] = useState(false)
+
+  const emptyForm = {
+    title: '', slug: '', excerpt: '', content: '',
+    imageUrl: '', author: 'Hemingways Lakeside',
+    tags: [] as string[], publishedAt: new Date().toISOString().slice(0, 10),
+    published: true,
+  }
+  const [form, setForm] = useState(emptyForm)
+  const [tagInput, setTagInput] = useState('')
+
+  const load = async () => {
+    setLoading(true)
+    try {
+      setPosts(await getBlogPosts())
+    } catch {
+      toast.error('Failed to load posts')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => { load() }, [])
+
+  const slugify = (str: string) =>
+    str.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
+
+  const setField = (key: string, val: any) =>
+    setForm(f => ({ ...f, [key]: val }))
+
+  const openCreate = () => {
+    setForm(emptyForm)
+    setTagInput('')
+    setEditing(null)
+    setCreating(true)
+  }
+
+  const openEdit = (post: BlogPost) => {
+    setForm({
+      title: post.title,
+      slug: post.slug,
+      excerpt: post.excerpt,
+      content: post.content,
+      imageUrl: post.imageUrl || '',
+      author: post.author,
+      tags: post.tags,
+      publishedAt: post.publishedAt.slice(0, 10),
+      published: (post as any).published !== false,
+    })
+    setTagInput('')
+    setEditing(post)
+    setCreating(false)
+  }
+
+  const close = () => {
+    setEditing(null)
+    setCreating(false)
+  }
+
+  const addTag = () => {
+    const t = tagInput.trim()
+    if (t && !form.tags.includes(t)) {
+      setField('tags', [...form.tags, t])
+    }
+    setTagInput('')
+  }
+
+  const removeTag = (tag: string) =>
+    setField('tags', form.tags.filter((t: string) => t !== tag))
+
+  const handleSave = async () => {
+    if (!form.title) { toast.error('Title is required'); return }
+    const slug = form.slug || slugify(form.title)
+    const data = { ...form, slug, publishedAt: new Date(form.publishedAt).toISOString() }
+    try {
+      if (editing) {
+        await updateBlogPost(editing.id, data)
+        toast.success('Post updated')
+      } else {
+        await saveBlogPost(data)
+        toast.success('Post created')
+      }
+      await load()
+      close()
+    } catch {
+      toast.error('Failed to save post')
+    }
+  }
+
+  const handleDelete = async (post: BlogPost) => {
+    if (!confirm(`Delete "${post.title}"?`)) return
+    try {
+      await deleteBlogPost(post.id)
+      toast.success('Post deleted')
+      await load()
+    } catch {
+      toast.error('Failed to delete post')
+    }
+  }
+
+  const togglePublish = async (post: BlogPost) => {
+    try {
+      const published = !((post as any).published !== false)
+      await updateBlogPost(post.id, { published } as any)
+      toast.success(published ? 'Published' : 'Unpublished')
+      await load()
+    } catch {
+      toast.error('Failed to update')
+    }
+  }
+
+  if (creating || editing) {
+    return (
+      <div className="max-w-3xl">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-white font-bold text-lg">{editing ? 'Edit Post' : 'New Post'}</h2>
+          <button onClick={close} className="text-gray-500 hover:text-white p-1">
+            <X size={18} />
+          </button>
+        </div>
+
+        <div className="space-y-4">
+          <div>
+            <label className="block text-xs tracking-wider uppercase text-gray-500 mb-2">Title *</label>
+            <input
+              type="text"
+              value={form.title}
+              onChange={e => {
+                setField('title', e.target.value)
+                if (!editing) setField('slug', slugify(e.target.value))
+              }}
+              placeholder="Post title"
+              className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-[#c9a84c]/50"
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs tracking-wider uppercase text-gray-500 mb-2">Slug</label>
+              <input
+                type="text"
+                value={form.slug}
+                onChange={e => setField('slug', e.target.value)}
+                placeholder="url-friendly-slug"
+                className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-[#c9a84c]/50"
+              />
+            </div>
+            <div>
+              <label className="block text-xs tracking-wider uppercase text-gray-500 mb-2">Publish Date</label>
+              <input
+                type="date"
+                value={form.publishedAt}
+                onChange={e => setField('publishedAt', e.target.value)}
+                className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-sm text-white focus:outline-none focus:border-[#c9a84c]/50"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-xs tracking-wider uppercase text-gray-500 mb-2">Excerpt</label>
+            <textarea
+              value={form.excerpt}
+              onChange={e => setField('excerpt', e.target.value)}
+              placeholder="Short summary shown in blog listing..."
+              rows={2}
+              className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-[#c9a84c]/50 resize-none"
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs tracking-wider uppercase text-gray-500 mb-2">Content</label>
+            <textarea
+              value={form.content}
+              onChange={e => setField('content', e.target.value)}
+              placeholder="Full post content (supports line breaks)..."
+              rows={12}
+              className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-[#c9a84c]/50 resize-y font-mono"
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs tracking-wider uppercase text-gray-500 mb-2">Author</label>
+              <input
+                type="text"
+                value={form.author}
+                onChange={e => setField('author', e.target.value)}
+                className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-sm text-white focus:outline-none focus:border-[#c9a84c]/50"
+              />
+            </div>
+            <div>
+              <label className="block text-xs tracking-wider uppercase text-gray-500 mb-2">Cover Image URL</label>
+              <input
+                type="text"
+                value={form.imageUrl}
+                onChange={e => setField('imageUrl', e.target.value)}
+                placeholder="https://..."
+                className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-[#c9a84c]/50"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-xs tracking-wider uppercase text-gray-500 mb-2">Tags</label>
+            <div className="flex gap-2 mb-2 flex-wrap">
+              {form.tags.map((tag: string) => (
+                <span key={tag} className="flex items-center gap-1 text-xs bg-[#c9a84c]/10 text-[#c9a84c] px-2 py-1 rounded-full">
+                  {tag}
+                  <button onClick={() => removeTag(tag)} className="hover:text-white"><X size={10} /></button>
+                </span>
+              ))}
+            </div>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={tagInput}
+                onChange={e => setTagInput(e.target.value)}
+                onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addTag() } }}
+                placeholder="Add tag..."
+                className="flex-1 bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-sm text-white placeholder-gray-600 focus:outline-none focus:border-[#c9a84c]/50"
+              />
+              <button onClick={addTag} className="px-4 py-2 bg-white/5 text-gray-400 hover:text-white text-sm rounded-lg transition-colors">
+                Add
+              </button>
+            </div>
+          </div>
+
+          <div className="flex gap-3 pt-2">
+            <button
+              onClick={handleSave}
+              className="px-6 py-3 bg-[#c9a84c] text-black font-bold text-sm rounded-lg hover:bg-[#b8973d] transition-colors"
+            >
+              {editing ? 'Save Changes' : 'Publish Post'}
+            </button>
+            <button
+              onClick={close}
+              className="px-6 py-3 bg-white/5 text-gray-400 text-sm rounded-lg hover:text-white transition-colors"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-6">
+        <p className="text-gray-500 text-sm">{posts.length} post{posts.length !== 1 ? 's' : ''}</p>
+        <button
+          onClick={openCreate}
+          className="flex items-center gap-2 px-4 py-2 bg-[#c9a84c] text-black font-bold text-sm rounded-lg hover:bg-[#b8973d] transition-colors"
+        >
+          <Plus size={14} /> New Post
+        </button>
+      </div>
+
+      {loading ? (
+        <div className="text-center py-16 text-gray-600">Loading...</div>
+      ) : posts.length === 0 ? (
+        <div className="text-center py-16 text-gray-600">No posts yet. Create your first one!</div>
+      ) : (
+        <div className="space-y-3">
+          {posts.map(post => (
+            <div key={post.id} className="bg-[#141414] border border-white/5 rounded-xl p-5 flex items-center gap-4">
+              {post.imageUrl && (
+                <img src={post.imageUrl} alt="" className="w-16 h-16 rounded-lg object-cover shrink-0" />
+              )}
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-white font-semibold truncate">{post.title}</span>
+                  {(post as any).published === false && (
+                    <span className="text-xs bg-gray-500/20 text-gray-400 px-2 py-0.5 rounded-full">Draft</span>
+                  )}
+                </div>
+                <p className="text-gray-500 text-sm truncate">{post.excerpt}</p>
+                <div className="flex items-center gap-3 mt-1 text-xs text-gray-600">
+                  <span>{post.publishedAt.slice(0, 10)}</span>
+                  <span>{post.author}</span>
+                  {post.tags.map(t => <span key={t} className="bg-white/5 px-1.5 py-0.5 rounded">{t}</span>)}
+                </div>
+              </div>
+              <div className="flex items-center gap-1 shrink-0">
+                <button
+                  onClick={() => togglePublish(post)}
+                  title={(post as any).published === false ? 'Publish' : 'Unpublish'}
+                  className="p-2 text-gray-600 hover:text-[#c9a84c] transition-colors"
+                >
+                  {(post as any).published === false ? <Eye size={15} /> : <EyeOff size={15} />}
+                </button>
+                <button
+                  onClick={() => openEdit(post)}
+                  className="p-2 text-gray-600 hover:text-white transition-colors"
+                >
+                  <Edit2 size={15} />
+                </button>
+                <button
+                  onClick={() => handleDelete(post)}
+                  className="p-2 text-gray-600 hover:text-red-400 transition-colors"
+                >
+                  <Trash2 size={15} />
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   )
 }
@@ -377,7 +693,7 @@ function ContactCard({ contact, onRefresh }: { contact: CRMContact; onRefresh: (
 // ── Main Admin ─────────────────────────────────────────────────────────────────
 export default function Admin() {
   const [user, setUser] = useState<User | null>(null)
-  const [tab, setTab] = useState<'enquiries' | 'crm' | 'menu'>('enquiries')
+  const [tab, setTab] = useState<'enquiries' | 'crm' | 'menu' | 'blog'>('enquiries')
   const [enquiries, setEnquiries] = useState<Enquiry[]>([])
   const [contacts, setContacts] = useState<CRMContact[]>([])
   const [loading, setLoading] = useState(false)
@@ -424,6 +740,14 @@ export default function Admin() {
             <p className="text-gray-500 text-sm mt-1">Hemingways Lakeside</p>
           </div>
           <div className="flex items-center gap-3">
+            <a
+              href="https://hemingwayslakeside.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 text-gray-400 hover:text-white text-sm transition-colors"
+            >
+              <ExternalLink size={14} /> Visit Site
+            </a>
             <button
               onClick={loadData}
               disabled={loading}
@@ -456,11 +780,12 @@ export default function Admin() {
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-2 mb-6">
+        <div className="flex gap-2 mb-6 flex-wrap">
           {[
             { key: 'enquiries', label: 'Enquiries', icon: MessageSquare },
             { key: 'crm', label: 'CRM Contacts', icon: Users },
             { key: 'menu', label: 'Menu Images', icon: ImageIcon },
+            { key: 'blog', label: 'Blog', icon: FileText },
           ].map(({ key, label, icon: Icon }) => (
             <button
               key={key}
@@ -520,6 +845,9 @@ export default function Admin() {
 
         {/* Menu Images */}
         {tab === 'menu' && <MenuImages />}
+
+        {/* Blog */}
+        {tab === 'blog' && <BlogManager />}
       </div>
     </div>
   )

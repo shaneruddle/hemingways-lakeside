@@ -57,31 +57,30 @@ export default function Navbar() {
           <div className="hidden md:flex items-center gap-6">
             {navLinks.map(link =>
               link.children ? (
-                <div key={link.label} className="relative group">
-                  <button
-                    className="flex items-center gap-1 text-sm tracking-wider uppercase text-gray-300 hover:text-[#c9a84c] transition-colors"
-                    onMouseEnter={() => setEventsOpen(true)}
-                    onMouseLeave={() => setEventsOpen(false)}
-                  >
+                <div
+                  key={link.label}
+                  className="relative"
+                  onMouseEnter={() => setEventsOpen(true)}
+                  onMouseLeave={() => setEventsOpen(false)}
+                >
+                  <button className="flex items-center gap-1 text-sm tracking-wider uppercase text-gray-300 hover:text-[#c9a84c] transition-colors">
                     {link.label}
                     <ChevronDown size={14} />
                   </button>
-                  <div
-                    className={`absolute top-full left-0 mt-2 w-48 bg-black/95 border border-white/10 rounded-lg overflow-hidden transition-all duration-200 ${
-                      eventsOpen ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 -translate-y-2 pointer-events-none'
-                    }`}
-                    onMouseEnter={() => setEventsOpen(true)}
-                    onMouseLeave={() => setEventsOpen(false)}
-                  >
-                    {link.children.map(child => (
-                      <Link
-                        key={child.to}
-                        to={child.to}
-                        className="block px-4 py-3 text-sm text-gray-300 hover:text-[#c9a84c] hover:bg-white/5 transition-colors"
-                      >
-                        {child.label}
-                      </Link>
-                    ))}
+                  <div className={`absolute top-full left-0 pt-2 transition-all duration-200 ${
+                    eventsOpen ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 -translate-y-2 pointer-events-none'
+                  }`}>
+                    <div className="w-48 bg-black/95 border border-white/10 rounded-lg overflow-hidden">
+                      {link.children.map(child => (
+                        <Link
+                          key={child.to}
+                          to={child.to}
+                          className="block px-4 py-3 text-sm text-gray-300 hover:text-[#c9a84c] hover:bg-white/5 transition-colors"
+                        >
+                          {child.label}
+                        </Link>
+                      ))}
+                    </div>
                   </div>
                 </div>
               ) : (

@@ -1,7 +1,26 @@
 import { useState } from 'react'
+import emailjs from '@emailjs/browser'
 import { toast } from 'sonner'
 import { submitEnquiry } from '../lib/firestore'
 import type { Enquiry } from '../types'
+
+// EmailJS setup:
+// 1. Create account at https://emailjs.com
+// 2. Add Gmail service: account.services → Add Service → Gmail
+//    Use: info@hemingwayslakeside.com  App password: fpaf qqjw txuy usxy
+// 3. Create template with these variables:
+//    {{from_name}}, {{from_phone}}, {{from_email}}, {{enquiry_type}},
+//    {{message}}, {{event_date}}, {{guest_count}}
+//    Set "To Email" to: info@hemingwayslakeside.com
+// 4. Add to .env.local:
+//    VITE_EMAILJS_SERVICE_ID=service_xxxxxxx
+//    VITE_EMAILJS_TEMPLATE_ID=template_xxxxxxx
+//    VITE_EMAILJS_PUBLIC_KEY=xxxxxxxxxxxxxxx
+// 5. Add the same 3 vars as GitHub secrets for CI
+
+const EMAILJS_SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID
+const EMAILJS_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID
+const EMAILJS_PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY
 
 interface Props {
   type?: Enquiry['type']
@@ -39,6 +58,24 @@ export default function EnquiryForm({ type = 'general', title = 'Make an Enquiry
         date: form.date,
         guestCount: form.guestCount ? parseInt(form.guestCount) : undefined,
       })
+
+      if (EMAILJS_SERVICE_ID && EMAILJS_TEMPLATE_ID && EMAILJS_PUBLIC_KEY) {
+        await emailjs.send(
+          EMAILJS_SERVICE_ID,
+          EMAILJS_TEMPLATE_ID,
+          {
+            from_name: form.name,
+            from_phone: form.phone,
+            from_email: form.email || 'Not provided',
+            enquiry_type: type,
+            message: form.message || 'No message',
+            event_date: form.date || 'Not specified',
+            guest_count: form.guestCount || 'Not specified',
+          },
+          EMAILJS_PUBLIC_KEY
+        )
+      }
+
       toast.success("Thanks! We'll be in touch soon.")
       setForm({ name: '', phone: '', email: '', date: '', guestCount: '', message: '' })
     } catch {
