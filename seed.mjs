@@ -1,112 +1,34 @@
-// Firestore seed script via REST API — node seed.mjs
-import { readFileSync } from 'fs'
+// Firestore seed script — uses service account for auth
+// node seed.mjs
 
-// Load .env.local
-const env = Object.fromEntries(
-  readFileSync('.env.local', 'utf8')
-    .split('\n')
-    .filter(l => l.includes('='))
-    .map(l => {
-      const idx = l.indexOf('=')
-      return [l.slice(0, idx).trim(), l.slice(idx + 1).trim()]
-    })
-)
+import { initializeApp, cert } from 'firebase-admin/app'
+import { getFirestore } from 'firebase-admin/firestore'
+import { createRequire } from 'module'
 
-const PROJECT_ID = env.VITE_FIREBASE_PROJECT_ID
-const API_KEY = env.VITE_FIREBASE_API_KEY
-const BASE = `https://firestore.googleapis.com/v1/projects/${PROJECT_ID}/databases/(default)/documents`
+const require = createRequire(import.meta.url)
+const serviceAccount = require('/Users/shaneruddle/Downloads/gen-lang-client-0174805651-ee94a058741d.json')
 
-// Sign in with email/password to get an ID token for authenticated writes
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD
-
-if (!ADMIN_EMAIL || !ADMIN_PASSWORD) {
-  console.error('Usage: ADMIN_EMAIL=x ADMIN_PASSWORD=y node seed.mjs')
-  process.exit(1)
-}
-
-// Get Firebase ID token
-const authRes = await fetch(
-  `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${API_KEY}`,
-  {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email: ADMIN_EMAIL, password: ADMIN_PASSWORD, returnSecureToken: true }),
-  }
-)
-
-if (!authRes.ok) {
-  const err = await authRes.json()
-  console.error('Auth failed:', err.error?.message)
-  process.exit(1)
-}
-
-const { idToken } = await authRes.json()
-console.log('✓ Authenticated\n')
-
-// Helpers
-function toFirestore(val) {
-  if (val === null || val === undefined) return { nullValue: null }
-  if (typeof val === 'boolean') return { booleanValue: val }
-  if (typeof val === 'number') return Number.isInteger(val) ? { integerValue: String(val) } : { doubleValue: val }
-  if (typeof val === 'string') return { stringValue: val }
-  if (Array.isArray(val)) return { arrayValue: { values: val.map(toFirestore) } }
-  if (typeof val === 'object') {
-    return {
-      mapValue: {
-        fields: Object.fromEntries(Object.entries(val).map(([k, v]) => [k, toFirestore(v)])),
-      },
-    }
-  }
-  return { stringValue: String(val) }
-}
-
-async function listDocs(col) {
-  const res = await fetch(`${BASE}/${col}?key=${API_KEY}`)
-  if (!res.ok) return []
-  const data = await res.json()
-  return data.documents || []
-}
-
-async function deleteDoc(name) {
-  await fetch(`https://firestore.googleapis.com/v1/${name}`, {
-    method: 'DELETE',
-    headers: { Authorization: `Bearer ${idToken}` },
-  })
-}
-
-async function addDoc(col, fields) {
-  const res = await fetch(`${BASE}/${col}?key=${API_KEY}`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${idToken}`,
-    },
-    body: JSON.stringify({
-      fields: Object.fromEntries(Object.entries(fields).map(([k, v]) => [k, toFirestore(v)])),
-    }),
-  })
-  if (!res.ok) {
-    const err = await res.json()
-    throw new Error(JSON.stringify(err))
-  }
-}
+initializeApp({ credential: cert(serviceAccount), projectId: 'gen-lang-client-0174805651' })
+const db = getFirestore('default')
 
 async function seed(col, docs) {
-  // Clear existing
-  const existing = await listDocs(col)
-  for (const d of existing) await deleteDoc(d.name)
-  // Add new
-  for (const doc of docs) await addDoc(col, doc)
+  const existing = await db.collection(col).get()
+  const batch = db.batch()
+  existing.docs.forEach(d => batch.delete(d.ref))
+  await batch.commit()
+
+  const batch2 = db.batch()
+  docs.forEach(doc => batch2.set(db.collection(col).doc(), doc))
+  await batch2.commit()
   console.log(`✓ ${col} — ${docs.length} docs`)
 }
 
-// ── Data ──────────────────────────────────────────────────────────────────────
+// ── Menu ─────────────────────────────────────────────────────────────────────
 
 const menu = [
   { name: 'Chicken Wings', description: '8 crispy wings, BBQ or buffalo sauce, celery sticks', price: 179, category: 'Starters', available: true },
   { name: 'Garlic Bread', description: 'Toasted baguette with garlic butter', price: 89, category: 'Starters', available: true },
-  { name: 'Soup of the Day', description: "Ask your server for today's soup", price: 99, category: 'Starters', available: true },
+  { name: "Soup of the Day", description: "Ask your server for today's soup", price: 99, category: 'Starters', available: true },
   { name: 'Nachos', description: 'Tortilla chips, cheese, jalapeños, sour cream, salsa', price: 149, category: 'Starters', available: true },
   { name: 'Fish & Chips', description: 'Beer-battered cod, chunky chips, mushy peas, tartar sauce', price: 259, category: 'Mains', available: true },
   { name: 'Full English Breakfast', description: 'Eggs, bacon, sausages, beans, toast, mushrooms, tomato', price: 199, category: 'Mains', available: true },
@@ -179,14 +101,10 @@ const poolPackages = [
   },
 ]
 
-// ── Run ───────────────────────────────────────────────────────────────────────
-
 console.log('🌱 Seeding Firestore...\n')
-
 await seed('menu', menu)
 await seed('specials', specials)
 await seed('sports', sports)
 await seed('pool_packages', poolPackages)
-
-console.log('\n✅ Done! Firestore is seeded.')
+console.log('\n✅ Done!')
 process.exit(0)
