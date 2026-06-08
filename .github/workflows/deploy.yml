@@ -33,17 +33,18 @@ jobs:
           VITE_EMAILJS_TEMPLATE_ID: ${{ secrets.VITE_EMAILJS_TEMPLATE_ID }}
           VITE_EMAILJS_PUBLIC_KEY: ${{ secrets.VITE_EMAILJS_PUBLIC_KEY }}
 
-      - name: Deploy Storage Rules
-        run: |
-          echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}' > /tmp/sa.json
-          GOOGLE_APPLICATION_CREDENTIALS=/tmp/sa.json npx firebase-tools@13 deploy --only storage --project ${{ secrets.VITE_FIREBASE_PROJECT_ID }} --non-interactive 2>&1 || echo "Warning: storage rules deploy skipped (check service account permissions)"
-          rm -f /tmp/sa.json
-
-      - name: Deploy to Firebase Hosting
+      - name: Deploy to Firebase Hosting + Storage Rules
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
           channelId: live
           projectId: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
+          entryPoint: .
+
+      - name: Deploy Storage Rules
+        run: |
+          echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}' > /tmp/sa.json
+          GOOGLE_APPLICATION_CREDENTIALS=/tmp/sa.json npx firebase-tools@13 deploy --only storage --project ${{ secrets.VITE_FIREBASE_PROJECT_ID }} --non-interactive
+          rm -f /tmp/sa.json
 

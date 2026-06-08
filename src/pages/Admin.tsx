@@ -49,7 +49,10 @@ function MenuImages() {
       setNewFile(null)
       setNewPreview(null)
       await load()
-    } catch { toast.error('Upload failed') } finally { setUploading(false) }
+    } catch (err: any) {
+      console.error('Upload error:', err)
+      toast.error(`Upload failed: ${err?.message || err?.code || String(err)}`)
+    } finally { setUploading(false) }
   }
 
   const handleDelete = async (slug: string) => {
