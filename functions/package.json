@@ -1,0 +1,13 @@
+{
+  "name": "hemingways-lakeside-functions",
+  "private": true,
+  "type": "module",
+  "main": "index.js",
+  "engines": {
+    "node": "20"
+  },
+  "dependencies": {
+    "firebase-functions": "^5.1.1",
+    "nodemailer": "^6.9.16"
+  }
+}
