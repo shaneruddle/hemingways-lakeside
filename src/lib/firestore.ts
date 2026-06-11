@@ -149,7 +149,7 @@ export const getGalleryImages = async (type: GalleryImage['type']): Promise<Gall
   const snap = await getDocs(query(collection(db, 'event_galleries'), where('type', '==', type)))
   return snap.docs
     .map((d: any) => ({ id: d.id, ...d.data() } as GalleryImage))
-    .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+    .sort((a: GalleryImage, b: GalleryImage) => b.createdAt.localeCompare(a.createdAt))
 }
 
 export const addGalleryImage = async (type: GalleryImage['type'], imageUrl: string) => {
