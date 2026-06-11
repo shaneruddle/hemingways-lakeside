@@ -36,7 +36,7 @@ export default function Specials() {
           {loading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {[...Array(6)].map((_, i) => (
-                <div key={i} className="bg-[#141414] rounded-2xl aspect-[4/3] animate-pulse" />
+                <div key={i} className="bg-[#141414] rounded-2xl aspect-[210/297] animate-pulse" />
               ))}
             </div>
           ) : active.length === 0 ? (
@@ -49,7 +49,7 @@ export default function Specials() {
                   className="group relative rounded-2xl overflow-hidden border border-white/5 bg-[#141414]"
                 >
                   {special.imageUrl ? (
-                    <div className="aspect-[4/3] overflow-hidden">
+                    <div className="aspect-[210/297] overflow-hidden">
                       <img
                         src={special.imageUrl}
                         alt={special.title}
@@ -57,7 +57,7 @@ export default function Specials() {
                       />
                     </div>
                   ) : (
-                    <div className="aspect-[4/3] bg-white/3 flex items-center justify-center">
+                    <div className="aspect-[210/297] bg-white/3 flex items-center justify-center">
                       <span className="text-gray-700 text-sm">No image</span>
                     </div>
                   )}
