@@ -33,7 +33,7 @@ export default function Corporate() {
         <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-[#0d0d0d] z-10" />
         <div
           className="absolute inset-0 bg-cover bg-bottom"
-          style={{ backgroundImage: "url('/hero.webp')" }}
+          style={{ backgroundImage: "url('/hero-evening.webp')" }}
         />
         <div className="relative z-20 px-4 pb-20 pt-48 w-full">
           <div className="max-w-7xl mx-auto">

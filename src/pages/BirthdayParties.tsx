@@ -23,7 +23,7 @@ export default function BirthdayParties() {
         <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-[#0d0d0d] z-10" />
         <div
           className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: "url('/hero.webp')" }}
+          style={{ backgroundImage: "url('/hero-evening.webp')" }}
         />
         <div className="relative z-20 px-4 pb-20 pt-48 w-full">
           <div className="max-w-7xl mx-auto">
