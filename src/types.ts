@@ -65,6 +65,13 @@ export interface PoolPackage {
   imageUrl?: string
 }
 
+export interface GalleryImage {
+  id: string
+  type: 'kids' | 'birthday' | 'corporate'
+  imageUrl: string
+  createdAt: string
+}
+
 export interface Enquiry {
   id: string
   name: string

@@ -4,10 +4,118 @@ import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
 import { auth, storage } from '../lib/firebase'
 
 type User = { uid: string; email: string | null }
-import { getEnquiries, updateEnquiry, getCRMContacts, enquiryToContact, deleteCRMContact, updateCRMContact, getBlogPosts, saveBlogPost, updateBlogPost, deleteBlogPost, getMenuImages, saveMenuImage, deleteMenuImage, getSpecials, saveSpecial, updateSpecial, deleteSpecial } from '../lib/firestore'
-import type { Enquiry, CRMContact, BlogPost, Special } from '../types'
+import { getEnquiries, updateEnquiry, getCRMContacts, enquiryToContact, deleteCRMContact, updateCRMContact, getBlogPosts, saveBlogPost, updateBlogPost, deleteBlogPost, getMenuImages, saveMenuImage, deleteMenuImage, getSpecials, saveSpecial, updateSpecial, deleteSpecial, getGalleryImages, addGalleryImage, deleteGalleryImage } from '../lib/firestore'
+import type { Enquiry, CRMContact, BlogPost, Special, GalleryImage } from '../types'
 import { toast } from 'sonner'
 import { LogOut, Users, MessageSquare, RefreshCw, UserPlus, Trash2, Phone, Mail, Tag, ChevronDown, ChevronUp, ImageIcon, Upload, ExternalLink, FileText, Edit2, Plus, X, Eye, EyeOff, Star } from 'lucide-react'
+
+// ── Event Galleries ─────────────────────────────────────────────────────────────
+const GALLERY_TYPES: { key: GalleryImage['type']; label: string }[] = [
+  { key: 'kids', label: 'Kids Parties' },
+  { key: 'birthday', label: 'Adult Birthdays' },
+  { key: 'corporate', label: 'Corporate Events' },
+]
+
+function GalleryManager() {
+  const [galleryType, setGalleryType] = useState<GalleryImage['type']>('kids')
+  const [images, setImages] = useState<GalleryImage[]>([])
+  const [loading, setLoading] = useState(true)
+  const [uploading, setUploading] = useState(false)
+  const fileRef = useRef<HTMLInputElement | null>(null)
+
+  const load = async (type: GalleryImage['type']) => {
+    setLoading(true)
+    try { setImages(await getGalleryImages(type)) } finally { setLoading(false) }
+  }
+
+  useEffect(() => { load(galleryType) }, [galleryType])
+
+  const handleFiles = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || [])
+    if (files.length === 0) return
+    setUploading(true)
+    try {
+      for (const file of files) {
+        const ext = file.name.split('.').pop()
+        const path = `event-galleries/${galleryType}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`
+        const storageRef = ref(storage, path)
+        await uploadBytes(storageRef, file)
+        const url = await getDownloadURL(storageRef)
+        await addGalleryImage(galleryType, url)
+      }
+      toast.success(`${files.length} photo${files.length > 1 ? 's' : ''} uploaded`)
+      if (fileRef.current) fileRef.current.value = ''
+      await load(galleryType)
+    } catch (err: any) {
+      console.error('Gallery upload error:', err)
+      toast.error(`Upload failed: ${err?.message || err?.code || String(err)}`)
+    } finally { setUploading(false) }
+  }
+
+  const handleDelete = async (id: string) => {
+    if (!confirm('Remove this photo from the gallery?')) return
+    await deleteGalleryImage(id)
+    toast.success('Photo removed')
+    await load(galleryType)
+  }
+
+  return (
+    <div>
+      <div className="flex gap-2 mb-6 flex-wrap">
+        {GALLERY_TYPES.map(({ key, label }) => (
+          <button
+            key={key}
+            onClick={() => setGalleryType(key)}
+            className={`px-4 py-2 rounded-lg text-sm transition-colors ${
+              galleryType === key ? 'bg-white text-black font-bold' : 'bg-white/5 text-gray-400 hover:text-white'
+            }`}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
+      <div className="bg-[#141414] border border-white/5 rounded-2xl p-6 mb-6">
+        <label className="flex items-center justify-center gap-3 border-2 border-dashed border-white/10 rounded-xl py-10 cursor-pointer hover:border-[#c9a84c]/40 transition-colors">
+          <Upload size={18} className="text-[#c9a84c]" />
+          <span className="text-gray-400 text-sm">
+            {uploading ? 'Uploading…' : 'Click to upload photos (you can select multiple)'}
+          </span>
+          <input
+            ref={fileRef}
+            type="file"
+            accept="image/*"
+            multiple
+            className="hidden"
+            disabled={uploading}
+            onChange={handleFiles}
+          />
+        </label>
+      </div>
+
+      {loading ? (
+        <div className="text-center text-gray-600 py-16">Loading…</div>
+      ) : images.length === 0 ? (
+        <div className="text-center text-gray-600 py-16">No photos in this gallery yet</div>
+      ) : (
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+          {images.map(img => (
+            <div key={img.id} className="group relative aspect-square rounded-xl overflow-hidden bg-black border border-white/5">
+              <img src={img.imageUrl} alt="" className="w-full h-full object-cover" />
+              <button
+                onClick={() => handleDelete(img.id)}
+                className="absolute top-2 right-2 p-2 rounded-lg bg-black/70 text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"
+                aria-label="Delete photo"
+              >
+                <Trash2 size={14} />
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
 
 // ── Menu Images ────────────────────────────────────────────────────────────────
 function MenuImages() {
@@ -916,7 +1024,7 @@ function ContactCard({ contact, onRefresh }: { contact: CRMContact; onRefresh: (
 // ── Main Admin ─────────────────────────────────────────────────────────────────
 export default function Admin() {
   const [user, setUser] = useState<User | null>(null)
-  const [tab, setTab] = useState<'enquiries' | 'crm' | 'menu' | 'blog' | 'specials'>('enquiries')
+  const [tab, setTab] = useState<'enquiries' | 'crm' | 'menu' | 'blog' | 'specials' | 'galleries'>('enquiries')
   const [enquiries, setEnquiries] = useState<Enquiry[]>([])
   const [contacts, setContacts] = useState<CRMContact[]>([])
   const [loading, setLoading] = useState(false)
@@ -1010,6 +1118,7 @@ export default function Admin() {
             { key: 'menu', label: 'Menu Images', icon: ImageIcon },
             { key: 'blog', label: 'Blog', icon: FileText },
             { key: 'specials', label: 'Specials', icon: Star },
+            { key: 'galleries', label: 'Galleries', icon: ImageIcon },
           ].map(({ key, label, icon: Icon }) => (
             <button
               key={key}
@@ -1075,6 +1184,9 @@ export default function Admin() {
 
         {/* Specials */}
         {tab === 'specials' && <SpecialsManager />}
+
+        {/* Event Galleries */}
+        {tab === 'galleries' && <GalleryManager />}
       </div>
     </div>
   )

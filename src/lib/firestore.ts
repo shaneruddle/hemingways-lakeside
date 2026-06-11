@@ -12,7 +12,7 @@ import {
   orderBy,
 } from 'firebase/firestore'
 import { db } from './firebase'
-import type { MenuItem, Event, Special, BlogPost, SportsFixture, PoolPackage, Enquiry, CRMContact } from '../types'
+import type { MenuItem, Event, Special, BlogPost, SportsFixture, PoolPackage, Enquiry, CRMContact, GalleryImage } from '../types'
 
 // ── Menu Images ───────────────────────────────────────────────────────────────
 export const getMenuImages = async (): Promise<Record<string, string>> => {
@@ -142,6 +142,26 @@ export const getPoolPackages = async (): Promise<PoolPackage[]> => {
 
 export const savePoolPackage = async (pkg: Omit<PoolPackage, 'id'>) => {
   return addDoc(collection(db, 'pool_packages'), pkg)
+}
+
+// ── Event Galleries ───────────────────────────────────────────────────────────
+export const getGalleryImages = async (type: GalleryImage['type']): Promise<GalleryImage[]> => {
+  const snap = await getDocs(query(collection(db, 'event_galleries'), where('type', '==', type)))
+  return snap.docs
+    .map((d: any) => ({ id: d.id, ...d.data() } as GalleryImage))
+    .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+}
+
+export const addGalleryImage = async (type: GalleryImage['type'], imageUrl: string) => {
+  return addDoc(collection(db, 'event_galleries'), {
+    type,
+    imageUrl,
+    createdAt: new Date().toISOString(),
+  })
+}
+
+export const deleteGalleryImage = async (id: string) => {
+  return deleteDoc(doc(db, 'event_galleries', id))
 }
 
 // ── Enquiries ─────────────────────────────────────────────────────────────────
