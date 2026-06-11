@@ -112,6 +112,13 @@ export const getBlogPost = async (id: string): Promise<BlogPost | null> => {
   return { id: snap.id, ...snap.data() } as BlogPost
 }
 
+export const getBlogPostBySlug = async (slug: string): Promise<BlogPost | null> => {
+  const snap = await getDocs(query(collection(db, 'blog'), where('slug', '==', slug)))
+  if (snap.empty) return null
+  const d = snap.docs[0]
+  return { id: d.id, ...d.data() } as BlogPost
+}
+
 export const saveBlogPost = async (post: Omit<BlogPost, 'id'>) => {
   return addDoc(collection(db, 'blog'), post)
 }

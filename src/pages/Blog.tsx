@@ -33,7 +33,10 @@ export default function Blog() {
 
   useEffect(() => {
     getBlogPosts()
-      .then(data => { if (data.length) setPosts(data) })
+      .then(data => {
+        const published = data.filter(p => p.status !== 'draft')
+        if (published.length) setPosts(published)
+      })
       .catch(() => {})
   }, [])
 
@@ -52,7 +55,7 @@ export default function Blog() {
           {posts.map(post => (
             <Link
               key={post.id}
-              to={`/blog/${post.id}`}
+              to={`/blog/${post.slug || post.id}`}
               className="bg-[#141414] border border-white/5 rounded-2xl overflow-hidden hover:border-[#c9a84c]/20 transition-colors group"
             >
               {post.imageUrl && (

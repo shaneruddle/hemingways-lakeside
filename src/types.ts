@@ -43,6 +43,11 @@ export interface BlogPost {
   publishedAt: string
   author: string
   tags: string[]
+  metaTitle?: string
+  metaDescription?: string
+  status?: 'published' | 'draft'
+  imageSuggestion?: string
+  createdAt?: string
 }
 
 export interface SportsFixture {

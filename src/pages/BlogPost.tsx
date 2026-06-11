@@ -1,22 +1,38 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { ArrowLeft, Calendar } from 'lucide-react'
-import { getBlogPost } from '../lib/firestore'
+import { getBlogPost, getBlogPostBySlug } from '../lib/firestore'
 import type { BlogPost as BlogPostType } from '../types'
 import { format, parseISO } from 'date-fns'
 
+const setMeta = (post: BlogPostType) => {
+  document.title = post.metaTitle || post.title
+  let tag = document.querySelector('meta[name="description"]')
+  if (!tag) {
+    tag = document.createElement('meta')
+    tag.setAttribute('name', 'description')
+    document.head.appendChild(tag)
+  }
+  tag.setAttribute('content', post.metaDescription || post.excerpt || '')
+}
+
 export default function BlogPost() {
-  const { id } = useParams<{ id: string }>()
+  const { slug } = useParams<{ slug: string }>()
   const [post, setPost] = useState<BlogPostType | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    if (!id) return
-    getBlogPost(id)
-      .then(setPost)
+    if (!slug) return
+    getBlogPostBySlug(slug)
+      .then(p => p ?? getBlogPost(slug))
+      .then(p => {
+        setPost(p)
+        if (p) setMeta(p)
+      })
       .catch(() => {})
       .finally(() => setLoading(false))
-  }, [id])
+    return () => { document.title = 'Hemingways Lakeside' }
+  }, [slug])
 
   if (loading) {
     return (
@@ -34,6 +50,8 @@ export default function BlogPost() {
       </div>
     )
   }
+
+  const isHtml = /<\/?[a-z][\s\S]*>/i.test(post.content)
 
   return (
     <div>
@@ -59,11 +77,18 @@ export default function BlogPost() {
           {post.imageUrl && (
             <img src={post.imageUrl} alt={post.title} className="w-full rounded-2xl mb-8 object-cover max-h-80" />
           )}
-          <div className="prose prose-invert prose-lg max-w-none text-gray-300 leading-relaxed">
-            {post.content.split('\n').map((para, i) => (
-              <p key={i} className="mb-4">{para}</p>
-            ))}
-          </div>
+          {isHtml ? (
+            <div
+              className="blog-content text-gray-300 leading-relaxed"
+              dangerouslySetInnerHTML={{ __html: post.content }}
+            />
+          ) : (
+            <div className="text-gray-300 leading-relaxed">
+              {post.content.split('\n').map((para, i) => (
+                <p key={i} className="mb-4">{para}</p>
+              ))}
+            </div>
+          )}
         </div>
       </section>
     </div>

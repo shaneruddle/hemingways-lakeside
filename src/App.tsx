@@ -34,7 +34,7 @@ export default function App() {
           <Route path="/sports" element={<Sports />} />
           <Route path="/specials" element={<Specials />} />
           <Route path="/blog" element={<Blog />} />
-          <Route path="/blog/:id" element={<BlogPost />} />
+          <Route path="/blog/:slug" element={<BlogPost />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/location" element={<Location />} />
         </Route>
