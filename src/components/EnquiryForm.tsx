@@ -64,6 +64,8 @@ export default function EnquiryForm({ type = 'general', title = 'Make an Enquiry
           EMAILJS_SERVICE_ID,
           EMAILJS_TEMPLATE_ID,
           {
+            to_email: 'info@hemingwayslakeside.com',
+            reply_to: form.email || 'info@hemingwayslakeside.com',
             from_name: form.name,
             from_phone: form.phone,
             from_email: form.email || 'Not provided',

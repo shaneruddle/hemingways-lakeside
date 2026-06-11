@@ -17,7 +17,7 @@ export default function Location() {
           <div className="rounded-2xl overflow-hidden bg-[#141414] border border-white/5 aspect-video lg:aspect-auto">
             <iframe
               title="Hemingways Lakeside Map"
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3874.1!2d100.9!3d12.9!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zSGVtaW5nd2F5cyBMYWtlc2lkZQ!5e0!3m2!1sen!2sth!4v1620000000000!5m2!1sen!2sth"
+              src="https://www.google.com/maps?q=Hemingways+(Lakeside)+Restaurant+%26+Bar,+Pornprapanimit+Rd,+Pattaya&z=16&output=embed"
               width="100%"
               height="100%"
               style={{ border: 0, minHeight: '400px' }}
