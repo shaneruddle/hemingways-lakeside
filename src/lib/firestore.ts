@@ -81,9 +81,11 @@ export const deleteEvent = async (id: string) => {
 
 // ── Specials ──────────────────────────────────────────────────────────────────
 export const getSpecials = async (activeOnly = true): Promise<Special[]> => {
+  // No orderBy here — legacy docs without an `order` field would be excluded
+  // by Firestore. Callers sort client-side.
   const q = activeOnly
     ? query(collection(db, 'specials'), where('active', '==', true))
-    : query(collection(db, 'specials'), orderBy('order'))
+    : query(collection(db, 'specials'))
   const snap = await getDocs(q)
   return snap.docs.map((d: any) => ({ id: d.id, ...d.data() } as Special))
 }

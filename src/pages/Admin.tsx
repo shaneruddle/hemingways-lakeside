@@ -561,6 +561,7 @@ function SpecialsManager() {
   const [loading, setLoading] = useState(true)
   const [uploading, setUploading] = useState(false)
   const [editing, setEditing] = useState<Special | null>(null)
+  const [showForm, setShowForm] = useState(false)
   const [form, setForm] = useState({ title: '', imageUrl: '' })
   const [imageFile, setImageFile] = useState<File | null>(null)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
@@ -583,6 +584,7 @@ function SpecialsManager() {
     setForm({ title: '', imageUrl: '' })
     setImageFile(null)
     setImagePreview(null)
+    setShowForm(true)
   }
 
   const openEdit = (s: Special) => {
@@ -590,6 +592,7 @@ function SpecialsManager() {
     setForm({ title: s.title, imageUrl: s.imageUrl || '' })
     setImageFile(null)
     setImagePreview(s.imageUrl || null)
+    setShowForm(true)
   }
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -619,6 +622,7 @@ function SpecialsManager() {
         toast.success('Added')
       }
       setEditing(null)
+      setShowForm(false)
       setForm({ title: '', imageUrl: '' })
       setImageFile(null)
       setImagePreview(null)
@@ -642,8 +646,6 @@ function SpecialsManager() {
     setSpecials(prev => prev.filter(x => x.id !== s.id))
   }
 
-  const isFormOpen = editing !== null || (form.title !== '' || imageFile !== null || imagePreview !== null)
-
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -657,11 +659,11 @@ function SpecialsManager() {
       </div>
 
       {/* Form */}
-      {(editing !== null || form.title !== '' || imageFile || imagePreview) && (
+      {showForm && (
         <div className="bg-[#141414] border border-white/10 rounded-xl p-6 space-y-4">
           <div className="flex items-center justify-between mb-2">
             <h3 className="text-white font-semibold">{editing ? 'Edit Special' : 'New Special'}</h3>
-            <button onClick={() => { setEditing(null); setForm({ title: '', imageUrl: '' }); setImageFile(null); setImagePreview(null) }} className="text-gray-500 hover:text-white">
+            <button onClick={() => { setEditing(null); setShowForm(false); setForm({ title: '', imageUrl: '' }); setImageFile(null); setImagePreview(null) }} className="text-gray-500 hover:text-white">
               <X size={16} />
             </button>
           </div>

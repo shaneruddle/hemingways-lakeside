@@ -63,6 +63,14 @@ export default function Specials() {
                   )}
                   <div className="p-5">
                     <h3 className="text-white font-bold text-lg tracking-wide">{special.title}</h3>
+                    {special.description && (
+                      <p className="text-gray-500 text-sm mt-1">{special.description}</p>
+                    )}
+                    {special.day && (
+                      <span className="inline-block mt-3 text-xs text-[#c9a84c] bg-[#c9a84c]/10 px-2 py-0.5 rounded-full">
+                        {special.day}
+                      </span>
+                    )}
                   </div>
                 </div>
               ))}
