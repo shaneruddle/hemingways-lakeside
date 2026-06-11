@@ -26,7 +26,7 @@ export default function KidsParties() {
         <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-[#0d0d0d] z-10" />
         <div
           className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: "url('/pool.webp')" }}
+          style={{ backgroundImage: "url('/kids-hero.webp')" }}
         />
         <div className="relative z-20 px-4 pb-20 pt-48 w-full">
           <div className="max-w-7xl mx-auto">
