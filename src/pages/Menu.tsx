@@ -1,34 +1,38 @@
 import { useState, useEffect } from 'react'
-import { getMenuItems } from '../lib/firestore'
-import type { MenuItem } from '../types'
+import { X } from 'lucide-react'
+import { getMenuItems, getMenuPages } from '../lib/firestore'
+import type { MenuItem, MenuPage } from '../types'
 
-const fallbackCategories = ['Starters', 'Mains', 'Burgers', 'Thai Food', 'Desserts', 'Drinks']
-
-const fallbackItems: MenuItem[] = [
-  { id: '1', name: 'Fish & Chips', description: 'Battered cod fillet, chunky chips, mushy peas, tartar sauce', price: 259, category: 'Mains', available: true },
-  { id: '2', name: 'Full English Breakfast', description: 'Eggs, bacon, sausages, beans, toast, mushrooms, tomato', price: 199, category: 'Mains', available: true },
-  { id: '3', name: 'Classic Burger', description: 'Beef patty, cheese, lettuce, tomato, gherkin, fries', price: 229, category: 'Burgers', available: true },
-  { id: '4', name: 'Chicken Wings', description: '8 crispy wings, your choice of sauce, celery sticks', price: 179, category: 'Starters', available: true },
-  { id: '5', name: 'Pad Thai', description: 'Classic Thai noodles with your choice of chicken or prawns', price: 149, category: 'Thai Food', available: true },
-  { id: '6', name: 'Green Curry', description: 'Authentic Thai green curry, jasmine rice', price: 159, category: 'Thai Food', available: true },
-  { id: '7', name: 'Draught Beer (Pint)', description: 'Ask about our selection of draught beers and ciders', price: 99, category: 'Drinks', available: true },
-  { id: '8', name: 'Sticky Toffee Pudding', description: 'Warm pudding, toffee sauce, vanilla ice cream', price: 129, category: 'Desserts', available: true },
-]
+// Categories that have no designed menu page and render as text cards
+const TEXT_CATEGORIES = ['Desserts', 'Drinks']
 
 export default function Menu() {
-  const [items, setItems] = useState<MenuItem[]>(fallbackItems)
+  const [pages, setPages] = useState<MenuPage[]>([])
+  const [items, setItems] = useState<MenuItem[]>([])
   const [activeCategory, setActiveCategory] = useState('All')
   const [loading, setLoading] = useState(true)
+  const [lightbox, setLightbox] = useState<MenuPage | null>(null)
 
   useEffect(() => {
-    getMenuItems()
-      .then(data => { if (data.length) setItems(data) })
-      .catch(() => {})
+    Promise.all([
+      getMenuPages().catch(() => [] as MenuPage[]),
+      getMenuItems().catch(() => [] as MenuItem[]),
+    ])
+      .then(([p, i]) => { setPages(p); setItems(i) })
       .finally(() => setLoading(false))
   }, [])
 
-  const categories = ['All', ...Array.from(new Set(items.map(i => i.category)))]
-  const filtered = activeCategory === 'All' ? items : items.filter(i => i.category === activeCategory)
+  const imageGroups = Array.from(new Set(pages.map(p => p.group)))
+  const textCategories = TEXT_CATEGORIES.filter(c => items.some(i => i.category === c && i.available))
+  const categories = ['All', ...imageGroups, ...textCategories]
+
+  const visiblePages =
+    activeCategory === 'All' ? pages :
+    imageGroups.includes(activeCategory) ? pages.filter(p => p.group === activeCategory) : []
+
+  const visibleItems =
+    activeCategory === 'All' ? items.filter(i => TEXT_CATEGORIES.includes(i.category) && i.available) :
+    TEXT_CATEGORIES.includes(activeCategory) ? items.filter(i => i.category === activeCategory && i.available) : []
 
   return (
     <div>
@@ -62,33 +66,95 @@ export default function Menu() {
         </div>
       </section>
 
-      {/* Items */}
+      {/* Designed menu pages */}
       <section className="py-16 px-4">
         <div className="max-w-7xl mx-auto">
           {loading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {[...Array(6)].map((_, i) => (
-                <div key={i} className="bg-[#141414] rounded-2xl h-36 animate-pulse" />
+                <div key={i} className="bg-[#141414] rounded-2xl aspect-[2/3] animate-pulse" />
               ))}
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {filtered.filter(i => i.available).map(item => (
-                <div key={item.id} className="bg-[#141414] border border-white/5 rounded-2xl p-6 hover:border-[#c9a84c]/20 transition-colors">
-                  <div className="flex justify-between items-start gap-4">
-                    <div className="flex-1">
-                      <span className="text-xs text-[#c9a84c] tracking-wider uppercase">{item.category}</span>
-                      <h3 className="text-white font-bold mt-1 mb-1">{item.name}</h3>
-                      <p className="text-gray-500 text-sm leading-relaxed">{item.description}</p>
-                    </div>
-                    <span className="text-[#c9a84c] font-bold text-lg shrink-0">฿{item.price}</span>
-                  </div>
+            <>
+              {visiblePages.length > 0 && (
+                <div className={`grid grid-cols-1 gap-6 ${
+                  visiblePages.length === 1
+                    ? 'max-w-2xl mx-auto'
+                    : 'md:grid-cols-2 lg:grid-cols-3'
+                }`}>
+                  {visiblePages.map(page => (
+                    <button
+                      key={page.id}
+                      onClick={() => setLightbox(page)}
+                      className="group relative rounded-2xl overflow-hidden border border-white/10 hover:border-[#c9a84c]/40 transition-colors cursor-pointer bg-[#141414]"
+                    >
+                      <img
+                        src={page.imageUrl}
+                        alt={`${page.name} menu`}
+                        loading="lazy"
+                        className="w-full h-auto"
+                      />
+                    </button>
+                  ))}
                 </div>
-              ))}
-            </div>
+              )}
+
+              {/* Text categories (Desserts / Drinks) */}
+              {visibleItems.length > 0 && (
+                <div className={visiblePages.length > 0 ? 'mt-16' : ''}>
+                  {TEXT_CATEGORIES.filter(c => visibleItems.some(i => i.category === c)).map(cat => (
+                    <div key={cat} className="mb-12">
+                      <div className="flex items-center gap-4 mb-6">
+                        <h2 className="text-2xl font-bold">{cat}</h2>
+                        <div className="flex-1 h-px bg-white/10" />
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {visibleItems.filter(i => i.category === cat).map(item => (
+                          <div key={item.id} className="bg-[#141414] border border-white/5 rounded-2xl p-6 hover:border-[#c9a84c]/20 transition-colors">
+                            <div className="flex justify-between items-start gap-4">
+                              <div className="flex-1">
+                                <h3 className="text-white font-bold mb-1">{item.name}</h3>
+                                <p className="text-gray-500 text-sm leading-relaxed">{item.description}</p>
+                              </div>
+                              <span className="text-[#c9a84c] font-bold text-lg shrink-0">฿{item.price}</span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {visiblePages.length === 0 && visibleItems.length === 0 && (
+                <div className="text-center text-gray-600 py-16">Nothing in this category yet</div>
+              )}
+            </>
           )}
         </div>
       </section>
+
+      {/* Lightbox */}
+      {lightbox && (
+        <div
+          className="fixed inset-0 z-50 bg-black/95 flex items-start md:items-center justify-center p-4 overflow-y-auto"
+          onClick={() => setLightbox(null)}
+        >
+          <button
+            onClick={() => setLightbox(null)}
+            className="fixed top-6 right-6 z-50 text-white/70 hover:text-white"
+            aria-label="Close"
+          >
+            <X size={32} />
+          </button>
+          <img
+            src={lightbox.imageUrl}
+            alt={`${lightbox.name} menu`}
+            className="max-w-full md:max-h-[95vh] md:object-contain rounded-lg"
+          />
+        </div>
+      )}
 
       {/* Note */}
       <section className="py-8 px-4 text-center border-t border-white/5">

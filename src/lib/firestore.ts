@@ -12,7 +12,7 @@ import {
   orderBy,
 } from 'firebase/firestore'
 import { db } from './firebase'
-import type { MenuItem, Event, Special, BlogPost, SportsFixture, PoolPackage, Enquiry, CRMContact, GalleryImage } from '../types'
+import type { MenuItem, Event, Special, BlogPost, SportsFixture, PoolPackage, Enquiry, CRMContact, GalleryImage, MenuPage } from '../types'
 
 // ── Menu Images ───────────────────────────────────────────────────────────────
 export const getMenuImages = async (): Promise<Record<string, string>> => {
@@ -20,6 +20,14 @@ export const getMenuImages = async (): Promise<Record<string, string>> => {
   const result: Record<string, string> = {}
   snap.docs.forEach((d: any) => { result[d.id] = d.data().imageUrl })
   return result
+}
+
+export const getMenuPages = async (): Promise<MenuPage[]> => {
+  const snap = await getDocs(collection(db, 'menu_images'))
+  return snap.docs
+    .map((d: any) => ({ id: d.id, ...d.data() } as MenuPage))
+    .filter((p: MenuPage) => p.group && p.imageUrl)
+    .sort((a: MenuPage, b: MenuPage) => (a.order ?? 99) - (b.order ?? 99))
 }
 
 export const saveMenuImage = async (slug: string, imageUrl: string) => {
