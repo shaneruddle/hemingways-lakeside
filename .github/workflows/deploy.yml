@@ -42,9 +42,9 @@ jobs:
           projectId: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
           entryPoint: .
 
-      - name: Deploy Storage Rules
+      - name: Deploy Firestore + Storage Rules
         run: |
           echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}' > /tmp/sa.json
-          GOOGLE_APPLICATION_CREDENTIALS=/tmp/sa.json npx firebase-tools@13 deploy --only storage --project ${{ secrets.VITE_FIREBASE_PROJECT_ID }} --non-interactive
+          GOOGLE_APPLICATION_CREDENTIALS=/tmp/sa.json npx firebase-tools@13 deploy --only firestore:rules,storage --project ${{ secrets.VITE_FIREBASE_PROJECT_ID }} --non-interactive
           rm -f /tmp/sa.json
 
