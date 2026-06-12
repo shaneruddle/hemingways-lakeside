@@ -29,7 +29,7 @@ export default function Sports() {
         <div className="absolute inset-0 bg-gradient-to-b from-black/55 via-black/35 to-[#0d0d0d] z-10" />
         <div
           className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: "url('/hero-evening.webp')" }}
+          style={{ backgroundImage: "url('/sports-hero.webp')" }}
         />
         <div className="relative z-20 px-4 pb-20 pt-48 w-full">
           <div className="max-w-7xl mx-auto">
