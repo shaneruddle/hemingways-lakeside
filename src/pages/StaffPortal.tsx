@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'firebase/auth'
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from 'firebase/auth'
 import { toast, Toaster } from 'sonner'
 import { Search, LogOut } from 'lucide-react'
 import { auth } from '../lib/firebase'
@@ -10,19 +10,30 @@ import {
   updateLoyaltyCustomer,
   saveLoyaltyCustomer,
   getUserProfile,
+  saveUserProfile,
 } from '../lib/firestore'
 import { logActivity } from '../utils/logger'
 import type { LoyaltyCustomer, LoyaltyTransaction, LoyaltyTxType } from '../types'
 
 const BONUS_RATE = 0.10
 
-// ─── Login Screen ─────────────────────────────────────────────────────────────
+const inputClass = 'w-full bg-white/5 border border-white/10 text-white rounded-lg px-4 py-3 placeholder-gray-500 text-sm focus:outline-none focus:border-[#c9a84c]/50'
+
+// ─── Login / Register Screen ───────────────────────────────────────────────────
 function LoginScreen({ onLogin }: { onLogin: () => void }) {
+  const [mode, setMode] = useState<'login' | 'register'>('login')
+  const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [confirm, setConfirm] = useState('')
   const [loading, setLoading] = useState(false)
 
-  const submit = async (e: React.FormEvent) => {
+  const switchMode = (next: 'login' | 'register') => {
+    setMode(next)
+    setName(''); setEmail(''); setPassword(''); setConfirm('')
+  }
+
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
     try {
@@ -30,12 +41,41 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
       const profile = await getUserProfile(cred.user.uid)
       if (!profile || (profile.role !== 'admin' && profile.role !== 'manager' && profile.role !== 'staff')) {
         await signOut(auth)
-        toast.error('Access denied')
+        toast.error('Access denied — ask your manager to approve your account')
         return
       }
       onLogin()
     } catch {
-      toast.error('Invalid credentials')
+      toast.error('Invalid email or password')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleRegister = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!name.trim()) return toast.error('Name is required')
+    if (password.length < 6) return toast.error('Password must be at least 6 characters')
+    if (password !== confirm) return toast.error('Passwords do not match')
+    setLoading(true)
+    try {
+      const cred = await createUserWithEmailAndPassword(auth, email, password)
+      await saveUserProfile(cred.user.uid, {
+        uid: cred.user.uid,
+        email,
+        displayName: name.trim(),
+        role: 'staff',
+        createdAt: new Date().toISOString(),
+      })
+      await logActivity('Staff registered', `${name.trim()} (${email})`, 'user')
+      onLogin()
+      toast.success('Account created!')
+    } catch (err: any) {
+      if (err?.code === 'auth/email-already-in-use') {
+        toast.error('An account with this email already exists')
+      } else {
+        toast.error('Registration failed — try again')
+      }
     } finally {
       setLoading(false)
     }
@@ -48,31 +88,45 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
           <h1 className="text-2xl font-bold text-white">Hemingways Lakeside</h1>
           <p className="text-gray-400 text-sm mt-1">Staff Portal</p>
         </div>
-        <form onSubmit={submit} className="space-y-4">
-          <input
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={e => setEmail(e.target.value)}
-            className="w-full bg-white/5 border border-white/10 text-white rounded-lg px-4 py-3 placeholder-gray-500 text-sm"
-            required
-          />
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={e => setPassword(e.target.value)}
-            className="w-full bg-white/5 border border-white/10 text-white rounded-lg px-4 py-3 placeholder-gray-500 text-sm"
-            required
-          />
+
+        {/* Mode toggle */}
+        <div className="flex bg-white/5 rounded-lg p-1 mb-6">
           <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-[#c9a84c] hover:bg-[#b8973b] text-black font-semibold py-3 rounded-lg transition-colors disabled:opacity-50"
+            type="button"
+            onClick={() => switchMode('login')}
+            className={`flex-1 py-2 rounded-md text-sm font-medium transition-colors ${mode === 'login' ? 'bg-[#c9a84c] text-black' : 'text-gray-400 hover:text-white'}`}
           >
-            {loading ? 'Signing in...' : 'Sign In'}
+            Sign In
           </button>
-        </form>
+          <button
+            type="button"
+            onClick={() => switchMode('register')}
+            className={`flex-1 py-2 rounded-md text-sm font-medium transition-colors ${mode === 'register' ? 'bg-[#c9a84c] text-black' : 'text-gray-400 hover:text-white'}`}
+          >
+            Register
+          </button>
+        </div>
+
+        {mode === 'login' ? (
+          <form onSubmit={handleLogin} className="space-y-4">
+            <input type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} className={inputClass} required />
+            <input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} className={inputClass} required />
+            <button type="submit" disabled={loading} className="w-full bg-[#c9a84c] hover:bg-[#b8973b] text-black font-semibold py-3 rounded-lg transition-colors disabled:opacity-50">
+              {loading ? 'Signing in...' : 'Sign In'}
+            </button>
+          </form>
+        ) : (
+          <form onSubmit={handleRegister} className="space-y-4">
+            <input type="text" placeholder="Full Name" value={name} onChange={e => setName(e.target.value)} className={inputClass} required />
+            <input type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} className={inputClass} required />
+            <input type="password" placeholder="Password (min 6 chars)" value={password} onChange={e => setPassword(e.target.value)} className={inputClass} required />
+            <input type="password" placeholder="Confirm Password" value={confirm} onChange={e => setConfirm(e.target.value)} className={inputClass} required />
+            <button type="submit" disabled={loading} className="w-full bg-[#c9a84c] hover:bg-[#b8973b] text-black font-semibold py-3 rounded-lg transition-colors disabled:opacity-50">
+              {loading ? 'Creating account...' : 'Create Account'}
+            </button>
+            <p className="text-gray-600 text-xs text-center">Your account will have staff-level access.</p>
+          </form>
+        )}
       </div>
     </div>
   )
