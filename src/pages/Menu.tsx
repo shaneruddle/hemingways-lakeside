@@ -1,38 +1,27 @@
 import { useState, useEffect } from 'react'
 import { X } from 'lucide-react'
-import { getMenuItems, getMenuPages } from '../lib/firestore'
-import type { MenuItem, MenuPage } from '../types'
-
-// Categories that have no designed menu page and render as text cards
-const TEXT_CATEGORIES = ['Desserts', 'Drinks']
+import { getMenuPages } from '../lib/firestore'
+import type { MenuPage } from '../types'
 
 export default function Menu() {
   const [pages, setPages] = useState<MenuPage[]>([])
-  const [items, setItems] = useState<MenuItem[]>([])
   const [activeCategory, setActiveCategory] = useState('All')
   const [loading, setLoading] = useState(true)
   const [lightbox, setLightbox] = useState<MenuPage | null>(null)
 
   useEffect(() => {
-    Promise.all([
-      getMenuPages().catch(() => [] as MenuPage[]),
-      getMenuItems().catch(() => [] as MenuItem[]),
-    ])
-      .then(([p, i]) => { setPages(p); setItems(i) })
+    getMenuPages()
+      .catch(() => [] as MenuPage[])
+      .then(p => setPages(p))
       .finally(() => setLoading(false))
   }, [])
 
   const imageGroups = Array.from(new Set(pages.map(p => p.group)))
-  const textCategories = TEXT_CATEGORIES.filter(c => items.some(i => i.category === c && i.available))
-  const categories = ['All', ...imageGroups, ...textCategories]
+  const categories = ['All', ...imageGroups]
 
   const visiblePages =
     activeCategory === 'All' ? pages :
-    imageGroups.includes(activeCategory) ? pages.filter(p => p.group === activeCategory) : []
-
-  const visibleItems =
-    activeCategory === 'All' ? items.filter(i => TEXT_CATEGORIES.includes(i.category) && i.available) :
-    TEXT_CATEGORIES.includes(activeCategory) ? items.filter(i => i.category === activeCategory && i.available) : []
+    pages.filter(p => p.group === activeCategory)
 
   return (
     <div>
@@ -100,34 +89,7 @@ export default function Menu() {
                 </div>
               )}
 
-              {/* Text categories (Desserts / Drinks) */}
-              {visibleItems.length > 0 && (
-                <div className={visiblePages.length > 0 ? 'mt-16' : ''}>
-                  {TEXT_CATEGORIES.filter(c => visibleItems.some(i => i.category === c)).map(cat => (
-                    <div key={cat} className="mb-12">
-                      <div className="flex items-center gap-4 mb-6">
-                        <h2 className="text-2xl font-bold">{cat}</h2>
-                        <div className="flex-1 h-px bg-white/10" />
-                      </div>
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {visibleItems.filter(i => i.category === cat).map(item => (
-                          <div key={item.id} className="bg-[#141414] border border-white/5 rounded-2xl p-6 hover:border-[#c9a84c]/20 transition-colors">
-                            <div className="flex justify-between items-start gap-4">
-                              <div className="flex-1">
-                                <h3 className="text-white font-bold mb-1">{item.name}</h3>
-                                <p className="text-gray-500 text-sm leading-relaxed">{item.description}</p>
-                              </div>
-                              <span className="text-[#c9a84c] font-bold text-lg shrink-0">฿{item.price}</span>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              {visiblePages.length === 0 && visibleItems.length === 0 && (
+              {visiblePages.length === 0 && (
                 <div className="text-center text-gray-600 py-16">Nothing in this category yet</div>
               )}
             </>

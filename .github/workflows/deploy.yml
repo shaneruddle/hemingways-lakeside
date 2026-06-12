@@ -47,9 +47,9 @@ jobs:
           GOOGLE_APPLICATION_CREDENTIALS=/tmp/sa.json npx firebase-tools@13 deploy --only functions --project ${{ secrets.VITE_FIREBASE_PROJECT_ID }} --non-interactive --force
           rm -f /tmp/sa.json functions/.env
 
-      - name: Deploy Firestore + Storage Rules
+      - name: Deploy Firestore Rules
         run: |
           echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}' > /tmp/sa.json
-          GOOGLE_APPLICATION_CREDENTIALS=/tmp/sa.json npx firebase-tools@13 deploy --only firestore:rules,storage --project ${{ secrets.VITE_FIREBASE_PROJECT_ID }} --non-interactive
+          GOOGLE_APPLICATION_CREDENTIALS=/tmp/sa.json npx firebase-tools@13 deploy --only firestore:rules --project ${{ secrets.VITE_FIREBASE_PROJECT_ID }} --non-interactive
           rm -f /tmp/sa.json
 
