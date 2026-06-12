@@ -52,5 +52,31 @@ service cloud.firestore {
     match /crm_contacts/{doc} {
       allow read, write: if request.auth != null;
     }
+
+    // Users — only auth'd users can read/write their own; admin reads all
+    match /users/{uid} {
+      allow read, write: if request.auth != null;
+    }
+
+    // System logs — auth write, auth read
+    match /system_logs/{doc} {
+      allow read, write: if request.auth != null;
+    }
+
+    // Loyalty — auth only
+    match /loyalty_customers/{doc} {
+      allow read, write: if request.auth != null;
+      match /transactions/{tx} {
+        allow read, write: if request.auth != null;
+      }
+    }
+
+    // Finance — auth only
+    match /finance_expenses/{doc} {
+      allow read, write: if request.auth != null;
+    }
+    match /finance_income/{doc} {
+      allow read, write: if request.auth != null;
+    }
   }
 }

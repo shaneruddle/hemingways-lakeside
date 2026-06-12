@@ -7,8 +7,12 @@ type User = { uid: string; email: string | null }
 import { getEnquiries, updateEnquiry, getCRMContacts, enquiryToContact, deleteCRMContact, updateCRMContact, saveCRMContact, getBlogPosts, saveBlogPost, updateBlogPost, deleteBlogPost, getMenuImages, saveMenuImage, deleteMenuImage, getSpecials, saveSpecial, updateSpecial, deleteSpecial, getGalleryImages, addGalleryImage, deleteGalleryImage } from '../lib/firestore'
 import type { Enquiry, CRMContact, BlogPost, Special, GalleryImage } from '../types'
 import { toast } from 'sonner'
-import { LogOut, Users, MessageSquare, RefreshCw, UserPlus, Trash2, Phone, Mail, Tag, ChevronDown, ChevronUp, ImageIcon, Upload, ExternalLink, FileText, Edit2, Plus, X, Eye, EyeOff, Star, UtensilsCrossed } from 'lucide-react'
+import { LogOut, Users, MessageSquare, RefreshCw, UserPlus, Trash2, Phone, Mail, Tag, ChevronDown, ChevronUp, ImageIcon, Upload, ExternalLink, FileText, Edit2, Plus, X, Eye, EyeOff, Star, UtensilsCrossed, ScrollText, CreditCard, TrendingUp, Smartphone } from 'lucide-react'
 import MenuManager from '../components/admin/MenuManager'
+import SystemLogs from '../components/admin/SystemLogs'
+import UserManagement from '../components/admin/UserManagement'
+import LoyaltyManager from '../components/admin/LoyaltyManager'
+import FinanceManager from '../components/admin/FinanceManager'
 
 // ── Event Galleries ─────────────────────────────────────────────────────────────
 const GALLERY_TYPES: { key: GalleryImage['type']; label: string }[] = [
@@ -1144,7 +1148,7 @@ function CRMTab({ contacts, onRefresh }: { contacts: CRMContact[]; onRefresh: ()
 // ── Main Admin ─────────────────────────────────────────────────────────────────
 export default function Admin() {
   const [user, setUser] = useState<User | null>(null)
-  const [tab, setTab] = useState<'enquiries' | 'crm' | 'menu' | 'blog' | 'specials' | 'galleries' | 'digital-menu'>('enquiries')
+  const [tab, setTab] = useState<'enquiries' | 'crm' | 'menu' | 'blog' | 'specials' | 'galleries' | 'digital-menu' | 'system-logs' | 'users' | 'loyalty' | 'finance'>('enquiries')
   const [enquiries, setEnquiries] = useState<Enquiry[]>([])
   const [contacts, setContacts] = useState<CRMContact[]>([])
   const [loading, setLoading] = useState(false)
@@ -1189,6 +1193,10 @@ export default function Admin() {
     { key: 'specials', label: 'Specials', icon: Star },
     { key: 'galleries', label: 'Galleries', icon: ImageIcon },
     { key: 'digital-menu', label: 'Digital Menu', icon: UtensilsCrossed },
+    { key: 'loyalty', label: 'Loyalty', icon: CreditCard },
+    { key: 'finance', label: 'Finance', icon: TrendingUp },
+    { key: 'users', label: 'Users', icon: Users },
+    { key: 'system-logs', label: 'System Logs', icon: ScrollText },
   ] as const
 
   return (
@@ -1232,6 +1240,14 @@ export default function Admin() {
             className="flex items-center gap-2 px-3 py-2 rounded-lg text-gray-600 hover:text-white text-xs transition-colors hover:bg-white/5 w-full"
           >
             <ExternalLink size={13} /> Visit Site
+          </a>
+          <a
+            href="/staff"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 px-3 py-2 rounded-lg text-gray-600 hover:text-[#c9a84c] text-xs transition-colors hover:bg-white/5 w-full"
+          >
+            <Smartphone size={13} /> Staff Portal
           </a>
           <button
             onClick={loadData}
@@ -1314,6 +1330,18 @@ export default function Admin() {
 
           {/* Digital Menu */}
           {tab === 'digital-menu' && <MenuManager />}
+
+          {/* Loyalty */}
+          {tab === 'loyalty' && <LoyaltyManager />}
+
+          {/* Finance */}
+          {tab === 'finance' && <FinanceManager />}
+
+          {/* Users */}
+          {tab === 'users' && <UserManagement />}
+
+          {/* System Logs */}
+          {tab === 'system-logs' && <SystemLogs />}
         </div>
       </main>
     </div>

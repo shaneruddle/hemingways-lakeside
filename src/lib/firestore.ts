@@ -270,3 +270,92 @@ export const updateDigitalMenuItem = async (id: string, data: Partial<DigitalMen
 export const deleteDigitalMenuItem = async (id: string) => {
   return deleteDoc(doc(db, 'digital_menu_items', id))
 }
+
+// ── Users ─────────────────────────────────────────────────────────────────────
+export const getUserProfile = async (uid: string): Promise<import('../types').UserProfile | null> => {
+  const snap = await getDoc(doc(db, 'users', uid))
+  if (!snap.exists()) return null
+  return { id: snap.id, ...snap.data() } as import('../types').UserProfile
+}
+
+export const saveUserProfile = async (uid: string, data: Omit<import('../types').UserProfile, 'id'>) => {
+  return setDoc(doc(db, 'users', uid), data, { merge: true })
+}
+
+export const getUsers = async (): Promise<import('../types').UserProfile[]> => {
+  const snap = await getDocs(query(collection(db, 'users'), orderBy('createdAt', 'desc')))
+  return snap.docs.map((d: any) => ({ id: d.id, ...d.data() } as import('../types').UserProfile))
+}
+
+export const updateUserRole = async (uid: string, role: import('../types').UserProfile['role']) => {
+  return updateDoc(doc(db, 'users', uid), { role })
+}
+
+// ── System Logs ───────────────────────────────────────────────────────────────
+export const getSystemLogs = async (limitCount = 50): Promise<import('../types').SystemLog[]> => {
+  const { limit } = await import('firebase/firestore')
+  const snap = await getDocs(query(collection(db, 'system_logs'), orderBy('timestamp', 'desc'), limit(limitCount)))
+  return snap.docs.map((d: any) => ({ id: d.id, ...d.data() } as import('../types').SystemLog))
+}
+
+// ── Loyalty Customers ────────────────────────────────────────────────────────
+export const getLoyaltyCustomers = async (): Promise<import('../types').LoyaltyCustomer[]> => {
+  const snap = await getDocs(query(collection(db, 'loyalty_customers'), orderBy('createdAt', 'desc')))
+  return snap.docs.map((d: any) => ({ id: d.id, ...d.data() } as import('../types').LoyaltyCustomer))
+}
+
+export const saveLoyaltyCustomer = async (data: Omit<import('../types').LoyaltyCustomer, 'id'>) => {
+  return addDoc(collection(db, 'loyalty_customers'), data)
+}
+
+export const updateLoyaltyCustomer = async (id: string, data: Partial<import('../types').LoyaltyCustomer>) => {
+  return updateDoc(doc(db, 'loyalty_customers', id), data)
+}
+
+export const deleteLoyaltyCustomer = async (id: string) => {
+  return deleteDoc(doc(db, 'loyalty_customers', id))
+}
+
+export const getLoyaltyTransactions = async (customerId: string): Promise<import('../types').LoyaltyTransaction[]> => {
+  const snap = await getDocs(
+    query(collection(db, 'loyalty_customers', customerId, 'transactions'), orderBy('timestamp', 'desc'))
+  )
+  return snap.docs.map((d: any) => ({ id: d.id, ...d.data() } as import('../types').LoyaltyTransaction))
+}
+
+export const addLoyaltyTransaction = async (customerId: string, tx: Omit<import('../types').LoyaltyTransaction, 'id'>) => {
+  return addDoc(collection(db, 'loyalty_customers', customerId, 'transactions'), tx)
+}
+
+// ── Finance ───────────────────────────────────────────────────────────────────
+export const getExpenses = async (month?: string): Promise<import('../types').Expense[]> => {
+  const q = month
+    ? query(collection(db, 'finance_expenses'), where('date', '>=', `${month}-01`), where('date', '<=', `${month}-31`), orderBy('date', 'desc'))
+    : query(collection(db, 'finance_expenses'), orderBy('date', 'desc'))
+  const snap = await getDocs(q)
+  return snap.docs.map((d: any) => ({ id: d.id, ...d.data() } as import('../types').Expense))
+}
+
+export const saveExpense = async (data: Omit<import('../types').Expense, 'id'>) => {
+  return addDoc(collection(db, 'finance_expenses'), data)
+}
+
+export const deleteExpense = async (id: string) => {
+  return deleteDoc(doc(db, 'finance_expenses', id))
+}
+
+export const getIncome = async (month?: string): Promise<import('../types').Income[]> => {
+  const q = month
+    ? query(collection(db, 'finance_income'), where('date', '>=', `${month}-01`), where('date', '<=', `${month}-31`), orderBy('date', 'desc'))
+    : query(collection(db, 'finance_income'), orderBy('date', 'desc'))
+  const snap = await getDocs(q)
+  return snap.docs.map((d: any) => ({ id: d.id, ...d.data() } as import('../types').Income))
+}
+
+export const saveIncome = async (data: Omit<import('../types').Income, 'id'>) => {
+  return addDoc(collection(db, 'finance_income'), data)
+}
+
+export const deleteIncome = async (id: string) => {
+  return deleteDoc(doc(db, 'finance_income', id))
+}

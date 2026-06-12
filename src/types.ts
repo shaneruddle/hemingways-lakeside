@@ -99,6 +99,80 @@ export interface Enquiry {
   createdAt: string
 }
 
+// ── Auth / Users ──────────────────────────────────────────────────────────────
+export interface UserProfile {
+  id: string
+  uid: string
+  email: string
+  displayName?: string
+  role: 'admin' | 'manager' | 'staff'
+  createdAt: string
+  lastLogin?: string
+}
+
+// ── System Logs ───────────────────────────────────────────────────────────────
+export type LogCategory = 'menu' | 'finance' | 'user' | 'loyalty' | 'crm' | 'system' | 'specials' | 'blog' | 'gallery'
+
+export interface SystemLog {
+  id: string
+  action: string
+  details: string
+  category: LogCategory
+  userEmail: string
+  userId: string
+  timestamp: string
+}
+
+// ── Loyalty ───────────────────────────────────────────────────────────────────
+export interface LoyaltyCustomer {
+  id: string
+  name: string
+  phone: string
+  email?: string
+  balance: number
+  loyaltyEnabled: boolean
+  createdAt: string
+  enrolledAt?: string
+}
+
+export type LoyaltyTxType = 'TOP_UP' | 'REDEEM' | 'BONUS' | 'ADJUSTMENT'
+
+export interface LoyaltyTransaction {
+  id: string
+  type: LoyaltyTxType
+  amount: number
+  bonus?: number
+  balanceAfter: number
+  details: string
+  processedBy: string
+  timestamp: string
+}
+
+// ── Finance ───────────────────────────────────────────────────────────────────
+export type ExpenseCategory = 'food' | 'drinks' | 'utilities' | 'staff' | 'equipment' | 'rent' | 'marketing' | 'repairs' | 'other'
+export type IncomeCategory = 'food' | 'drinks' | 'events' | 'pool' | 'other'
+
+export interface Expense {
+  id: string
+  date: string
+  category: ExpenseCategory
+  description: string
+  amount: number
+  notes?: string
+  loggedBy: string
+  createdAt: string
+}
+
+export interface Income {
+  id: string
+  date: string
+  category: IncomeCategory
+  amount: number
+  notes?: string
+  loggedBy: string
+  createdAt: string
+}
+
 export interface DigitalMenuCategory {
   id: string
   name: string

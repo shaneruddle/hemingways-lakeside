@@ -15,6 +15,7 @@ import Contact from './pages/Contact'
 import Location from './pages/Location'
 import Admin from './pages/Admin'
 import DigitalMenu from './pages/DigitalMenu'
+import StaffPortal from './pages/StaffPortal'
 
 export default function App() {
   return (
@@ -25,6 +26,9 @@ export default function App() {
 
         {/* Digital menu — standalone, no navbar/footer */}
         <Route path="/digital-menu" element={<DigitalMenu />} />
+
+        {/* Staff portal — standalone, own auth */}
+        <Route path="/staff" element={<StaffPortal />} />
 
         {/* Public routes with Navbar + Footer */}
         <Route element={<Layout />}>
