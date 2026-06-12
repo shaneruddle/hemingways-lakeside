@@ -4,7 +4,7 @@ import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
 import { auth, storage } from '../lib/firebase'
 
 type User = { uid: string; email: string | null }
-import { getEnquiries, updateEnquiry, getCRMContacts, enquiryToContact, deleteCRMContact, updateCRMContact, getBlogPosts, saveBlogPost, updateBlogPost, deleteBlogPost, getMenuImages, saveMenuImage, deleteMenuImage, getSpecials, saveSpecial, updateSpecial, deleteSpecial, getGalleryImages, addGalleryImage, deleteGalleryImage } from '../lib/firestore'
+import { getEnquiries, updateEnquiry, getCRMContacts, enquiryToContact, deleteCRMContact, updateCRMContact, saveCRMContact, getBlogPosts, saveBlogPost, updateBlogPost, deleteBlogPost, getMenuImages, saveMenuImage, deleteMenuImage, getSpecials, saveSpecial, updateSpecial, deleteSpecial, getGalleryImages, addGalleryImage, deleteGalleryImage } from '../lib/firestore'
 import type { Enquiry, CRMContact, BlogPost, Special, GalleryImage } from '../types'
 import { toast } from 'sonner'
 import { LogOut, Users, MessageSquare, RefreshCw, UserPlus, Trash2, Phone, Mail, Tag, ChevronDown, ChevronUp, ImageIcon, Upload, ExternalLink, FileText, Edit2, Plus, X, Eye, EyeOff, Star } from 'lucide-react'
@@ -1023,6 +1023,123 @@ function ContactCard({ contact, onRefresh }: { contact: CRMContact; onRefresh: (
   )
 }
 
+// ── CRM Tab (with Add Contact) ─────────────────────────────────────────────────
+function CRMTab({ contacts, onRefresh }: { contacts: CRMContact[]; onRefresh: () => void }) {
+  const [showForm, setShowForm] = useState(false)
+  const [saving, setSaving] = useState(false)
+  const [tagInput, setTagInput] = useState('')
+  const emptyForm = { name: '', phone: '', email: '', notes: '', tags: [] as string[] }
+  const [form, setForm] = useState(emptyForm)
+
+  const setField = (k: string, v: any) => setForm(f => ({ ...f, [k]: v }))
+
+  const addTag = () => {
+    const t = tagInput.trim()
+    if (t && !form.tags.includes(t)) setField('tags', [...form.tags, t])
+    setTagInput('')
+  }
+
+  const handleSave = async () => {
+    if (!form.name.trim()) { toast.error('Name required'); return }
+    if (!form.phone.trim()) { toast.error('Phone required'); return }
+    setSaving(true)
+    try {
+      await saveCRMContact({
+        name: form.name.trim(),
+        phone: form.phone.trim(),
+        email: form.email.trim() || undefined,
+        notes: form.notes.trim(),
+        tags: form.tags,
+        source: 'manual',
+        lastContact: new Date().toISOString(),
+        createdAt: new Date().toISOString(),
+      })
+      toast.success('Contact added')
+      setForm(emptyForm)
+      setTagInput('')
+      setShowForm(false)
+      onRefresh()
+    } catch {
+      toast.error('Failed to save')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-6">
+        <p className="text-gray-500 text-sm">{contacts.length} contact{contacts.length !== 1 ? 's' : ''}</p>
+        <button
+          onClick={() => setShowForm(v => !v)}
+          className="flex items-center gap-2 px-4 py-2 bg-[#c9a84c] text-black font-bold text-sm rounded-lg hover:bg-[#b8973d] transition-colors"
+        >
+          <UserPlus size={14} /> New Contact
+        </button>
+      </div>
+
+      {showForm && (
+        <div className="bg-[#141414] border border-white/10 rounded-xl p-6 space-y-4 mb-6">
+          <div className="flex items-center justify-between">
+            <h3 className="text-white font-semibold">Add Contact</h3>
+            <button onClick={() => setShowForm(false)} className="text-gray-500 hover:text-white"><X size={16} /></button>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs text-gray-500 uppercase tracking-wider mb-1">Name *</label>
+              <input value={form.name} onChange={e => setField('name', e.target.value)} placeholder="Full name"
+                className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#c9a84c]/50" />
+            </div>
+            <div>
+              <label className="block text-xs text-gray-500 uppercase tracking-wider mb-1">Phone *</label>
+              <input value={form.phone} onChange={e => setField('phone', e.target.value)} placeholder="+66 8x xxx xxxx"
+                className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#c9a84c]/50" />
+            </div>
+          </div>
+          <div>
+            <label className="block text-xs text-gray-500 uppercase tracking-wider mb-1">Email</label>
+            <input value={form.email} onChange={e => setField('email', e.target.value)} placeholder="email@example.com" type="email"
+              className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#c9a84c]/50" />
+          </div>
+          <div>
+            <label className="block text-xs text-gray-500 uppercase tracking-wider mb-1">Tags</label>
+            <div className="flex gap-2 mb-2 flex-wrap">
+              {form.tags.map(t => (
+                <span key={t} className="flex items-center gap-1 text-xs bg-[#c9a84c]/10 text-[#c9a84c] px-2 py-1 rounded-full">
+                  {t} <button onClick={() => setField('tags', form.tags.filter((x: string) => x !== t))}><X size={10} /></button>
+                </span>
+              ))}
+            </div>
+            <div className="flex gap-2">
+              <input value={tagInput} onChange={e => setTagInput(e.target.value)}
+                onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addTag() } }}
+                placeholder="e.g. birthday, corporate" className="flex-1 bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-[#c9a84c]/50" />
+              <button onClick={addTag} className="px-3 py-2 bg-white/5 text-gray-400 hover:text-white text-sm rounded-lg">Add</button>
+            </div>
+          </div>
+          <div>
+            <label className="block text-xs text-gray-500 uppercase tracking-wider mb-1">Notes</label>
+            <textarea value={form.notes} onChange={e => setField('notes', e.target.value)} rows={3} placeholder="Any notes about this contact..."
+              className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-white text-sm resize-none focus:outline-none focus:border-[#c9a84c]/50" />
+          </div>
+          <button onClick={handleSave} disabled={saving}
+            className="w-full bg-[#c9a84c] text-black py-2.5 rounded-lg font-semibold text-sm hover:bg-[#d4b05a] transition-colors disabled:opacity-50">
+            {saving ? 'Saving…' : 'Add Contact'}
+          </button>
+        </div>
+      )}
+
+      {contacts.length === 0 ? (
+        <div className="text-center text-gray-600 py-16">No contacts yet.</div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {contacts.map(c => <ContactCard key={c.id} contact={c} onRefresh={onRefresh} />)}
+        </div>
+      )}
+    </div>
+  )
+}
+
 // ── Main Admin ─────────────────────────────────────────────────────────────────
 export default function Admin() {
   const [user, setUser] = useState<User | null>(null)
@@ -1063,133 +1180,137 @@ export default function Admin() {
 
   const newCount = enquiries.filter(e => e.status === 'new').length
 
+  const NAV_ITEMS = [
+    { key: 'enquiries', label: 'Enquiries', icon: MessageSquare, badge: newCount > 0 ? newCount : null },
+    { key: 'crm', label: 'CRM Contacts', icon: Users },
+    { key: 'menu', label: 'Menu Images', icon: ImageIcon },
+    { key: 'blog', label: 'Blog', icon: FileText },
+    { key: 'specials', label: 'Specials', icon: Star },
+    { key: 'galleries', label: 'Galleries', icon: ImageIcon },
+  ] as const
+
   return (
-    <div className="min-h-screen pt-20 px-4 py-8">
-      <div className="max-w-5xl mx-auto">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-2xl font-bold">Admin Dashboard</h1>
-            <p className="text-gray-500 text-sm mt-1">Hemingways Lakeside</p>
-          </div>
-          <div className="flex items-center gap-3">
-            <a
-              href="https://hemingwayslakeside.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 text-gray-400 hover:text-white text-sm transition-colors"
-            >
-              <ExternalLink size={14} /> Visit Site
-            </a>
-            <button
-              onClick={loadData}
-              disabled={loading}
-              className="p-2 rounded-lg bg-white/5 text-gray-400 hover:text-white transition-colors"
-            >
-              <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
-            </button>
-            <button
-              onClick={() => signOut(auth)}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 text-gray-400 hover:text-white text-sm transition-colors"
-            >
-              <LogOut size={14} /> Sign Out
-            </button>
-          </div>
+    <div className="min-h-screen pt-16 flex">
+      {/* Sidebar */}
+      <aside className="w-56 shrink-0 border-r border-white/5 bg-[#0a0a0a] flex flex-col">
+        <div className="p-6 border-b border-white/5">
+          <div className="text-[#c9a84c] font-bold text-sm tracking-widest uppercase">Hemingways</div>
+          <div className="text-gray-600 text-xs tracking-wider mt-0.5">Lakeside Admin</div>
         </div>
 
-        {/* Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          {[
-            { label: 'Total Enquiries', value: enquiries.length },
-            { label: 'New', value: newCount, highlight: newCount > 0 },
-            { label: 'Booked', value: enquiries.filter(e => e.status === 'booked').length },
-            { label: 'CRM Contacts', value: contacts.length },
-          ].map(({ label, value, highlight }) => (
-            <div key={label} className={`rounded-xl p-5 border ${highlight ? 'bg-[#c9a84c]/10 border-[#c9a84c]/30' : 'bg-[#141414] border-white/5'}`}>
-              <div className={`text-2xl font-bold ${highlight ? 'text-[#c9a84c]' : 'text-white'}`}>{value}</div>
-              <div className="text-gray-500 text-sm">{label}</div>
-            </div>
-          ))}
-        </div>
-
-        {/* Tabs */}
-        <div className="flex gap-2 mb-6 flex-wrap">
-          {[
-            { key: 'enquiries', label: 'Enquiries', icon: MessageSquare },
-            { key: 'crm', label: 'CRM Contacts', icon: Users },
-            { key: 'menu', label: 'Menu Images', icon: ImageIcon },
-            { key: 'blog', label: 'Blog', icon: FileText },
-            { key: 'specials', label: 'Specials', icon: Star },
-            { key: 'galleries', label: 'Galleries', icon: ImageIcon },
-          ].map(({ key, label, icon: Icon }) => (
+        <nav className="flex-1 py-4 space-y-0.5 px-2">
+          {NAV_ITEMS.map(({ key, label, icon: Icon, badge }: any) => (
             <button
               key={key}
-              onClick={() => setTab(key as typeof tab)}
-              className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm transition-colors ${
-                tab === key ? 'bg-[#c9a84c] text-black font-bold' : 'bg-white/5 text-gray-400 hover:text-white'
+              onClick={() => setTab(key)}
+              className={`w-full flex items-center justify-between gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${
+                tab === key
+                  ? 'bg-[#c9a84c]/10 text-[#c9a84c] font-semibold'
+                  : 'text-gray-500 hover:text-white hover:bg-white/5'
               }`}
             >
-              <Icon size={14} />
-              {label}
+              <span className="flex items-center gap-3">
+                <Icon size={15} />
+                {label}
+              </span>
+              {badge && (
+                <span className="text-xs bg-[#c9a84c] text-black font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                  {badge}
+                </span>
+              )}
             </button>
           ))}
-        </div>
+        </nav>
 
-        {/* Enquiries */}
-        {tab === 'enquiries' && (
-          <div>
-            <div className="flex gap-2 mb-4 flex-wrap">
-              {['all', 'new', 'contacted', 'booked', 'closed'].map(s => (
-                <button
-                  key={s}
-                  onClick={() => setStatusFilter(s)}
-                  className={`px-3 py-1.5 rounded-full text-xs tracking-wider uppercase transition-colors ${
-                    statusFilter === s ? 'bg-white text-black font-bold' : 'bg-white/5 text-gray-500 hover:text-white'
-                  }`}
-                >
-                  {s}
-                </button>
+        <div className="p-4 border-t border-white/5 space-y-2">
+          <a
+            href="https://hemingwayslakeside.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 px-3 py-2 rounded-lg text-gray-600 hover:text-white text-xs transition-colors hover:bg-white/5 w-full"
+          >
+            <ExternalLink size={13} /> Visit Site
+          </a>
+          <button
+            onClick={loadData}
+            disabled={loading}
+            className="flex items-center gap-2 px-3 py-2 rounded-lg text-gray-600 hover:text-white text-xs transition-colors hover:bg-white/5 w-full"
+          >
+            <RefreshCw size={13} className={loading ? 'animate-spin' : ''} /> Refresh
+          </button>
+          <button
+            onClick={() => signOut(auth)}
+            className="flex items-center gap-2 px-3 py-2 rounded-lg text-gray-600 hover:text-red-400 text-xs transition-colors hover:bg-white/5 w-full"
+          >
+            <LogOut size={13} /> Sign Out
+          </button>
+        </div>
+      </aside>
+
+      {/* Main content */}
+      <main className="flex-1 overflow-y-auto">
+        <div className="max-w-4xl mx-auto px-6 py-8">
+          {/* Stats — only on enquiries/crm */}
+          {(tab === 'enquiries' || tab === 'crm') && (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+              {[
+                { label: 'Total Enquiries', value: enquiries.length },
+                { label: 'New', value: newCount, highlight: newCount > 0 },
+                { label: 'Booked', value: enquiries.filter(e => e.status === 'booked').length },
+                { label: 'CRM Contacts', value: contacts.length },
+              ].map(({ label, value, highlight }) => (
+                <div key={label} className={`rounded-xl p-5 border ${highlight ? 'bg-[#c9a84c]/10 border-[#c9a84c]/30' : 'bg-[#141414] border-white/5'}`}>
+                  <div className={`text-2xl font-bold ${highlight ? 'text-[#c9a84c]' : 'text-white'}`}>{value}</div>
+                  <div className="text-gray-500 text-sm">{label}</div>
+                </div>
               ))}
             </div>
-            <div className="space-y-3">
-              {filteredEnquiries.length === 0 ? (
-                <div className="text-center text-gray-600 py-16">No enquiries yet</div>
-              ) : (
-                filteredEnquiries.map(e => (
-                  <EnquiryCard key={e.id} enquiry={e} onRefresh={loadData} />
-                ))
-              )}
-            </div>
-          </div>
-        )}
+          )}
 
-        {/* CRM */}
-        {tab === 'crm' && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {contacts.length === 0 ? (
-              <div className="text-center text-gray-600 py-16 col-span-2">
-                No contacts yet. Add contacts from enquiries above.
+          {/* Enquiries */}
+          {tab === 'enquiries' && (
+            <div>
+              <div className="flex gap-2 mb-4 flex-wrap">
+                {['all', 'new', 'contacted', 'booked', 'closed'].map(s => (
+                  <button
+                    key={s}
+                    onClick={() => setStatusFilter(s)}
+                    className={`px-3 py-1.5 rounded-full text-xs tracking-wider uppercase transition-colors ${
+                      statusFilter === s ? 'bg-white text-black font-bold' : 'bg-white/5 text-gray-500 hover:text-white'
+                    }`}
+                  >
+                    {s}
+                  </button>
+                ))}
               </div>
-            ) : (
-              contacts.map(c => (
-                <ContactCard key={c.id} contact={c} onRefresh={loadData} />
-              ))
-            )}
-          </div>
-        )}
+              <div className="space-y-3">
+                {filteredEnquiries.length === 0 ? (
+                  <div className="text-center text-gray-600 py-16">No enquiries yet</div>
+                ) : (
+                  filteredEnquiries.map(e => (
+                    <EnquiryCard key={e.id} enquiry={e} onRefresh={loadData} />
+                  ))
+                )}
+              </div>
+            </div>
+          )}
 
-        {/* Menu Images */}
-        {tab === 'menu' && <MenuImages />}
+          {/* CRM */}
+          {tab === 'crm' && <CRMTab contacts={contacts} onRefresh={loadData} />}
 
-        {/* Blog */}
-        {tab === 'blog' && <BlogManager />}
+          {/* Menu Images */}
+          {tab === 'menu' && <MenuImages />}
 
-        {/* Specials */}
-        {tab === 'specials' && <SpecialsManager />}
+          {/* Blog */}
+          {tab === 'blog' && <BlogManager />}
 
-        {/* Event Galleries */}
-        {tab === 'galleries' && <GalleryManager />}
-      </div>
+          {/* Specials */}
+          {tab === 'specials' && <SpecialsManager />}
+
+          {/* Event Galleries */}
+          {tab === 'galleries' && <GalleryManager />}
+        </div>
+      </main>
     </div>
   )
 }
