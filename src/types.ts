@@ -99,6 +99,26 @@ export interface Enquiry {
   createdAt: string
 }
 
+export interface DigitalMenuCategory {
+  id: string
+  name: string
+  order: number
+}
+
+export interface DigitalMenuItem {
+  id: string
+  name: string
+  description: string
+  price: string           // e.g. "295"
+  price2?: string         // optional second price (e.g. half portion)
+  price2Label?: string    // e.g. "Half"
+  priceLabel?: string     // label for main price, e.g. "Full"
+  category: string        // must match a DigitalMenuCategory name
+  imageUrl?: string
+  available: boolean
+  order: number
+}
+
 export interface CRMContact {
   id: string
   name: string

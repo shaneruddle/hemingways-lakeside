@@ -14,6 +14,7 @@ import BlogPost from './pages/BlogPost'
 import Contact from './pages/Contact'
 import Location from './pages/Location'
 import Admin from './pages/Admin'
+import DigitalMenu from './pages/DigitalMenu'
 
 export default function App() {
   return (
@@ -21,6 +22,9 @@ export default function App() {
       <Routes>
         {/* Admin — no layout wrapper */}
         <Route path="/admin" element={<Admin />} />
+
+        {/* Digital menu — standalone, no navbar/footer */}
+        <Route path="/digital-menu" element={<DigitalMenu />} />
 
         {/* Public routes with Navbar + Footer */}
         <Route element={<Layout />}>

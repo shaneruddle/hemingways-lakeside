@@ -7,7 +7,8 @@ type User = { uid: string; email: string | null }
 import { getEnquiries, updateEnquiry, getCRMContacts, enquiryToContact, deleteCRMContact, updateCRMContact, saveCRMContact, getBlogPosts, saveBlogPost, updateBlogPost, deleteBlogPost, getMenuImages, saveMenuImage, deleteMenuImage, getSpecials, saveSpecial, updateSpecial, deleteSpecial, getGalleryImages, addGalleryImage, deleteGalleryImage } from '../lib/firestore'
 import type { Enquiry, CRMContact, BlogPost, Special, GalleryImage } from '../types'
 import { toast } from 'sonner'
-import { LogOut, Users, MessageSquare, RefreshCw, UserPlus, Trash2, Phone, Mail, Tag, ChevronDown, ChevronUp, ImageIcon, Upload, ExternalLink, FileText, Edit2, Plus, X, Eye, EyeOff, Star } from 'lucide-react'
+import { LogOut, Users, MessageSquare, RefreshCw, UserPlus, Trash2, Phone, Mail, Tag, ChevronDown, ChevronUp, ImageIcon, Upload, ExternalLink, FileText, Edit2, Plus, X, Eye, EyeOff, Star, UtensilsCrossed } from 'lucide-react'
+import MenuManager from '../components/admin/MenuManager'
 
 // ── Event Galleries ─────────────────────────────────────────────────────────────
 const GALLERY_TYPES: { key: GalleryImage['type']; label: string }[] = [
@@ -1143,7 +1144,7 @@ function CRMTab({ contacts, onRefresh }: { contacts: CRMContact[]; onRefresh: ()
 // ── Main Admin ─────────────────────────────────────────────────────────────────
 export default function Admin() {
   const [user, setUser] = useState<User | null>(null)
-  const [tab, setTab] = useState<'enquiries' | 'crm' | 'menu' | 'blog' | 'specials' | 'galleries'>('enquiries')
+  const [tab, setTab] = useState<'enquiries' | 'crm' | 'menu' | 'blog' | 'specials' | 'galleries' | 'digital-menu'>('enquiries')
   const [enquiries, setEnquiries] = useState<Enquiry[]>([])
   const [contacts, setContacts] = useState<CRMContact[]>([])
   const [loading, setLoading] = useState(false)
@@ -1187,6 +1188,7 @@ export default function Admin() {
     { key: 'blog', label: 'Blog', icon: FileText },
     { key: 'specials', label: 'Specials', icon: Star },
     { key: 'galleries', label: 'Galleries', icon: ImageIcon },
+    { key: 'digital-menu', label: 'Digital Menu', icon: UtensilsCrossed },
   ] as const
 
   return (
@@ -1309,6 +1311,9 @@ export default function Admin() {
 
           {/* Event Galleries */}
           {tab === 'galleries' && <GalleryManager />}
+
+          {/* Digital Menu */}
+          {tab === 'digital-menu' && <MenuManager />}
         </div>
       </main>
     </div>

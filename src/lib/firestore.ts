@@ -12,7 +12,7 @@ import {
   orderBy,
 } from 'firebase/firestore'
 import { db } from './firebase'
-import type { MenuItem, Event, Special, BlogPost, SportsFixture, PoolPackage, Enquiry, CRMContact, GalleryImage, MenuPage } from '../types'
+import type { MenuItem, Event, Special, BlogPost, SportsFixture, PoolPackage, Enquiry, CRMContact, GalleryImage, MenuPage, DigitalMenuCategory, DigitalMenuItem } from '../types'
 
 // ── Menu Images ───────────────────────────────────────────────────────────────
 export const getMenuImages = async (): Promise<Record<string, string>> => {
@@ -233,4 +233,40 @@ export const enquiryToContact = async (enquiry: Enquiry) => {
     createdAt: new Date().toISOString(),
   })
   await updateEnquiry(enquiry.id, { status: 'contacted' })
+}
+
+// ── Digital Menu Categories ───────────────────────────────────────────────────
+export const getMenuCategories = async (): Promise<DigitalMenuCategory[]> => {
+  const snap = await getDocs(query(collection(db, 'digital_menu_categories'), orderBy('order', 'asc')))
+  return snap.docs.map((d: any) => ({ id: d.id, ...d.data() } as DigitalMenuCategory))
+}
+
+export const saveMenuCategory = async (data: Omit<DigitalMenuCategory, 'id'>) => {
+  return addDoc(collection(db, 'digital_menu_categories'), data)
+}
+
+export const updateMenuCategory = async (id: string, data: Partial<DigitalMenuCategory>) => {
+  return updateDoc(doc(db, 'digital_menu_categories', id), data)
+}
+
+export const deleteMenuCategory = async (id: string) => {
+  return deleteDoc(doc(db, 'digital_menu_categories', id))
+}
+
+// ── Digital Menu Items ────────────────────────────────────────────────────────
+export const getDigitalMenuItems = async (): Promise<DigitalMenuItem[]> => {
+  const snap = await getDocs(query(collection(db, 'digital_menu_items'), orderBy('order', 'asc')))
+  return snap.docs.map((d: any) => ({ id: d.id, ...d.data() } as DigitalMenuItem))
+}
+
+export const saveDigitalMenuItem = async (data: Omit<DigitalMenuItem, 'id'>) => {
+  return addDoc(collection(db, 'digital_menu_items'), data)
+}
+
+export const updateDigitalMenuItem = async (id: string, data: Partial<DigitalMenuItem>) => {
+  return updateDoc(doc(db, 'digital_menu_items', id), data)
+}
+
+export const deleteDigitalMenuItem = async (id: string) => {
+  return deleteDoc(doc(db, 'digital_menu_items', id))
 }
