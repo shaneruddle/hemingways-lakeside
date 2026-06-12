@@ -58,7 +58,7 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
     if (password.length < 6) return toast.error('Password must be at least 6 characters')
     if (password !== confirm) return toast.error('Passwords do not match')
     setLoading(true)
-    let uid: string | null = null
+    let uid = ''
     try {
       const cred = await createUserWithEmailAndPassword(auth, email, password)
       uid = cred.user.uid
