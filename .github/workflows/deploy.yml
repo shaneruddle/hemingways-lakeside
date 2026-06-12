@@ -49,7 +49,45 @@ jobs:
 
       - name: Deploy Firestore Rules
         run: |
+          pip install google-auth requests --quiet
           echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}' > /tmp/sa.json
-          GOOGLE_APPLICATION_CREDENTIALS=/tmp/sa.json npx firebase-tools@13 deploy --only firestore:rules --project ${{ secrets.VITE_FIREBASE_PROJECT_ID }} --non-interactive
+          python3 - << 'PYEOF'
+import json, sys, requests
+from google.oauth2 import service_account
+from google.auth.transport.requests import Request
+
+with open('/tmp/sa.json') as f:
+    sa = json.load(f)
+project_id = sa['project_id']
+print(f'Project: {project_id}')
+
+creds = service_account.Credentials.from_service_account_info(
+    sa, scopes=['https://www.googleapis.com/auth/firebase'])
+creds.refresh(Request())
+headers = {'Authorization': f'Bearer {creds.token}', 'Content-Type': 'application/json'}
+
+rules = open('firestore.rules').read()
+base = f'https://firebaserules.googleapis.com/v1/projects/{project_id}'
+
+# Create ruleset
+r = requests.post(f'{base}/rulesets', headers=headers,
+    json={'source': {'files': [{'name': 'firestore.rules', 'content': rules}]}})
+r.raise_for_status()
+ruleset_name = r.json()['name']
+print(f'Created ruleset: {ruleset_name}')
+
+# Release for named database 'default'
+# Release path: projects/{project}/releases/cloud.firestore/default
+release_path = f'{base}/releases/cloud.firestore/default'
+release_body = {'name': release_path, 'rulesetName': ruleset_name}
+
+r2 = requests.patch(f'{release_path}?updateMask=rulesetName', headers=headers,
+    json={'release': release_body})
+if r2.status_code == 404:
+    print('Release not found, creating...')
+    r2 = requests.post(f'{base}/releases', headers=headers, json=release_body)
+r2.raise_for_status()
+print(f'Rules deployed successfully: {r2.json().get("name", r2.json())}')
+PYEOF
           rm -f /tmp/sa.json
 
