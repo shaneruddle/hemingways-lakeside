@@ -25,8 +25,11 @@ export const getMenuImages = async (): Promise<Record<string, string>> => {
 export const getMenuPages = async (): Promise<MenuPage[]> => {
   const snap = await getDocs(collection(db, 'menu_images'))
   return snap.docs
-    .map((d: any) => ({ id: d.id, ...d.data() } as MenuPage))
-    .filter((p: MenuPage) => p.group && p.imageUrl)
+    .map((d: any) => {
+      const data = d.data()
+      return { id: d.id, ...data, group: data.group || d.id, name: data.name || d.id } as MenuPage
+    })
+    .filter((p: MenuPage) => p.imageUrl)
     .sort((a: MenuPage, b: MenuPage) => (a.order ?? 99) - (b.order ?? 99))
 }
 
