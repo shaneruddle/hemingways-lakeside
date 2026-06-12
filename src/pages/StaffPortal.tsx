@@ -58,10 +58,25 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
     if (password.length < 6) return toast.error('Password must be at least 6 characters')
     if (password !== confirm) return toast.error('Passwords do not match')
     setLoading(true)
+    let uid: string | null = null
     try {
       const cred = await createUserWithEmailAndPassword(auth, email, password)
-      await saveUserProfile(cred.user.uid, {
-        uid: cred.user.uid,
+      uid = cred.user.uid
+    } catch (err: any) {
+      setLoading(false)
+      const msgs: Record<string, string> = {
+        'auth/email-already-in-use': 'An account with this email already exists',
+        'auth/invalid-email': 'Invalid email address',
+        'auth/weak-password': 'Password must be at least 6 characters',
+        'auth/operation-not-allowed': 'Email registration is not enabled — contact admin',
+        'auth/network-request-failed': 'Network error — check your connection',
+      }
+      toast.error(msgs[err?.code] ?? `Registration failed (${err?.code ?? 'unknown'})`)
+      return
+    }
+    try {
+      await saveUserProfile(uid, {
+        uid,
         email,
         displayName: name.trim(),
         role: 'staff',
@@ -71,11 +86,7 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
       onLogin()
       toast.success('Account created!')
     } catch (err: any) {
-      if (err?.code === 'auth/email-already-in-use') {
-        toast.error('An account with this email already exists')
-      } else {
-        toast.error('Registration failed — try again')
-      }
+      toast.error(`Profile save failed (${err?.code ?? err?.message ?? 'unknown'}) — contact admin`)
     } finally {
       setLoading(false)
     }
