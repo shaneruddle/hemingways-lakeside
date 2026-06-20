@@ -156,18 +156,19 @@ function ItemForm({
         await uploadBytes(storageRef, imageFile)
         imageUrl = await getDownloadURL(storageRef)
       }
-      await onSave({
+      const payload: Omit<DigitalMenuItem, 'id'> = {
         name: form.name.trim(),
         description: form.description.trim(),
         price: form.price.trim(),
-        price2: form.price2.trim() || undefined,
-        price2Label: form.price2Label.trim() || undefined,
-        priceLabel: form.priceLabel.trim() || undefined,
         category: form.category,
         available: form.available,
         order: Number(form.order) || 0,
-        imageUrl: imageUrl || undefined,
-      })
+      }
+      if (form.price2.trim()) payload.price2 = form.price2.trim()
+      if (form.price2Label.trim()) payload.price2Label = form.price2Label.trim()
+      if (form.priceLabel.trim()) payload.priceLabel = form.priceLabel.trim()
+      if (imageUrl) payload.imageUrl = imageUrl
+      await onSave(payload)
     } catch (err: any) {
       toast.error(err?.message || 'Save failed')
     } finally {
