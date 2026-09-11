@@ -4,11 +4,11 @@ import Seo from '../components/Seo'
 import { HOURS_SUMMARY } from '../lib/schema'
 
 const features = [
-  { icon: Tv, label: '15 Screen TVs', desc: 'Every sport from around the world on crystal-clear displays' },
+  { icon: Waves, label: 'Free Swimming Pool', desc: 'Free with any table or bar order — no tickets, no time limits' },
+  { icon: Tv, label: '10+ Screen TVs', desc: 'Every sport from around the world on crystal-clear displays' },
   { icon: Beer, label: 'Draught Beers', desc: 'Wide selection of your favourite draught beers and ciders served cold' },
   { icon: ChefHat, label: 'Famous Pub Food', desc: 'Quality western menu and traditional Thai food — local favourites' },
   { icon: Users, label: 'English Management', desc: 'Friendly English staff ensuring top-quality service every visit' },
-  { icon: Waves, label: 'Swimming Pool', desc: 'Cool off in our pool — perfect for families and pool days' },
   { icon: PartyPopper, label: 'Private Events', desc: 'Birthdays, kids parties, corporate functions — we host it all' },
 ]
 
@@ -30,11 +30,12 @@ export default function Home() {
           style={{ backgroundImage: "url('/hero.webp')" }}
         />
         <div className="relative z-20 text-center px-4 max-w-4xl mx-auto">
-          <p className="text-[#c9a84c] text-xs tracking-[0.4em] uppercase mb-6">East Pattaya's Finest</p>
+          <p className="text-[#c9a84c] text-xs tracking-[0.4em] uppercase mb-6">Free Pool · Live Sports · On The Lake</p>
           <h1 className="text-5xl sm:text-7xl font-bold tracking-tight mb-2">HEMINGWAYS</h1>
           <h2 className="text-3xl sm:text-5xl font-light tracking-[0.2em] text-[#c9a84c] mb-6">LAKESIDE</h2>
           <p className="text-gray-300 text-lg sm:text-xl max-w-xl mx-auto mb-10 leading-relaxed">
-            Restaurant & Bar at The Lake. Live Sports. Pool. Great Food. Established 2020.
+            A free swimming pool with every meal, 10+ screens for every match, and great food
+            on the shores of Lake Mabprachan in East Pattaya.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link

@@ -12,7 +12,7 @@ interface Props {
 
 const DEFAULT_TITLE = 'Hemingways Lakeside'
 const DEFAULT_DESCRIPTION =
-  "Hemingways Lakeside — East Pattaya's best expat sports bar & restaurant. Events, birthday parties, pool days, live sports on 15 screens."
+  "East Pattaya's lakeside restaurant & sports bar — free swimming pool with dining, 10+ screens for every match, kids' playroom and event spaces."
 
 /**
  * Sets per-page <title>/meta description and injects JSON-LD structured data.
