@@ -7,8 +7,13 @@ import BirthdayParties from './pages/BirthdayParties'
 import KidsParties from './pages/KidsParties'
 import Corporate from './pages/Corporate'
 import Pool from './pages/Pool'
+import PoolParty from './pages/PoolParty'
 import FamilyKids from './pages/FamilyKids'
 import Sports from './pages/Sports'
+import BeerGarden from './pages/BeerGarden'
+import SundayRoast from './pages/SundayRoast'
+import Food from './pages/Food'
+import Christmas from './pages/Christmas'
 import Specials from './pages/Specials'
 import Blog from './pages/Blog'
 import BlogPost from './pages/BlogPost'
@@ -41,8 +46,13 @@ export default function App() {
           <Route path="/events/kids" element={<KidsParties />} />
           <Route path="/events/corporate" element={<Corporate />} />
           <Route path="/pool" element={<Pool />} />
+          <Route path="/pool-party" element={<PoolParty />} />
           <Route path="/family-kids" element={<FamilyKids />} />
           <Route path="/sports" element={<Sports />} />
+          <Route path="/beer-garden" element={<BeerGarden />} />
+          <Route path="/sunday-roast" element={<SundayRoast />} />
+          <Route path="/food" element={<Food />} />
+          <Route path="/christmas" element={<Christmas />} />
           <Route path="/specials" element={<Specials />} />
           <Route path="/blog" element={<Blog />} />
           <Route path="/blog/:slug" element={<BlogPost />} />

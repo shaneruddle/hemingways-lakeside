@@ -88,7 +88,7 @@ export default function Home() {
                 Cool off in our swimming pool while enjoying cold drinks and great food. Perfect for families, groups, and anyone who wants to make the most of the Pattaya sun.
               </p>
               <Link
-                to="/pool"
+                to="/pool-party"
                 className="inline-flex items-center gap-2 px-6 py-3 bg-[#c9a84c] text-black font-bold text-sm tracking-widest uppercase rounded hover:bg-[#b8973d] transition-colors"
               >
                 Pool Packages <ArrowRight size={16} />

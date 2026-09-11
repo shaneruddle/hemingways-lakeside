@@ -126,7 +126,7 @@ export function buildBusinessSchema() {
 export interface FaqItem {
   question: string
   answer: string
-  categories: ('general' | 'kids' | 'birthday' | 'corporate' | 'sports')[]
+  categories: ('general' | 'kids' | 'birthday' | 'corporate' | 'sports' | 'pool_party' | 'food' | 'beer_garden')[]
 }
 
 export const SITE_FAQS: FaqItem[] = [
@@ -210,6 +210,36 @@ export const SITE_FAQS: FaqItem[] = [
     answer:
       'No cover charge, ever. Normal food and drink prices apply, same as any other visit - just come in, order, and watch.',
     categories: ['sports'],
+  },
+  {
+    question: 'Do I need to book a pool day, or can I just turn up?',
+    answer:
+      "Walk-ins are always welcome. If you want a lounger reserved or you're coming as a group of 6+, call ahead on 064-240-0222 - otherwise just arrive and grab a spot.",
+    categories: ['pool_party', 'general'],
+  },
+  {
+    question: 'What do the pool packages include?',
+    answer:
+      'Three options: a Pool Day Pass (pool access, lounger and a welcome drink), Pool & Lunch (pool access, lounger, a main course and two drinks), and a Family Package (pool access for 2 adults and 2 kids, loungers and four meals). Ask your server which suits your group, or just eat/drink a la carte and the pool is free with that too.',
+    categories: ['pool_party'],
+  },
+  {
+    question: 'Is the Sunday Roast available every week?',
+    answer:
+      "Yes, it's a regular weekly special. The exact dishes can vary - ask your server or check the specials board on the day.",
+    categories: ['food'],
+  },
+  {
+    question: 'Do you have a proper beer garden?',
+    answer:
+      "We've got open-air lakeside seating right on Lake Mabprachan with a full range of draught and bottled beers - it's the closest thing to a beer garden you'll find on this side of Pattaya, without the indoor pub feel.",
+    categories: ['beer_garden'],
+  },
+  {
+    question: 'Do you serve steak?',
+    answer:
+      "Our menu leans British pub classics and Thai favourites rather than a dedicated steakhouse cut - think Steak & Ale Pie, burgers, fish & chips and Thai curries. Ask your server what's on the specials board if you're after something heartier.",
+    categories: ['food'],
   },
 ]
 

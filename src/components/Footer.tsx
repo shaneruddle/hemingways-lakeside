@@ -24,6 +24,9 @@ export default function Footer() {
             <ul className="space-y-3">
               {[
                 { label: 'Food Menu', to: '/menu' },
+                { label: 'Pub Classics', to: '/food' },
+                { label: 'Sunday Roast', to: '/sunday-roast' },
+                { label: 'Beer Garden', to: '/beer-garden' },
                 { label: 'Events', to: '/events' },
                 { label: 'Pool Day', to: '/pool' },
                 { label: 'Family & Kids', to: '/family-kids' },
@@ -49,7 +52,8 @@ export default function Footer() {
                 { label: 'Birthday Parties', to: '/events/birthdays' },
                 { label: 'Kids Parties', to: '/events/kids' },
                 { label: 'Corporate Functions', to: '/events/corporate' },
-                { label: 'Pool Parties', to: '/pool' },
+                { label: 'Pool Parties', to: '/pool-party' },
+                { label: 'Christmas & New Year', to: '/christmas' },
               ].map(l => (
                 <li key={l.to}>
                   <Link to={l.to} className="text-gray-500 text-sm hover:text-[#c9a84c] transition-colors">

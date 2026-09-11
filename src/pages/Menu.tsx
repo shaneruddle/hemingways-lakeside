@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { X } from 'lucide-react'
+import { Link } from 'react-router-dom'
 import { getMenuPages } from '../lib/firestore'
 import type { MenuPage } from '../types'
 
@@ -117,6 +118,21 @@ export default function Menu() {
           />
         </div>
       )}
+
+      {/* Cross-links */}
+      <section className="py-16 px-4 border-t border-white/5">
+        <div className="max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
+          <Link to="/food" className="bg-[#141414] border border-white/5 rounded-xl p-5 hover:border-[#c9a84c]/30 transition-colors">
+            <span className="text-white font-semibold text-sm">Pub Classics</span>
+          </Link>
+          <Link to="/sunday-roast" className="bg-[#141414] border border-white/5 rounded-xl p-5 hover:border-[#c9a84c]/30 transition-colors">
+            <span className="text-white font-semibold text-sm">Sunday Roast</span>
+          </Link>
+          <Link to="/beer-garden" className="bg-[#141414] border border-white/5 rounded-xl p-5 hover:border-[#c9a84c]/30 transition-colors">
+            <span className="text-white font-semibold text-sm">Beer Garden</span>
+          </Link>
+        </div>
+      </section>
 
       {/* Note */}
       <section className="py-8 px-4 text-center border-t border-white/5">
