@@ -4,8 +4,6 @@
 // GEO/SEO context: see the Sept 2026 "Competitive & AI-Search Strategy Report" —
 // AI assistants (ChatGPT/Gemini/Perplexity) weigh consistent NAP data and
 // machine-readable structured data heavily when recommending local businesses.
-//
-// A couple of small items are still open — see the remaining TODO below.
 
 export const SITE_URL = 'https://hemingwayslakeside.com'
 
@@ -48,13 +46,12 @@ export const BUSINESS = {
   // Source: existing Google Maps embed in Location.tsx
   geo: { latitude: 12.9206794, longitude: 100.9620102 },
   priceRange: '฿200-400',
-  // Facebook + Instagram confirmed by Shane (Sept 2026). Tripadvisor and the Google Maps
-  // place URL are still open — guessing exact URLs there would hurt more than help.
+  // Facebook, Instagram, Tripadvisor and Google Maps all confirmed by Shane (Sept 2026).
   sameAs: [
     'https://www.facebook.com/hemingwayslakeside',
     'https://www.instagram.com/hemingways.lakeside/',
-    // 'https://www.tripadvisor.com/<exact listing URL>',
-    // 'https://www.google.com/maps/place/<exact place URL or CID>',
+    'https://www.tripadvisor.com/Restaurant_Review-g293919-d26840997-Reviews-Hemingways_Lakeside-Pattaya_Chonburi_Province.html',
+    'https://www.google.com/maps/place/?q=place_id:ChIJWfsfAuyVAjERylWF266iQkY',
   ] as string[],
 }
 
