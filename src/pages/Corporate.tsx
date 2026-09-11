@@ -2,6 +2,10 @@ import { Building2, Trees, Waves, Users, ChefHat, Monitor, Wifi, Car } from 'luc
 import EnquiryForm from '../components/EnquiryForm'
 import EventGallery from '../components/EventGallery'
 import Seo from '../components/Seo'
+import FaqMini from '../components/FaqMini'
+import { buildFaqSchema, SITE_FAQS } from '../lib/schema'
+
+const corporateFaqs = SITE_FAQS.filter(f => f.categories.includes('corporate'))
 
 const spaces = [
   { icon: Building2, title: 'Private Dining Room', desc: 'Indoor, air-conditioned and quiet — boardroom lunches, planning sessions, award dinners.' },
@@ -32,6 +36,7 @@ export default function Corporate() {
       <Seo
         title="Corporate Events"
         description="A lakeside East Pattaya venue for corporate events — private dining, lakeside outdoor space, pool area or full venue hire for 100+ guests. Custom catering and AV on request."
+        jsonLd={[buildFaqSchema(corporateFaqs)]}
       />
       {/* Hero */}
       <section className="relative min-h-[85vh] flex items-end overflow-hidden">
@@ -117,6 +122,9 @@ export default function Corporate() {
 
       {/* Gallery (admin-managed) */}
       <EventGallery type="corporate" label="Past Events" title="How Companies Use the Lake" />
+
+      {/* FAQ (also feeds FAQPage schema above) */}
+      <FaqMini heading="Corporate Event Questions" items={corporateFaqs} />
 
       {/* Enquiry */}
       <section id="enquiry" className="py-24 px-4 bg-[#0a0a0a]">

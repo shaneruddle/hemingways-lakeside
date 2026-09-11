@@ -1,6 +1,11 @@
 import { UtensilsCrossed, Trees, Waves, Building2, Martini, Users } from 'lucide-react'
 import EnquiryForm from '../components/EnquiryForm'
 import EventGallery from '../components/EventGallery'
+import FaqMini from '../components/FaqMini'
+import Seo from '../components/Seo'
+import { buildFaqSchema, SITE_FAQS } from '../lib/schema'
+
+const birthdayFaqs = SITE_FAQS.filter(f => f.categories.includes('birthday'))
 
 const spaces = [
   { icon: Building2, title: 'Private Dining Room', desc: 'An indoor room of your own — long-table dinners, speeches, and air-con when you want it.' },
@@ -18,6 +23,11 @@ const promises = [
 export default function BirthdayParties() {
   return (
     <div>
+      <Seo
+        title="Birthday Parties"
+        description="Adult birthday celebrations at Hemingways Lakeside - private dining, lakeside outdoor tables, poolside or full venue hire for up to 100+ guests, with a menu built around your group."
+        jsonLd={[buildFaqSchema(birthdayFaqs)]}
+      />
       {/* Hero */}
       <section className="relative min-h-[85vh] flex items-end overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-[#0d0d0d] z-10" />
@@ -89,6 +99,9 @@ export default function BirthdayParties() {
 
       {/* Gallery (admin-managed) */}
       <EventGallery type="birthday" label="Past Celebrations" title="Nights We’ve Hosted" />
+
+      {/* FAQ (also feeds FAQPage schema above) */}
+      <FaqMini heading="Birthday Party Questions" items={birthdayFaqs} />
 
       {/* Enquiry */}
       <section id="enquiry" className="py-24 px-4">

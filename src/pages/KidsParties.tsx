@@ -2,6 +2,10 @@ import { Waves, Gamepad2, PartyPopper, Cake, Sparkles, Music, Users, Check } fro
 import EnquiryForm from '../components/EnquiryForm'
 import EventGallery from '../components/EventGallery'
 import Seo from '../components/Seo'
+import FaqMini from '../components/FaqMini'
+import { buildFaqSchema, SITE_FAQS } from '../lib/schema'
+
+const kidsFaqs = SITE_FAQS.filter(f => f.categories.includes('kids'))
 
 const included = [
   { icon: Waves, title: 'Pool Access', desc: 'The pool is the party — safe shallow areas, floats and beach balls, with staff keeping an eye out.' },
@@ -25,6 +29,7 @@ export default function KidsParties() {
       <Seo
         title="Kids Birthday Parties"
         description="Kids' pool birthday parties at Hemingways Lakeside — pool access, playroom, party area, custom menu and cake, decorations and entertainment all handled for you."
+        jsonLd={[buildFaqSchema(kidsFaqs)]}
       />
       {/* Hero */}
       <section className="relative min-h-[85vh] flex items-end overflow-hidden">
@@ -98,6 +103,9 @@ export default function KidsParties() {
 
       {/* Gallery (admin-managed) */}
       <EventGallery type="kids" label="Past Parties" title="Real Parties, Real Smiles" />
+
+      {/* FAQ (also feeds FAQPage schema above) */}
+      <FaqMini heading="Kids Party Questions" items={kidsFaqs} />
 
       {/* Enquiry */}
       <section id="enquiry" className="py-24 px-4">
