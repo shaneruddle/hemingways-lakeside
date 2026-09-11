@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { MapPin, Phone, Mail, Clock } from 'lucide-react'
-import { HOURS_SUMMARY } from '../lib/schema'
+import { HOURS_SUMMARY, HAPPY_HOUR_SUMMARY } from '../lib/schema'
 
 export default function Footer() {
   return (
@@ -86,6 +86,10 @@ export default function Footer() {
                     pages were wrong. Confirmed against live GBP + Shane (Sept 2026). Pulled from
                     schema.ts so this and the JSON-LD can't drift apart again. */}
                 <span className="text-gray-500 text-sm">{HOURS_SUMMARY}</span>
+              </li>
+              <li className="flex items-center gap-3">
+                <Clock size={15} className="text-[#c9a84c] shrink-0 opacity-0" aria-hidden="true" />
+                <span className="text-gray-500 text-sm">{HAPPY_HOUR_SUMMARY}</span>
               </li>
             </ul>
           </div>

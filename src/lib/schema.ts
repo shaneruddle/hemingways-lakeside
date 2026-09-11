@@ -16,6 +16,11 @@ export const OPENING_HOURS_GROUPS = [
   { days: ['Friday', 'Saturday', 'Sunday'], opens: '08:00', closes: '22:00' },
 ]
 export const CLOSED_DAYS = ['Tuesday']
+
+// Confirmed by Shane (Sept 2026), also set as GBP "Happy hours" special hours. Keep in
+// sync with that GBP listing if it ever changes.
+export const HAPPY_HOUR_SUMMARY = 'Happy Hour: Weekdays 4-7PM, Weekends 1-9PM'
+
 // Human-readable summary for on-page copy — keep in sync with the groups above.
 export const HOURS_SUMMARY = 'Mon, Wed, Thu 8AM–9:30PM · Fri–Sun 8AM–10PM · Closed Tuesdays'
 
