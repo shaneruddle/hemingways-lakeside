@@ -1,9 +1,12 @@
 import { Tv, Volume2, Beer, MapPin, Phone, Armchair } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import Seo from '../components/Seo'
-import { HOURS_SUMMARY } from '../lib/schema'
+import FaqMini from '../components/FaqMini'
+import { buildFaqSchema, SITE_FAQS, HOURS_SUMMARY, LATE_FOOTBALL_POLICY } from '../lib/schema'
 
 const MAPS_URL = 'https://maps.google.com/?q=Hemingways+Lakeside+Pattaya'
+
+const sportsFaqs = SITE_FAQS.filter(f => f.categories.includes('sports'))
 
 const sports = [
   { emoji: '⚽', name: 'Premier League & Football', desc: 'Every PL game worth watching, plus Champions League, Europa and the internationals.' },
@@ -29,6 +32,7 @@ export default function Sports() {
       <Seo
         title="Sports Bar"
         description="East Pattaya's dedicated sports bar at Hemingways Lakeside — 10+ screens, Premier League, UFC, NFL, rugby, F1 and more, plus cold draught beer."
+        jsonLd={[buildFaqSchema(sportsFaqs)]}
       />
       {/* Hero */}
       <section className="relative min-h-[85vh] flex items-end overflow-hidden">
@@ -103,6 +107,9 @@ export default function Sports() {
         </div>
       </section>
 
+      {/* FAQ (also feeds FAQPage schema above) */}
+      <FaqMini heading="Sports Bar Questions" items={sportsFaqs} />
+
       {/* Just come in */}
       <section className="py-24 px-4">
         <div className="max-w-4xl mx-auto bg-[#141414] border border-white/10 rounded-3xl p-10 sm:p-14 text-center">
@@ -112,6 +119,9 @@ export default function Sports() {
             No schedule, no reservations, no fuss. Turn up, grab a seat, tell us what you want
             on &mdash; and if your game clashes with someone else’s, that’s what 10+ screens are for.
             {' '}{HOURS_SUMMARY}.
+          </p>
+          <p className="text-gray-500 text-sm max-w-lg mx-auto mb-8">
+            {LATE_FOOTBALL_POLICY}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a

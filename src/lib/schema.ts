@@ -199,6 +199,18 @@ export const SITE_FAQS: FaqItem[] = [
       "Yes - set menus, sharing feasts, buffets or a la carte, built around your group and budget. Nothing off the shelf.",
     categories: ['birthday'],
   },
+  {
+    question: 'Can I reserve a table or screen for a big game?',
+    answer:
+      "There's no formal reservation system for match days - just turn up and grab a seat. For a big one (a title fight, the Super Bowl, a final) with a group, call ahead on 064-240-0222 and we'll set you up with the right spot.",
+    categories: ['sports'],
+  },
+  {
+    question: 'Is there a cover charge to watch sport at Hemingways?',
+    answer:
+      'No cover charge, ever. Normal food and drink prices apply, same as any other visit - just come in, order, and watch.',
+    categories: ['sports'],
+  },
 ]
 
 export function buildFaqSchema(faqs: { question: string; answer: string }[]) {
