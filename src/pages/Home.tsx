@@ -1,5 +1,7 @@
 import { Link } from 'react-router-dom'
 import { Tv, Beer, ChefHat, Users, Waves, PartyPopper, Star, ArrowRight } from 'lucide-react'
+import Seo from '../components/Seo'
+import { HOURS_SUMMARY } from '../lib/schema'
 
 const features = [
   { icon: Tv, label: '15 Screen TVs', desc: 'Every sport from around the world on crystal-clear displays' },
@@ -19,6 +21,7 @@ const testimonials = [
 export default function Home() {
   return (
     <div>
+      <Seo />
       {/* Hero */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-[#0d0d0d] z-10" />
@@ -155,7 +158,7 @@ export default function Home() {
       <section className="py-16 px-4 bg-[#0a0a0a] border-t border-white/5">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
           <div>
-            <h3 className="text-white font-bold text-lg mb-1">Open Daily 8:00 AM – 10:00 PM</h3>
+            <h3 className="text-white font-bold text-lg mb-1">{HOURS_SUMMARY}</h3>
             <p className="text-gray-500 text-sm">Pornprapanimit Road, East Pattaya, Thailand · 064-240-0222</p>
           </div>
           <Link

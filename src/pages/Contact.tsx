@@ -1,5 +1,6 @@
 import { Phone, Mail, MapPin, Clock } from 'lucide-react'
 import EnquiryForm from '../components/EnquiryForm'
+import { HOURS_SUMMARY } from '../lib/schema'
 
 export default function Contact() {
   return (
@@ -24,7 +25,7 @@ export default function Contact() {
                   { icon: MapPin, label: 'Address', value: 'Pornprapanimit Road, East Pattaya, Bang Lamung District, Chonburi, Thailand' },
                   { icon: Phone, label: 'Phone', value: '064-240-0222', href: 'tel:0642400222' },
                   { icon: Mail, label: 'Email', value: 'info@hemingwayslakeside.com', href: 'mailto:info@hemingwayslakeside.com' },
-                  { icon: Clock, label: 'Hours', value: 'Wed–Mon: 8:00 AM – 10:00 PM · Closed Tuesdays' },
+                  { icon: Clock, label: 'Hours', value: HOURS_SUMMARY },
                 ].map(({ icon: Icon, label, value, href }) => (
                   <div key={label} className="flex gap-4">
                     <div className="w-10 h-10 rounded-xl bg-[#c9a84c]/10 flex items-center justify-center shrink-0">

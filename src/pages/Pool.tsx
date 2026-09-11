@@ -1,6 +1,8 @@
 import { Waves, Gamepad2, Martini, UtensilsCrossed, ShowerHead, Car, MapPin, Clock, Phone } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import EnquiryForm from '../components/EnquiryForm'
+import Seo from '../components/Seo'
+import { HOURS_SUMMARY } from '../lib/schema'
 
 const MAPS_URL = 'https://maps.google.com/?q=Hemingways+Lakeside+Pattaya'
 
@@ -23,6 +25,10 @@ const dayPlan = [
 export default function Pool() {
   return (
     <div>
+      <Seo
+        title="Free Swimming Pool"
+        description="A free swimming pool for anyone dining at Hemingways Lakeside — no tickets, no time limits. Kids' playroom, poolside food and drinks, right on Lake Mabprachan."
+      />
       {/* Hero */}
       <section className="relative min-h-[90vh] flex items-end overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-[#0d0d0d] z-10" />
@@ -70,7 +76,7 @@ export default function Pool() {
             </p>
           </div>
           <div className="flex items-center gap-6 text-black/80 text-sm font-bold tracking-wider uppercase shrink-0">
-            <span className="flex items-center gap-2"><Clock size={16} /> Daily 8 AM &ndash; 10 PM</span>
+            <span className="flex items-center gap-2"><Clock size={16} /> {HOURS_SUMMARY}</span>
           </div>
         </div>
       </section>

@@ -1,6 +1,7 @@
 import { Building2, Trees, Waves, Users, ChefHat, Monitor, Wifi, Car } from 'lucide-react'
 import EnquiryForm from '../components/EnquiryForm'
 import EventGallery from '../components/EventGallery'
+import Seo from '../components/Seo'
 
 const spaces = [
   { icon: Building2, title: 'Private Dining Room', desc: 'Indoor, air-conditioned and quiet — boardroom lunches, planning sessions, award dinners.' },
@@ -28,6 +29,10 @@ const practical = [
 export default function Corporate() {
   return (
     <div>
+      <Seo
+        title="Corporate Events"
+        description="A lakeside East Pattaya venue for corporate events — private dining, lakeside outdoor space, pool area or full venue hire for 100+ guests. Custom catering and AV on request."
+      />
       {/* Hero */}
       <section className="relative min-h-[85vh] flex items-end overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-[#0d0d0d] z-10" />

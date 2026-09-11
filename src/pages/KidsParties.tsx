@@ -1,6 +1,7 @@
 import { Waves, Gamepad2, PartyPopper, Cake, Sparkles, Music, Users, Check } from 'lucide-react'
 import EnquiryForm from '../components/EnquiryForm'
 import EventGallery from '../components/EventGallery'
+import Seo from '../components/Seo'
 
 const included = [
   { icon: Waves, title: 'Pool Access', desc: 'The pool is the party — safe shallow areas, floats and beach balls, with staff keeping an eye out.' },
@@ -21,6 +22,10 @@ const parentPoints = [
 export default function KidsParties() {
   return (
     <div>
+      <Seo
+        title="Kids Birthday Parties"
+        description="Kids' pool birthday parties at Hemingways Lakeside — pool access, playroom, party area, custom menu and cake, decorations and entertainment all handled for you."
+      />
       {/* Hero */}
       <section className="relative min-h-[85vh] flex items-end overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/20 to-[#0d0d0d] z-10" />

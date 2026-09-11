@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { MapPin, Phone, Mail, Clock } from 'lucide-react'
+import { HOURS_SUMMARY } from '../lib/schema'
 
 export default function Footer() {
   return (
@@ -28,6 +29,7 @@ export default function Footer() {
                 { label: 'Sports Schedule', to: '/sports' },
                 { label: 'Daily Specials', to: '/specials' },
                 { label: 'Blog', to: '/blog' },
+                { label: 'FAQ', to: '/faq' },
               ].map(l => (
                 <li key={l.to}>
                   <Link to={l.to} className="text-gray-500 text-sm hover:text-[#c9a84c] transition-colors">
@@ -79,7 +81,11 @@ export default function Footer() {
               </li>
               <li className="flex items-center gap-3">
                 <Clock size={15} className="text-[#c9a84c] shrink-0" />
-                <span className="text-gray-500 text-sm">Wed–Mon: 8:00 AM – 10:00 PM · Closed Tuesdays</span>
+                {/* This originally said "Wed–Mon 8AM–10PM · Closed Tuesdays" (correct), was briefly
+                    changed to "Open Daily" to match the other pages, then reverted — the OTHER
+                    pages were wrong. Confirmed against live GBP + Shane (Sept 2026). Pulled from
+                    schema.ts so this and the JSON-LD can't drift apart again. */}
+                <span className="text-gray-500 text-sm">{HOURS_SUMMARY}</span>
               </li>
             </ul>
           </div>

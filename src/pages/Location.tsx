@@ -1,4 +1,5 @@
 import { MapPin, Clock, Phone, Navigation } from 'lucide-react'
+import { HOURS_SUMMARY } from '../lib/schema'
 
 export default function Location() {
   return (
@@ -33,7 +34,7 @@ export default function Location() {
             </div>
             {[
               { icon: MapPin, label: 'Address', value: 'Pornprapanimit Road, Pattaya City, Bang Lamung District, Chonburi 20150, Thailand' },
-              { icon: Clock, label: 'Opening Hours', value: 'Open Daily: 8:00 AM – 10:00 PM' },
+              { icon: Clock, label: 'Opening Hours', value: HOURS_SUMMARY },
               { icon: Phone, label: 'Phone', value: '064-240-0222', href: 'tel:0642400222' },
             ].map(({ icon: Icon, label, value, href }) => (
               <div key={label} className="bg-[#141414] border border-white/5 rounded-xl p-6 flex gap-4">

@@ -13,6 +13,7 @@ import Blog from './pages/Blog'
 import BlogPost from './pages/BlogPost'
 import Contact from './pages/Contact'
 import Location from './pages/Location'
+import Faq from './pages/Faq'
 import Admin from './pages/Admin'
 import DigitalMenu from './pages/DigitalMenu'
 import StaffPortal from './pages/StaffPortal'
@@ -45,6 +46,7 @@ export default function App() {
           <Route path="/blog/:slug" element={<BlogPost />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/location" element={<Location />} />
+          <Route path="/faq" element={<Faq />} />
         </Route>
       </Routes>
     </BrowserRouter>

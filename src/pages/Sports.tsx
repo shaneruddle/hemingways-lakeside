@@ -1,5 +1,7 @@
 import { Tv, Volume2, Beer, MapPin, Phone, Armchair } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import Seo from '../components/Seo'
+import { HOURS_SUMMARY } from '../lib/schema'
 
 const MAPS_URL = 'https://maps.google.com/?q=Hemingways+Lakeside+Pattaya'
 
@@ -24,6 +26,10 @@ const setup = [
 export default function Sports() {
   return (
     <div>
+      <Seo
+        title="Sports Bar"
+        description="East Pattaya's dedicated sports bar at Hemingways Lakeside — 10+ screens, Premier League, UFC, NFL, rugby, F1 and more, plus cold draught beer."
+      />
       {/* Hero */}
       <section className="relative min-h-[85vh] flex items-end overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-black/55 via-black/35 to-[#0d0d0d] z-10" />
@@ -105,7 +111,7 @@ export default function Sports() {
           <p className="text-gray-400 max-w-lg mx-auto mb-8">
             No schedule, no reservations, no fuss. Turn up, grab a seat, tell us what you want
             on &mdash; and if your game clashes with someone else’s, that’s what 10+ screens are for.
-            Open daily 8 AM &ndash; 10 PM.
+            {' '}{HOURS_SUMMARY}.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
