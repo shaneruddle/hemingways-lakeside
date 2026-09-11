@@ -16,6 +16,7 @@ const navLinks = [
     ],
   },
   { label: 'Pool', to: '/pool' },
+  { label: 'Family & Kids', to: '/family-kids' },
   { label: 'Sports', to: '/sports' },
   { label: 'Specials', to: '/specials' },
   { label: 'Blog', to: '/blog' },

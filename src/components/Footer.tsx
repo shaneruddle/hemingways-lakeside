@@ -26,6 +26,7 @@ export default function Footer() {
                 { label: 'Food Menu', to: '/menu' },
                 { label: 'Events', to: '/events' },
                 { label: 'Pool Day', to: '/pool' },
+                { label: 'Family & Kids', to: '/family-kids' },
                 { label: 'Sports Schedule', to: '/sports' },
                 { label: 'Daily Specials', to: '/specials' },
                 { label: 'Blog', to: '/blog' },

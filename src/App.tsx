@@ -7,6 +7,7 @@ import BirthdayParties from './pages/BirthdayParties'
 import KidsParties from './pages/KidsParties'
 import Corporate from './pages/Corporate'
 import Pool from './pages/Pool'
+import FamilyKids from './pages/FamilyKids'
 import Sports from './pages/Sports'
 import Specials from './pages/Specials'
 import Blog from './pages/Blog'
@@ -40,6 +41,7 @@ export default function App() {
           <Route path="/events/kids" element={<KidsParties />} />
           <Route path="/events/corporate" element={<Corporate />} />
           <Route path="/pool" element={<Pool />} />
+          <Route path="/family-kids" element={<FamilyKids />} />
           <Route path="/sports" element={<Sports />} />
           <Route path="/specials" element={<Specials />} />
           <Route path="/blog" element={<Blog />} />
