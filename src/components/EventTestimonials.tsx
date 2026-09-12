@@ -4,6 +4,7 @@ interface Testimonial {
   name: string
   time: string
   text: string
+  photos?: string[]
 }
 
 /**
@@ -30,6 +31,19 @@ export default function EventTestimonials({ heading, items }: { heading: string;
                 ))}
               </div>
               <p className="text-gray-300 text-sm leading-relaxed mb-6">"{t.text}"</p>
+              {t.photos && t.photos.length > 0 && (
+                <div className="grid grid-cols-4 gap-2 mb-6">
+                  {t.photos.map(src => (
+                    <img
+                      key={src}
+                      src={src}
+                      alt={`Photo from a real event at Hemingways Lakeside, shared by ${t.name}`}
+                      loading="lazy"
+                      className="w-full aspect-square object-cover rounded-lg border border-white/5"
+                    />
+                  ))}
+                </div>
+              )}
               <div>
                 <p className="text-white font-semibold text-sm">{t.name}</p>
                 <p className="text-gray-500 text-xs">{t.time} · Google Review</p>

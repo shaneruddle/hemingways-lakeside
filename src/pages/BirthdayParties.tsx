@@ -125,6 +125,7 @@ export default function BirthdayParties() {
             name: 'Mike S.',
             time: '9 months ago',
             text: "We celebrated a birthday at Hemingways, highly recommended. We viewed a few other restaurants but after seeing Hemingways we knew it was the place for us. Fred the manager and the rest of the staff were so easy to deal with, the price was right, the food was great, and everything went smoothly.",
+            photos: ['/review-mike-buffet.webp', '/review-mike-grill.webp', '/review-mike-fingerfood.webp', '/review-mike-spread.webp'],
           },
           {
             name: 'Marcella C.',
