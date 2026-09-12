@@ -33,13 +33,13 @@ body {
 
 /* Blog post HTML content */
 .blog-content h2 {
-  color: white;
+  color: #1a1512;
   font-size: 1.5rem;
   font-weight: 700;
   margin: 2rem 0 0.75rem;
 }
 .blog-content h3 {
-  color: white;
+  color: #1a1512;
   font-size: 1.2rem;
   font-weight: 600;
   margin: 1.5rem 0 0.5rem;
@@ -66,5 +66,5 @@ body {
   color: #b8973d;
 }
 .blog-content strong {
-  color: white;
+  color: #1a1512;
 }
