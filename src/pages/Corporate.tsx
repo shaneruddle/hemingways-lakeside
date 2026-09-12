@@ -1,6 +1,7 @@
 import { Building2, Trees, Waves, Users, ChefHat, Monitor, Wifi, Car } from 'lucide-react'
 import EnquiryForm from '../components/EnquiryForm'
 import EventGallery from '../components/EventGallery'
+import EventAddOns from '../components/EventAddOns'
 import Seo from '../components/Seo'
 import FaqMini from '../components/FaqMini'
 import { buildFaqSchema, SITE_FAQS } from '../lib/schema'
@@ -8,10 +9,10 @@ import { buildFaqSchema, SITE_FAQS } from '../lib/schema'
 const corporateFaqs = SITE_FAQS.filter(f => f.categories.includes('corporate'))
 
 const spaces = [
-  { icon: Building2, title: 'Private Dining Room', desc: 'Indoor, air-conditioned and quiet — boardroom lunches, planning sessions, award dinners.' },
-  { icon: Trees, title: 'Lakeside Outdoor Area', desc: 'Open-air dining over Lake Mabprachan — the change of scene that gets people talking.' },
-  { icon: Waves, title: 'Pool Area', desc: 'Casual team days and end-of-quarter parties — loungers, drinks service, no neckties.' },
-  { icon: Users, title: 'Full Venue Hire', desc: 'The whole venue for your company — 100+ capacity for town halls, parties and client events.' },
+  { icon: Building2, title: 'Private Dining Room', desc: 'Indoor, air-conditioned and quiet — boardroom lunches, planning sessions, award dinners. Seated for up to 60.' },
+  { icon: Trees, title: 'Lakeside Outdoor Area', desc: 'Open-air dining over Lake Mabprachan — the change of scene that gets people talking. Seated for up to 60.' },
+  { icon: Waves, title: 'Pool Area', desc: 'Casual team days and end-of-quarter parties — loungers, drinks service, no neckties. Standing for up to 100.' },
+  { icon: Users, title: 'Full Venue Hire', desc: 'The whole venue for your company — up to 200 capacity for town halls, parties and client events.' },
 ]
 
 const useCases = [
@@ -35,7 +36,7 @@ export default function Corporate() {
     <div>
       <Seo
         title="Corporate Events"
-        description="A lakeside East Pattaya venue for corporate events — private dining, lakeside outdoor space, pool area or full venue hire for up to 100 guests, no minimum spend. Custom catering and AV on request."
+        description="A lakeside East Pattaya venue for corporate events — private dining, lakeside outdoor space, pool area or full venue hire for up to 200 guests, no minimum spend. Custom catering and AV on request."
         jsonLd={[buildFaqSchema(corporateFaqs)]}
       />
       {/* Hero */}
@@ -120,6 +121,9 @@ export default function Corporate() {
         </div>
       </section>
 
+      {/* Optional add-ons */}
+      <EventAddOns heading="Make It A Bigger Event" />
+
       {/* Gallery (admin-managed) */}
       <EventGallery type="corporate" label="Past Events" title="How Companies Use the Lake" />
 
@@ -132,7 +136,7 @@ export default function Corporate() {
           <div className="text-center mb-10">
             <h2 className="text-2xl font-bold mb-2">Tell Us About Your Event</h2>
             <p className="text-gray-500 text-sm">
-              Fully custom, up to 100 guests — no minimum spend. Tell us your headcount and
+              Fully custom, up to 200 guests — no minimum spend. Tell us your headcount and
               budget and we’ll put a proposal together.
             </p>
           </div>

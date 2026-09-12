@@ -35,7 +35,7 @@ export const BUSINESS = {
   // Exact name as registered on Google Business Profile — keep both in sync (NAP consistency)
   legalOrTradingName: 'Hemingways (Lakeside) Restaurant & Bar',
   description:
-    "East Pattaya's family-friendly restaurant and sports bar on Lake Mabprachan — free swimming pool with dining, kids' playroom, 10+ sports screens, and private event spaces for 100+ guests.",
+    "East Pattaya's family-friendly restaurant and sports bar on Lake Mabprachan — free swimming pool with dining, kids' playroom, 10+ sports screens, and private event spaces for up to 200 guests.",
   telephone: '+66642400222',
   telephoneDisplay: '064-240-0222',
   email: 'info@hemingwayslakeside.com',
@@ -64,7 +64,7 @@ export const AMENITIES = [
   { name: 'Free swimming pool (with dining)', value: true },
   { name: "Kids' playroom", value: true },
   { name: '10+ sports screens', value: true },
-  { name: 'Private event space (100+ capacity)', value: true },
+  { name: 'Private event space (up to 200 guests)', value: true },
   { name: 'Free on-site parking', value: true },
   { name: 'Wi-Fi', value: true },
   { name: 'Wheelchair accessible entrance, car park, toilet and seating', value: true }, // confirmed on live GBP
@@ -149,6 +149,17 @@ export const SITE_FAQS: FaqItem[] = [
     categories: ['corporate', 'birthday', 'kids'],
   },
   {
+    question: 'Is there a deposit for private events?',
+    answer: 'Yes - a 3,000 THB deposit secures your private hire booking.',
+    categories: ['corporate', 'birthday', 'kids'],
+  },
+  {
+    question: 'Can you add a DJ, photographer or private bar to our event?',
+    answer:
+      "Yes - a DJ and sound system, a professional photographer, private bar service and extra decorations beyond the standard setup are all available as add-ons. Just mention what you'd like when you enquire and we'll build it into your quote.",
+    categories: ['corporate', 'birthday', 'kids'],
+  },
+  {
     question: 'How much do birthday and kids party food packages cost?',
     answer:
       'Four options: Package A at 250-300 THB/person (5 food items, soft drinks, finger food/buffet), Package B at 400 THB/person (7 items), Package C at 500-700 THB/person (10 items), or Package D - tell us your guest count and budget and we\'ll build a custom package. A whole roasted pig is 4,000-6,000 THB as a showstopper option. Prices don\'t include activities or decorations.',
@@ -168,7 +179,7 @@ export const SITE_FAQS: FaqItem[] = [
   {
     question: 'How many guests can you host for an event?',
     answer:
-      "Up to 100+ guests with full venue hire - restaurant, pool and lakeside area together. Smaller private spaces are available too. See our Corporate Events and Kids Parties pages for the different formats.",
+      "Up to 200 guests with full venue hire - restaurant, pool and lakeside area together. Individual spaces: seated indoors for up to 60, seated outdoors for up to 60, or standing outdoors for up to 100. See our Corporate Events and Kids Parties pages for the different formats.",
     categories: ['corporate', 'birthday', 'kids'],
   },
   {

@@ -3,6 +3,7 @@ import EnquiryForm from '../components/EnquiryForm'
 import EventGallery from '../components/EventGallery'
 import FoodPackages from '../components/FoodPackages'
 import EventTestimonials from '../components/EventTestimonials'
+import EventAddOns from '../components/EventAddOns'
 import FaqMini from '../components/FaqMini'
 import Seo from '../components/Seo'
 import { buildFaqSchema, SITE_FAQS } from '../lib/schema'
@@ -10,10 +11,10 @@ import { buildFaqSchema, SITE_FAQS } from '../lib/schema'
 const birthdayFaqs = SITE_FAQS.filter(f => f.categories.includes('birthday'))
 
 const spaces = [
-  { icon: Building2, title: 'Private Dining Room', desc: 'An indoor room of your own — long-table dinners, speeches, and air-con when you want it.' },
-  { icon: Trees, title: 'Lakeside Outdoor Area', desc: 'Open-air tables under the festoon lights with Lake Mabprachan behind you. The golden-hour spot.' },
-  { icon: Waves, title: 'Pool Area', desc: 'Loungers, poolside tables and drinks service — for parties that don’t want to stay seated.' },
-  { icon: Users, title: 'Full Venue Hire', desc: 'Take the whole place — restaurant, pool and lakeside area — for celebrations of up to 100+.' },
+  { icon: Building2, title: 'Private Dining Room', desc: 'An indoor room of your own — long-table dinners, speeches, and air-con when you want it. Seated for up to 60.' },
+  { icon: Trees, title: 'Lakeside Outdoor Area', desc: 'Open-air tables under the festoon lights with Lake Mabprachan behind you. The golden-hour spot. Seated for up to 60.' },
+  { icon: Waves, title: 'Pool Area', desc: 'Loungers, poolside tables and drinks service — for parties that don’t want to stay seated. Standing for up to 100.' },
+  { icon: Users, title: 'Full Venue Hire', desc: 'Take the whole place — restaurant, pool and lakeside area — for celebrations of up to 200.' },
 ]
 
 const promises = [
@@ -27,7 +28,7 @@ export default function BirthdayParties() {
     <div>
       <Seo
         title="Birthday Parties"
-        description="Adult birthday celebrations at Hemingways Lakeside - private dining, lakeside outdoor tables, poolside or full venue hire for up to 100+ guests. Food packages from 250 THB/person, or a custom quote to your budget."
+        description="Adult birthday celebrations at Hemingways Lakeside - private dining, lakeside outdoor tables, poolside or full venue hire for up to 200 guests. Food packages from 250 THB/person, or a custom quote to your budget."
         jsonLd={[buildFaqSchema(birthdayFaqs)]}
       />
       {/* Hero */}
@@ -106,6 +107,9 @@ export default function BirthdayParties() {
           </div>
         </div>
       </section>
+
+      {/* Optional add-ons */}
+      <EventAddOns heading="Make Your Night Bigger" />
 
       {/* Gallery (admin-managed) */}
       <EventGallery type="birthday" label="Past Celebrations" title="Nights We’ve Hosted" />

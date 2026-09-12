@@ -3,6 +3,7 @@ import EnquiryForm from '../components/EnquiryForm'
 import EventGallery from '../components/EventGallery'
 import FoodPackages from '../components/FoodPackages'
 import EventTestimonials from '../components/EventTestimonials'
+import EventAddOns from '../components/EventAddOns'
 import Seo from '../components/Seo'
 import FaqMini from '../components/FaqMini'
 import { buildFaqSchema, SITE_FAQS } from '../lib/schema'
@@ -22,7 +23,7 @@ const parentPoints = [
   'You turn up with the cake candles — we handle everything else',
   'Sit down, order a coffee or a cold drink, and actually enjoy the party',
   'Changing rooms and showers for the post-swim cleanup',
-  'Free parking and space for 100+ guests if the whole class is coming',
+  'Free parking and space for up to 200 guests if the whole class is coming',
 ]
 
 export default function KidsParties() {
@@ -106,10 +107,13 @@ export default function KidsParties() {
           </ul>
           <div className="mt-10 flex items-center justify-center gap-3 text-[#5c5346] text-sm">
             <Users size={16} className="text-[#8a6d2f]" />
-            Lakeside setting, capacity for 100+ guests
+            Lakeside setting, capacity for up to 200 guests
           </div>
         </div>
       </section>
+
+      {/* Optional add-ons */}
+      <EventAddOns heading="Make It Extra Special" />
 
       {/* Gallery (admin-managed) */}
       <EventGallery type="kids" label="Past Parties" title="Real Parties, Real Smiles" />
