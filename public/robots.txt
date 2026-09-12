@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /staff
+Disallow: /digital-menu
+
+Sitemap: https://hemingwayslakeside.com/sitemap.xml
