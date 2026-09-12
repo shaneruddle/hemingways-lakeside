@@ -1,6 +1,7 @@
 import { Waves, Gamepad2, PartyPopper, Cake, Sparkles, Music, Users, Check } from 'lucide-react'
 import EnquiryForm from '../components/EnquiryForm'
 import EventGallery from '../components/EventGallery'
+import FoodPackages from '../components/FoodPackages'
 import Seo from '../components/Seo'
 import FaqMini from '../components/FaqMini'
 import { buildFaqSchema, SITE_FAQS } from '../lib/schema'
@@ -28,7 +29,7 @@ export default function KidsParties() {
     <div>
       <Seo
         title="Kids Birthday Parties"
-        description="Kids' pool birthday parties at Hemingways Lakeside — pool access, playroom, party area, custom menu and cake, decorations and entertainment all handled for you."
+        description="Kids' pool birthday parties at Hemingways Lakeside — pool access, playroom, party area, custom menu and cake, decorations and entertainment all handled for you. Food packages from 250 THB/person."
         jsonLd={[buildFaqSchema(kidsFaqs)]}
       />
       {/* Hero */}
@@ -48,12 +49,20 @@ export default function KidsParties() {
               Pool, playroom, food, cake, decorations and entertainment &mdash; all sorted,
               all in one lakeside venue. You enjoy the party. We do the work.
             </p>
-            <a
-              href="#enquiry"
-              className="inline-block px-8 py-4 bg-[#c9a84c] text-black font-bold text-sm tracking-widest uppercase rounded hover:bg-[#b8973d] transition-colors"
-            >
-              Plan Their Party
-            </a>
+            <div className="flex flex-wrap items-center gap-4">
+              <a
+                href="#enquiry"
+                className="inline-block px-8 py-4 bg-[#c9a84c] text-black font-bold text-sm tracking-widest uppercase rounded hover:bg-[#b8973d] transition-colors"
+              >
+                Plan Their Party
+              </a>
+              <a
+                href="#packages"
+                className="text-gray-300 text-sm hover:text-[#c9a84c] transition-colors"
+              >
+                Packages from <span className="text-[#c9a84c] font-bold">250 THB/person</span> &rarr;
+              </a>
+            </div>
           </div>
         </div>
       </section>
@@ -103,6 +112,9 @@ export default function KidsParties() {
 
       {/* Gallery (admin-managed) */}
       <EventGallery type="kids" label="Past Parties" title="Real Parties, Real Smiles" />
+
+      {/* Real package pricing — from Shane's Sept 2026 Birthday & Event Food Packages poster */}
+      <FoodPackages heading="Party Food Packages" />
 
       {/* FAQ (also feeds FAQPage schema above) */}
       <FaqMini heading="Kids Party Questions" items={kidsFaqs} />

@@ -35,7 +35,7 @@ export default function Corporate() {
     <div>
       <Seo
         title="Corporate Events"
-        description="A lakeside East Pattaya venue for corporate events — private dining, lakeside outdoor space, pool area or full venue hire for 100+ guests. Custom catering and AV on request."
+        description="A lakeside East Pattaya venue for corporate events — private dining, lakeside outdoor space, pool area or full venue hire for up to 100 guests, no minimum spend. Custom catering and AV on request."
         jsonLd={[buildFaqSchema(corporateFaqs)]}
       />
       {/* Hero */}
@@ -132,7 +132,8 @@ export default function Corporate() {
           <div className="text-center mb-10">
             <h2 className="text-2xl font-bold mb-2">Tell Us About Your Event</h2>
             <p className="text-gray-500 text-sm">
-              Fully custom — headcount, format and budget. We’ll put a proposal together.
+              Fully custom, up to 100 guests — no minimum spend. Tell us your headcount and
+              budget and we’ll put a proposal together.
             </p>
           </div>
           <EnquiryForm

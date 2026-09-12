@@ -145,8 +145,14 @@ export const SITE_FAQS: FaqItem[] = [
   {
     question: 'What is the minimum spend for a private event?',
     answer:
-      "It depends on the space, headcount and format - we don't publish a flat number because every event is different. Tell us your group size and what you have in mind on the enquiry form and we'll put together a proposal, usually within one business day.",
+      "For corporate events there's no minimum spend - tell us your headcount and budget and we'll put together a proposal, usually within one business day. For birthday and kids parties we publish set food packages from 250 THB/person (see the package options on those pages), or tell us your budget and we'll build a custom package around it.",
     categories: ['corporate', 'birthday', 'kids'],
+  },
+  {
+    question: 'How much do birthday and kids party food packages cost?',
+    answer:
+      'Four options: Package A at 250-300 THB/person (5 food items, soft drinks, finger food/buffet), Package B at 400 THB/person (7 items), Package C at 500-700 THB/person (10 items), or Package D - tell us your guest count and budget and we\'ll build a custom package. A whole roasted pig is 4,000-6,000 THB as a showstopper option. Prices don\'t include activities or decorations.',
+    categories: ['birthday', 'kids'],
   },
   {
     question: 'Can we bring our own entertainer, magician or performer for a kids party?',
