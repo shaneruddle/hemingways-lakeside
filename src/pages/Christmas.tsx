@@ -55,20 +55,20 @@ export default function Christmas() {
       </section>
 
       {/* Points */}
-      <section className="py-24 px-4">
+      <section className="py-24 px-4 bg-[#f6efe0]">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <p className="text-[#c9a84c] text-xs tracking-[0.4em] uppercase mb-3">Why Book Here</p>
-            <h2 className="text-3xl sm:text-4xl font-bold">A Different Kind Of Festive Season</h2>
+            <p className="text-[#9c7a2e] text-xs tracking-[0.4em] uppercase mb-3">Why Book Here</p>
+            <h2 className="text-3xl sm:text-4xl font-bold text-[#1a1512]">A Different Kind Of Festive Season</h2>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {points.map(({ icon: Icon, title, desc }) => (
-              <div key={title} className="bg-[#141414] border border-white/5 rounded-2xl p-8">
-                <div className="w-10 h-10 rounded-xl bg-[#c9a84c]/10 flex items-center justify-center mb-4">
-                  <Icon size={20} className="text-[#c9a84c]" />
+              <div key={title} className="bg-white border border-black/5 rounded-2xl p-8 shadow-sm">
+                <div className="w-10 h-10 rounded-xl bg-[#c9a84c]/15 flex items-center justify-center mb-4">
+                  <Icon size={20} className="text-[#8a6d2f]" />
                 </div>
-                <h3 className="text-white font-bold text-lg mb-1">{title}</h3>
-                <p className="text-gray-500 text-sm">{desc}</p>
+                <h3 className="text-[#1a1512] font-bold text-lg mb-1">{title}</h3>
+                <p className="text-[#5c5346] text-sm">{desc}</p>
               </div>
             ))}
           </div>
@@ -76,9 +76,9 @@ export default function Christmas() {
       </section>
 
       {/* Note on details */}
-      <section className="py-16 px-4 bg-[#0a0a0a] border-y border-white/5">
+      <section className="py-16 px-4 bg-white border-y border-black/5">
         <div className="max-w-3xl mx-auto text-center">
-          <p className="text-gray-400 leading-relaxed">
+          <p className="text-[#5c5346] leading-relaxed">
             Full Christmas Day and New Year's Eve menus, set times and pricing are confirmed closer
             to December. Send an enquiry now to register interest and we'll be in touch with the
             details as soon as they're set.
@@ -87,11 +87,11 @@ export default function Christmas() {
       </section>
 
       {/* Enquiry */}
-      <section id="enquiry" className="py-24 px-4">
+      <section id="enquiry" className="py-24 px-4 bg-[#f6efe0]">
         <div className="max-w-2xl mx-auto">
           <div className="text-center mb-10">
-            <h2 className="text-2xl font-bold mb-2">Register Your Interest</h2>
-            <p className="text-gray-500 text-sm">
+            <h2 className="text-2xl font-bold mb-2 text-[#1a1512]">Register Your Interest</h2>
+            <p className="text-[#5c5346] text-sm">
               Tell us your group size and which day (Christmas Day or New Year's Eve) - we'll come
               back with options as soon as this year's plans are confirmed.
             </p>

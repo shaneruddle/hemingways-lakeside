@@ -43,29 +43,29 @@ export default function Events() {
   return (
     <div>
       {/* Hero */}
-      <section className="pt-32 pb-20 px-4 bg-gradient-to-b from-[#1a0a00] to-[#0d0d0d]">
+      <section className="pt-32 pb-20 px-4 bg-[#f6efe0]">
         <div className="max-w-4xl mx-auto text-center">
-          <p className="text-[#c9a84c] text-xs tracking-[0.4em] uppercase mb-4">Private Hire</p>
-          <h1 className="text-4xl sm:text-6xl font-bold mb-4">Events & Parties</h1>
-          <p className="text-gray-400 text-lg max-w-xl mx-auto">
+          <p className="text-[#9c7a2e] text-xs tracking-[0.4em] uppercase mb-4">Private Hire</p>
+          <h1 className="text-4xl sm:text-6xl font-bold mb-4 text-[#1a1512]">Events & Parties</h1>
+          <p className="text-[#5c5346] text-lg max-w-xl mx-auto">
             From intimate birthday dinners to full pool parties for 100+ guests — Hemingways Lakeside is the venue.
           </p>
         </div>
       </section>
 
       {/* Event types */}
-      <section className="py-24 px-4">
+      <section className="py-24 px-4 bg-white">
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
           {eventTypes.map(({ icon: Icon, title, desc, href, cta }) => (
-            <div key={title} className="bg-[#141414] border border-white/5 rounded-2xl p-10 hover:border-[#c9a84c]/20 transition-colors group">
-              <div className="w-12 h-12 rounded-xl bg-[#c9a84c]/10 flex items-center justify-center mb-6 group-hover:bg-[#c9a84c]/20 transition-colors">
-                <Icon size={22} className="text-[#c9a84c]" />
+            <div key={title} className="bg-[#f6efe0] border border-black/5 rounded-2xl p-10 hover:border-[#c9a84c]/40 transition-colors group">
+              <div className="w-12 h-12 rounded-xl bg-[#c9a84c]/15 flex items-center justify-center mb-6 group-hover:bg-[#c9a84c]/25 transition-colors">
+                <Icon size={22} className="text-[#8a6d2f]" />
               </div>
-              <h3 className="text-xl font-bold mb-3">{title}</h3>
-              <p className="text-gray-500 leading-relaxed mb-6">{desc}</p>
+              <h3 className="text-xl font-bold mb-3 text-[#1a1512]">{title}</h3>
+              <p className="text-[#5c5346] leading-relaxed mb-6">{desc}</p>
               <Link
                 to={href}
-                className="inline-flex items-center gap-2 text-[#c9a84c] text-sm tracking-wider uppercase hover:gap-3 transition-all"
+                className="inline-flex items-center gap-2 text-[#8a6d2f] text-sm tracking-wider uppercase hover:gap-3 transition-all"
               >
                 {cta} <ArrowRight size={14} />
               </Link>
@@ -75,18 +75,18 @@ export default function Events() {
       </section>
 
       {/* How it works */}
-      <section className="py-20 px-4 bg-[#0a0a0a]">
+      <section className="py-20 px-4 bg-[#f6efe0]">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-14">
-            <p className="text-[#c9a84c] text-xs tracking-[0.4em] uppercase mb-3">Simple Process</p>
-            <h2 className="text-3xl font-bold">How It Works</h2>
+            <p className="text-[#9c7a2e] text-xs tracking-[0.4em] uppercase mb-3">Simple Process</p>
+            <h2 className="text-3xl font-bold text-[#1a1512]">How It Works</h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {howItWorks.map(({ step, title, desc }) => (
               <div key={step} className="text-center">
-                <div className="text-4xl font-bold text-[#c9a84c]/20 mb-3">{step}</div>
-                <h3 className="text-white font-bold mb-2">{title}</h3>
-                <p className="text-gray-500 text-sm">{desc}</p>
+                <div className="text-4xl font-bold text-[#c9a84c]/60 mb-3">{step}</div>
+                <h3 className="text-[#1a1512] font-bold mb-2">{title}</h3>
+                <p className="text-[#5c5346] text-sm">{desc}</p>
               </div>
             ))}
           </div>
@@ -94,11 +94,11 @@ export default function Events() {
       </section>
 
       {/* Enquiry */}
-      <section className="py-24 px-4">
+      <section className="py-24 px-4 bg-white">
         <div className="max-w-2xl mx-auto">
           <div className="text-center mb-10">
-            <h2 className="text-2xl font-bold mb-2">Start Planning Your Event</h2>
-            <p className="text-gray-500 text-sm">Tell us the basics and we'll get back to you within a few hours</p>
+            <h2 className="text-2xl font-bold mb-2 text-[#1a1512]">Start Planning Your Event</h2>
+            <p className="text-[#5c5346] text-sm">Tell us the basics and we'll get back to you within a few hours</p>
           </div>
           <EnquiryForm
             type="event"

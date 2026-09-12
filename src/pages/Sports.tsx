@@ -64,20 +64,20 @@ export default function Sports() {
       </section>
 
       {/* Setup */}
-      <section className="py-24 px-4">
+      <section className="py-24 px-4 bg-[#f6efe0]">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <p className="text-[#c9a84c] text-xs tracking-[0.4em] uppercase mb-3">The Setup</p>
-            <h2 className="text-3xl sm:text-4xl font-bold">Built for Match Days</h2>
+            <p className="text-[#9c7a2e] text-xs tracking-[0.4em] uppercase mb-3">The Setup</p>
+            <h2 className="text-3xl sm:text-4xl font-bold text-[#1a1512]">Built for Match Days</h2>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {setup.map(({ icon: Icon, title, desc }) => (
-              <div key={title} className="bg-[#141414] border border-white/5 rounded-2xl p-6">
-                <div className="w-10 h-10 rounded-xl bg-[#c9a84c]/10 flex items-center justify-center mb-4">
-                  <Icon size={20} className="text-[#c9a84c]" />
+              <div key={title} className="bg-white border border-black/5 rounded-2xl p-6 shadow-sm">
+                <div className="w-10 h-10 rounded-xl bg-[#c9a84c]/15 flex items-center justify-center mb-4">
+                  <Icon size={20} className="text-[#8a6d2f]" />
                 </div>
-                <h3 className="text-white font-bold mb-1">{title}</h3>
-                <p className="text-gray-500 text-sm">{desc}</p>
+                <h3 className="text-[#1a1512] font-bold mb-1">{title}</h3>
+                <p className="text-[#5c5346] text-sm">{desc}</p>
               </div>
             ))}
           </div>
@@ -85,22 +85,22 @@ export default function Sports() {
       </section>
 
       {/* What we show */}
-      <section className="py-24 px-4 bg-[#0a0a0a]">
+      <section className="py-24 px-4 bg-white">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <p className="text-[#c9a84c] text-xs tracking-[0.4em] uppercase mb-3">What We Show</p>
-            <h2 className="text-3xl sm:text-4xl font-bold">Everything Worth Watching</h2>
+            <p className="text-[#9c7a2e] text-xs tracking-[0.4em] uppercase mb-3">What We Show</p>
+            <h2 className="text-3xl sm:text-4xl font-bold text-[#1a1512]">Everything Worth Watching</h2>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {sports.map(({ emoji, name, desc }) => (
-              <div key={name} className="bg-[#141414] border border-white/5 rounded-2xl p-6">
+              <div key={name} className="bg-[#f6efe0] border border-black/5 rounded-2xl p-6">
                 <div className="text-3xl mb-3">{emoji}</div>
-                <h3 className="text-white font-bold mb-1">{name}</h3>
-                <p className="text-gray-500 text-sm">{desc}</p>
+                <h3 className="text-[#1a1512] font-bold mb-1">{name}</h3>
+                <p className="text-[#5c5346] text-sm">{desc}</p>
               </div>
             ))}
           </div>
-          <p className="text-center text-gray-400 mt-10 max-w-xl mx-auto">
+          <p className="text-center text-[#5c5346] mt-10 max-w-xl mx-auto">
             Not on the list? If it’s being broadcast anywhere, we can almost certainly get it on a
             screen for you &mdash; just ask at the bar.
           </p>
@@ -111,16 +111,16 @@ export default function Sports() {
       <FaqMini heading="Sports Bar Questions" items={sportsFaqs} />
 
       {/* Just come in */}
-      <section className="py-24 px-4">
-        <div className="max-w-4xl mx-auto bg-[#141414] border border-white/10 rounded-3xl p-10 sm:p-14 text-center">
-          <p className="text-[#c9a84c] text-xs tracking-[0.4em] uppercase mb-3">No Booking Needed</p>
-          <h2 className="text-3xl font-bold mb-4">Just Come In</h2>
-          <p className="text-gray-400 max-w-lg mx-auto mb-8">
+      <section className="py-24 px-4 bg-[#f6efe0]">
+        <div className="max-w-4xl mx-auto bg-white border border-black/5 rounded-3xl p-10 sm:p-14 text-center shadow-sm">
+          <p className="text-[#9c7a2e] text-xs tracking-[0.4em] uppercase mb-3">No Booking Needed</p>
+          <h2 className="text-3xl font-bold mb-4 text-[#1a1512]">Just Come In</h2>
+          <p className="text-[#5c5346] max-w-lg mx-auto mb-8">
             No schedule, no reservations, no fuss. Turn up, grab a seat, tell us what you want
             on &mdash; and if your game clashes with someone else’s, that’s what 10+ screens are for.
             {' '}{HOURS_SUMMARY}.
           </p>
-          <p className="text-gray-500 text-sm max-w-lg mx-auto mb-8">
+          <p className="text-[#8a6d2f] text-sm max-w-lg mx-auto mb-8">
             {LATE_FOOTBALL_POLICY}
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -134,13 +134,13 @@ export default function Sports() {
             </a>
             <a
               href="tel:0642400222"
-              className="inline-flex items-center justify-center gap-2 px-8 py-4 border border-[#c9a84c]/40 text-[#c9a84c] font-bold text-sm tracking-widest uppercase rounded hover:bg-[#c9a84c]/10 transition-colors"
+              className="inline-flex items-center justify-center gap-2 px-8 py-4 border border-[#8a6d2f]/40 text-[#8a6d2f] font-bold text-sm tracking-widest uppercase rounded hover:bg-[#c9a84c]/10 transition-colors"
             >
               <Phone size={16} /> 064-240-0222
             </a>
           </div>
-          <p className="text-gray-600 text-sm mt-8">
-            Big game day? Pair it with a swim &mdash; <Link to="/pool" className="text-[#c9a84c] hover:underline">the pool is free for diners</Link>.
+          <p className="text-[#5c5346] text-sm mt-8">
+            Big game day? Pair it with a swim &mdash; <Link to="/pool" className="text-[#8a6d2f] hover:underline">the pool is free for diners</Link>.
           </p>
         </div>
       </section>

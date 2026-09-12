@@ -27,18 +27,18 @@ export default function Menu() {
   return (
     <div>
       {/* Hero */}
-      <section className="pt-32 pb-16 px-4 bg-gradient-to-b from-[#1a0d00] to-[#0d0d0d]">
+      <section className="pt-32 pb-16 px-4 bg-[#f6efe0]">
         <div className="max-w-4xl mx-auto text-center">
-          <p className="text-[#c9a84c] text-xs tracking-[0.4em] uppercase mb-4">Culinary Excellence</p>
-          <h1 className="text-4xl sm:text-6xl font-bold mb-4">Food Menu</h1>
-          <p className="text-gray-400 text-lg max-w-xl mx-auto">
+          <p className="text-[#9c7a2e] text-xs tracking-[0.4em] uppercase mb-4">Culinary Excellence</p>
+          <h1 className="text-4xl sm:text-6xl font-bold mb-4 text-[#1a1512]">Food Menu</h1>
+          <p className="text-[#5c5346] text-lg max-w-xl mx-auto">
             Authentic British pub favourites, quality Western dishes, and traditional Thai specialties.
           </p>
         </div>
       </section>
 
       {/* Category filter */}
-      <section className="sticky top-16 md:top-20 z-30 bg-[#0d0d0d]/95 backdrop-blur border-b border-white/10 py-4 px-4">
+      <section className="sticky top-16 md:top-20 z-30 bg-white/95 backdrop-blur border-b border-black/10 py-4 px-4">
         <div className="max-w-7xl mx-auto flex gap-2 overflow-x-auto scrollbar-hide">
           {categories.map(cat => (
             <button
@@ -47,7 +47,7 @@ export default function Menu() {
               className={`px-4 py-2 rounded-full text-sm whitespace-nowrap transition-colors ${
                 activeCategory === cat
                   ? 'bg-[#c9a84c] text-black font-bold'
-                  : 'bg-white/5 text-gray-400 hover:text-white border border-white/10'
+                  : 'bg-black/5 text-[#5c5346] hover:text-[#1a1512] border border-black/10'
               }`}
             >
               {cat}
@@ -57,12 +57,12 @@ export default function Menu() {
       </section>
 
       {/* Designed menu pages */}
-      <section className="py-16 px-4">
+      <section className="py-16 px-4 bg-white">
         <div className="max-w-7xl mx-auto">
           {loading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {[...Array(6)].map((_, i) => (
-                <div key={i} className="bg-[#141414] rounded-2xl aspect-[2/3] animate-pulse" />
+                <div key={i} className="bg-[#f6efe0] rounded-2xl aspect-[2/3] animate-pulse" />
               ))}
             </div>
           ) : (
@@ -77,7 +77,7 @@ export default function Menu() {
                     <button
                       key={page.id}
                       onClick={() => setLightbox(page)}
-                      className="group relative rounded-2xl overflow-hidden border border-white/10 hover:border-[#c9a84c]/40 transition-colors cursor-pointer bg-[#141414]"
+                      className="group relative rounded-2xl overflow-hidden border border-black/10 hover:border-[#c9a84c]/40 transition-colors cursor-pointer bg-[#f6efe0] shadow-sm"
                     >
                       <img
                         src={page.imageUrl}
@@ -91,7 +91,7 @@ export default function Menu() {
               )}
 
               {visiblePages.length === 0 && (
-                <div className="text-center text-gray-600 py-16">Nothing in this category yet</div>
+                <div className="text-center text-[#5c5346] py-16">Nothing in this category yet</div>
               )}
             </>
           )}
@@ -120,23 +120,23 @@ export default function Menu() {
       )}
 
       {/* Cross-links */}
-      <section className="py-16 px-4 border-t border-white/5">
+      <section className="py-16 px-4 bg-[#f6efe0] border-t border-black/5">
         <div className="max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
-          <Link to="/food" className="bg-[#141414] border border-white/5 rounded-xl p-5 hover:border-[#c9a84c]/30 transition-colors">
-            <span className="text-white font-semibold text-sm">Pub Classics</span>
+          <Link to="/food" className="bg-white border border-black/5 rounded-xl p-5 shadow-sm hover:border-[#c9a84c]/40 transition-colors">
+            <span className="text-[#1a1512] font-semibold text-sm">Pub Classics</span>
           </Link>
-          <Link to="/sunday-roast" className="bg-[#141414] border border-white/5 rounded-xl p-5 hover:border-[#c9a84c]/30 transition-colors">
-            <span className="text-white font-semibold text-sm">Sunday Roast</span>
+          <Link to="/sunday-roast" className="bg-white border border-black/5 rounded-xl p-5 shadow-sm hover:border-[#c9a84c]/40 transition-colors">
+            <span className="text-[#1a1512] font-semibold text-sm">Sunday Roast</span>
           </Link>
-          <Link to="/beer-garden" className="bg-[#141414] border border-white/5 rounded-xl p-5 hover:border-[#c9a84c]/30 transition-colors">
-            <span className="text-white font-semibold text-sm">Beer Garden</span>
+          <Link to="/beer-garden" className="bg-white border border-black/5 rounded-xl p-5 shadow-sm hover:border-[#c9a84c]/40 transition-colors">
+            <span className="text-[#1a1512] font-semibold text-sm">Beer Garden</span>
           </Link>
         </div>
       </section>
 
       {/* Note */}
-      <section className="py-8 px-4 text-center border-t border-white/5">
-        <p className="text-gray-600 text-sm">Menu items and prices may vary. Ask our staff for today's specials.</p>
+      <section className="py-8 px-4 text-center bg-white border-t border-black/5">
+        <p className="text-[#5c5346] text-sm">Menu items and prices may vary. Ask our staff for today's specials.</p>
       </section>
     </div>
   )

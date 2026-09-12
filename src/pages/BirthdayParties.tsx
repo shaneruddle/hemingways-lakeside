@@ -139,11 +139,11 @@ export default function BirthdayParties() {
       <FaqMini heading="Birthday Party Questions" items={birthdayFaqs} />
 
       {/* Enquiry */}
-      <section id="enquiry" className="py-24 px-4">
+      <section id="enquiry" className="py-24 px-4 bg-[#f6efe0]">
         <div className="max-w-2xl mx-auto">
           <div className="text-center mb-10">
-            <h2 className="text-2xl font-bold mb-2">Tell Us About Your Night</h2>
-            <p className="text-gray-400 text-sm">
+            <h2 className="text-2xl font-bold mb-2 text-[#1a1512]">Tell Us About Your Night</h2>
+            <p className="text-[#5c5346] text-sm">
               Every celebration is fully custom &mdash; date, group size and the vibe you’re after. We’ll do the rest.
             </p>
           </div>

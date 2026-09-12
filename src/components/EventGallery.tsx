@@ -20,18 +20,18 @@ export default function EventGallery({ type, label = 'Gallery', title = 'See It 
   if (images.length === 0) return null
 
   return (
-    <section className="py-24 px-4 bg-[#0a0a0a]">
+    <section className="py-24 px-4 bg-[#f6efe0]">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-16">
-          <p className="text-[#c9a84c] text-xs tracking-[0.4em] uppercase mb-3">{label}</p>
-          <h2 className="text-3xl sm:text-4xl font-bold">{title}</h2>
+          <p className="text-[#9c7a2e] text-xs tracking-[0.4em] uppercase mb-3">{label}</p>
+          <h2 className="text-3xl sm:text-4xl font-bold text-[#1a1512]">{title}</h2>
         </div>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
           {images.map(img => (
             <button
               key={img.id}
               onClick={() => setLightbox(img.imageUrl)}
-              className="group relative aspect-square overflow-hidden rounded-xl bg-[#141414] border border-white/5 cursor-pointer"
+              className="group relative aspect-square overflow-hidden rounded-xl bg-white border border-black/5 shadow-sm cursor-pointer"
             >
               <img
                 src={img.imageUrl}

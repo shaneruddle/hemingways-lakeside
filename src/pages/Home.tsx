@@ -134,30 +134,30 @@ export default function Home() {
       </section>
 
       {/* Testimonials */}
-      <section className="py-24 px-4">
+      <section className="py-24 px-4 bg-[#f6efe0]">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-14">
-            <p className="text-[#c9a84c] text-xs tracking-[0.4em] uppercase mb-3">Reviews</p>
-            <h2 className="text-3xl sm:text-4xl font-bold mb-2">What Guests Say</h2>
+            <p className="text-[#9c7a2e] text-xs tracking-[0.4em] uppercase mb-3">Reviews</p>
+            <h2 className="text-3xl sm:text-4xl font-bold mb-2 text-[#1a1512]">What Guests Say</h2>
             <div className="flex items-center justify-center gap-1 mt-3">
               {[...Array(5)].map((_, i) => (
                 <Star key={i} size={16} className="text-[#c9a84c] fill-[#c9a84c]" />
               ))}
-              <span className="text-gray-400 text-sm ml-2">4.8 · 250+ reviews</span>
+              <span className="text-[#5c5346] text-sm ml-2">4.8 · 250+ reviews</span>
             </div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {testimonials.map(t => (
-              <div key={t.name} className="bg-[#141414] border border-white/5 rounded-2xl p-8">
+              <div key={t.name} className="bg-white border border-black/5 rounded-2xl p-8 shadow-sm">
                 <div className="flex gap-1 mb-4">
                   {[...Array(5)].map((_, i) => (
                     <Star key={i} size={13} className="text-[#c9a84c] fill-[#c9a84c]" />
                   ))}
                 </div>
-                <p className="text-gray-300 text-sm leading-relaxed mb-6">"{t.text}"</p>
+                <p className="text-[#3d372e] text-sm leading-relaxed mb-6">"{t.text}"</p>
                 <div>
-                  <p className="text-white font-semibold text-sm">{t.name}</p>
-                  <p className="text-gray-500 text-xs">{t.time}</p>
+                  <p className="text-[#1a1512] font-semibold text-sm">{t.name}</p>
+                  <p className="text-[#8a6d2f] text-xs">{t.time}</p>
                 </div>
               </div>
             ))}
@@ -166,15 +166,15 @@ export default function Home() {
       </section>
 
       {/* Location strip */}
-      <section className="py-16 px-4 bg-[#0a0a0a] border-t border-white/5">
+      <section className="py-16 px-4 bg-white border-t border-black/5">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
           <div>
-            <h3 className="text-white font-bold text-lg mb-1">{HOURS_SUMMARY}</h3>
-            <p className="text-gray-400 text-sm">Pornprapanimit Road, East Pattaya, Thailand · 064-240-0222</p>
+            <h3 className="text-[#1a1512] font-bold text-lg mb-1">{HOURS_SUMMARY}</h3>
+            <p className="text-[#5c5346] text-sm">Pornprapanimit Road, East Pattaya, Thailand · 064-240-0222</p>
           </div>
           <Link
             to="/location"
-            className="px-6 py-3 border border-[#c9a84c]/40 text-[#c9a84c] text-sm tracking-wider uppercase rounded hover:bg-[#c9a84c]/10 transition-colors"
+            className="px-6 py-3 border border-[#8a6d2f]/40 text-[#8a6d2f] text-sm tracking-wider uppercase rounded hover:bg-[#c9a84c]/10 transition-colors"
           >
             Get Directions
           </Link>

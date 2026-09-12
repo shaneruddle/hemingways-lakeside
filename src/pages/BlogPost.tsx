@@ -36,7 +36,7 @@ export default function BlogPost() {
 
   if (loading) {
     return (
-      <div className="pt-32 flex items-center justify-center min-h-screen">
+      <div className="pt-32 flex items-center justify-center min-h-screen bg-white">
         <div className="w-8 h-8 border-2 border-[#c9a84c] border-t-transparent rounded-full animate-spin" />
       </div>
     )
@@ -44,9 +44,9 @@ export default function BlogPost() {
 
   if (!post) {
     return (
-      <div className="pt-32 text-center px-4">
-        <p className="text-gray-500 mb-4">Post not found.</p>
-        <Link to="/blog" className="text-[#c9a84c] hover:underline">← Back to Blog</Link>
+      <div className="pt-32 text-center px-4 bg-white min-h-screen">
+        <p className="text-[#5c5346] mb-4">Post not found.</p>
+        <Link to="/blog" className="text-[#8a6d2f] hover:underline">← Back to Blog</Link>
       </div>
     )
   }
@@ -55,18 +55,18 @@ export default function BlogPost() {
 
   return (
     <div>
-      <section className="pt-32 pb-16 px-4">
+      <section className="pt-32 pb-16 px-4 bg-white">
         <div className="max-w-3xl mx-auto">
-          <Link to="/blog" className="inline-flex items-center gap-2 text-gray-500 hover:text-[#c9a84c] text-sm mb-8 transition-colors">
+          <Link to="/blog" className="inline-flex items-center gap-2 text-[#5c5346] hover:text-[#8a6d2f] text-sm mb-8 transition-colors">
             <ArrowLeft size={14} /> Back to Blog
           </Link>
           <div className="flex flex-wrap gap-2 mb-4">
             {post.tags.map(tag => (
-              <span key={tag} className="text-xs text-[#c9a84c] bg-[#c9a84c]/10 px-2 py-0.5 rounded-full">{tag}</span>
+              <span key={tag} className="text-xs text-[#8a6d2f] bg-[#c9a84c]/15 px-2 py-0.5 rounded-full">{tag}</span>
             ))}
           </div>
-          <h1 className="text-3xl sm:text-4xl font-bold mb-4">{post.title}</h1>
-          <div className="flex items-center gap-4 text-gray-500 text-sm mb-8">
+          <h1 className="text-3xl sm:text-4xl font-bold mb-4 text-[#1a1512]">{post.title}</h1>
+          <div className="flex items-center gap-4 text-[#5c5346] text-sm mb-8">
             <div className="flex items-center gap-2">
               <Calendar size={14} />
               {format(parseISO(post.publishedAt), 'd MMMM yyyy')}
@@ -79,11 +79,11 @@ export default function BlogPost() {
           )}
           {isHtml ? (
             <div
-              className="blog-content text-gray-300 leading-relaxed"
+              className="blog-content text-[#3d372e] leading-relaxed"
               dangerouslySetInnerHTML={{ __html: post.content }}
             />
           ) : (
-            <div className="text-gray-300 leading-relaxed">
+            <div className="text-[#3d372e] leading-relaxed">
               {post.content.split('\n').map((para, i) => (
                 <p key={i} className="mb-4">{para}</p>
               ))}

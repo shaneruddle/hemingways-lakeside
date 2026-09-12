@@ -79,20 +79,20 @@ export default function BeerGarden() {
       </section>
 
       {/* Features */}
-      <section className="py-24 px-4">
+      <section className="py-24 px-4 bg-[#f6efe0]">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <p className="text-[#c9a84c] text-xs tracking-[0.4em] uppercase mb-3">Why Sit Outside</p>
-            <h2 className="text-3xl sm:text-4xl font-bold">The Lakeside Difference</h2>
+            <p className="text-[#9c7a2e] text-xs tracking-[0.4em] uppercase mb-3">Why Sit Outside</p>
+            <h2 className="text-3xl sm:text-4xl font-bold text-[#1a1512]">The Lakeside Difference</h2>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {features.map(({ icon: Icon, title, desc }) => (
-              <div key={title} className="bg-[#141414] border border-white/5 rounded-2xl p-6">
-                <div className="w-10 h-10 rounded-xl bg-[#c9a84c]/10 flex items-center justify-center mb-4">
-                  <Icon size={20} className="text-[#c9a84c]" />
+              <div key={title} className="bg-white border border-black/5 rounded-2xl p-6 shadow-sm">
+                <div className="w-10 h-10 rounded-xl bg-[#c9a84c]/15 flex items-center justify-center mb-4">
+                  <Icon size={20} className="text-[#8a6d2f]" />
                 </div>
-                <h3 className="text-white font-bold mb-1">{title}</h3>
-                <p className="text-gray-500 text-sm">{desc}</p>
+                <h3 className="text-[#1a1512] font-bold mb-1">{title}</h3>
+                <p className="text-[#5c5346] text-sm">{desc}</p>
               </div>
             ))}
           </div>
@@ -100,24 +100,24 @@ export default function BeerGarden() {
       </section>
 
       {/* Drinks pricing */}
-      <section className="py-24 px-4 bg-[#0a0a0a]">
+      <section className="py-24 px-4 bg-white">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-14">
-            <p className="text-[#c9a84c] text-xs tracking-[0.4em] uppercase mb-3">On The Menu</p>
-            <h2 className="text-3xl sm:text-4xl font-bold">Beer Garden Prices</h2>
+            <p className="text-[#9c7a2e] text-xs tracking-[0.4em] uppercase mb-3">On The Menu</p>
+            <h2 className="text-3xl sm:text-4xl font-bold text-[#1a1512]">Beer Garden Prices</h2>
           </div>
-          <div className="bg-[#141414] border border-white/5 rounded-2xl divide-y divide-white/5">
+          <div className="bg-[#f6efe0] border border-black/5 rounded-2xl divide-y divide-black/5">
             {drinks.map(d => (
               <div key={d.name} className="flex items-center justify-between gap-4 px-6 py-5">
                 <div>
-                  <p className="text-white font-semibold">{d.name}</p>
-                  <p className="text-gray-500 text-sm">{d.desc}</p>
+                  <p className="text-[#1a1512] font-semibold">{d.name}</p>
+                  <p className="text-[#5c5346] text-sm">{d.desc}</p>
                 </div>
-                <span className="text-[#c9a84c] font-bold shrink-0">{d.price} THB</span>
+                <span className="text-[#8a6d2f] font-bold shrink-0">{d.price} THB</span>
               </div>
             ))}
           </div>
-          <p className="text-gray-600 text-sm text-center mt-6">Prices may vary - ask your server for today's guest taps and cocktail list.</p>
+          <p className="text-[#5c5346] text-sm text-center mt-6">Prices may vary - ask your server for today's guest taps and cocktail list.</p>
         </div>
       </section>
 
@@ -125,11 +125,11 @@ export default function BeerGarden() {
       <FaqMini heading="Beer Garden Questions" items={beerGardenFaqs} />
 
       {/* Groups CTA */}
-      <section className="py-24 px-4">
+      <section className="py-24 px-4 bg-[#f6efe0]">
         <div className="max-w-2xl mx-auto">
           <div className="text-center mb-10">
-            <h2 className="text-2xl font-bold mb-2">Bringing A Group?</h2>
-            <p className="text-gray-500 text-sm">Walk-ins always welcome - let us know ahead for groups of 6+ so we can hold you a table.</p>
+            <h2 className="text-2xl font-bold mb-2 text-[#1a1512]">Bringing A Group?</h2>
+            <p className="text-[#5c5346] text-sm">Walk-ins always welcome - let us know ahead for groups of 6+ so we can hold you a table.</p>
           </div>
           <EnquiryForm
             type="general"

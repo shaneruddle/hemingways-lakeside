@@ -82,20 +82,20 @@ export default function Pool() {
       </section>
 
       {/* Facilities */}
-      <section className="py-24 px-4">
+      <section className="py-24 px-4 bg-[#f6efe0]">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <p className="text-[#c9a84c] text-xs tracking-[0.4em] uppercase mb-3">Everything On-Site</p>
-            <h2 className="text-3xl sm:text-4xl font-bold">Built for a Full Day</h2>
+            <p className="text-[#9c7a2e] text-xs tracking-[0.4em] uppercase mb-3">Everything On-Site</p>
+            <h2 className="text-3xl sm:text-4xl font-bold text-[#1a1512]">Built for a Full Day</h2>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {facilities.map(({ icon: Icon, title, desc }) => (
-              <div key={title} className="bg-[#141414] border border-white/5 rounded-2xl p-6">
-                <div className="w-10 h-10 rounded-xl bg-[#c9a84c]/10 flex items-center justify-center mb-4">
-                  <Icon size={20} className="text-[#c9a84c]" />
+              <div key={title} className="bg-white border border-black/5 rounded-2xl p-6 shadow-sm">
+                <div className="w-10 h-10 rounded-xl bg-[#c9a84c]/15 flex items-center justify-center mb-4">
+                  <Icon size={20} className="text-[#8a6d2f]" />
                 </div>
-                <h3 className="text-white font-bold mb-1">{title}</h3>
-                <p className="text-gray-500 text-sm">{desc}</p>
+                <h3 className="text-[#1a1512] font-bold mb-1">{title}</h3>
+                <p className="text-[#5c5346] text-sm">{desc}</p>
               </div>
             ))}
           </div>
@@ -103,18 +103,18 @@ export default function Pool() {
       </section>
 
       {/* How a day works */}
-      <section className="py-24 px-4 bg-[#0a0a0a]">
+      <section className="py-24 px-4 bg-white">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-16">
-            <p className="text-[#c9a84c] text-xs tracking-[0.4em] uppercase mb-3">How It Works</p>
-            <h2 className="text-3xl sm:text-4xl font-bold">Your Day at the Lake</h2>
+            <p className="text-[#9c7a2e] text-xs tracking-[0.4em] uppercase mb-3">How It Works</p>
+            <h2 className="text-3xl sm:text-4xl font-bold text-[#1a1512]">Your Day at the Lake</h2>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {dayPlan.map(({ time, desc }, i) => (
-              <div key={time} className="relative bg-[#141414] border border-white/5 rounded-2xl p-6">
-                <div className="text-[#c9a84c] font-bold text-4xl mb-3 opacity-30">{i + 1}</div>
-                <h3 className="text-white font-bold mb-1">{time}</h3>
-                <p className="text-gray-500 text-sm">{desc}</p>
+              <div key={time} className="relative bg-[#f6efe0] border border-black/5 rounded-2xl p-6">
+                <div className="text-[#c9a84c] font-bold text-4xl mb-3 opacity-60">{i + 1}</div>
+                <h3 className="text-[#1a1512] font-bold mb-1">{time}</h3>
+                <p className="text-[#5c5346] text-sm">{desc}</p>
               </div>
             ))}
           </div>
@@ -122,11 +122,11 @@ export default function Pool() {
       </section>
 
       {/* Worth the trip / directions */}
-      <section className="py-24 px-4">
-        <div className="max-w-4xl mx-auto bg-[#141414] border border-white/10 rounded-3xl p-10 sm:p-14 text-center">
-          <p className="text-[#c9a84c] text-xs tracking-[0.4em] uppercase mb-3">Worth the Drive</p>
-          <h2 className="text-3xl font-bold mb-4">30 Minutes From Central Pattaya</h2>
-          <p className="text-gray-400 max-w-lg mx-auto mb-8">
+      <section className="py-24 px-4 bg-[#f6efe0]">
+        <div className="max-w-4xl mx-auto bg-white border border-black/5 rounded-3xl p-10 sm:p-14 text-center shadow-sm">
+          <p className="text-[#9c7a2e] text-xs tracking-[0.4em] uppercase mb-3">Worth the Drive</p>
+          <h2 className="text-3xl font-bold mb-4 text-[#1a1512]">30 Minutes From Central Pattaya</h2>
+          <p className="text-[#5c5346] max-w-lg mx-auto mb-8">
             We&rsquo;re out at Lake Mabprachan in East Pattaya &mdash; away from the traffic and the crowds.
             An easy drive, free parking when you arrive, and a day the kids will ask to repeat.
           </p>
@@ -141,7 +141,7 @@ export default function Pool() {
             </a>
             <a
               href="tel:0642400222"
-              className="inline-flex items-center justify-center gap-2 px-8 py-4 border border-[#c9a84c]/40 text-[#c9a84c] font-bold text-sm tracking-widest uppercase rounded hover:bg-[#c9a84c]/10 transition-colors"
+              className="inline-flex items-center justify-center gap-2 px-8 py-4 border border-[#8a6d2f]/40 text-[#8a6d2f] font-bold text-sm tracking-widest uppercase rounded hover:bg-[#c9a84c]/10 transition-colors"
             >
               <Phone size={16} /> 064-240-0222
             </a>
@@ -152,15 +152,15 @@ export default function Pool() {
       {/* Kids pool parties CTA */}
       <section className="pb-24 px-4">
         <div className="max-w-4xl mx-auto text-center">
-          <p className="text-[#c9a84c] text-xs tracking-[0.4em] uppercase mb-3">Kids Love It</p>
-          <h2 className="text-3xl font-bold mb-4">Planning a Kids Pool Party?</h2>
-          <p className="text-gray-400 max-w-lg mx-auto mb-8">
+          <p className="text-[#9c7a2e] text-xs tracking-[0.4em] uppercase mb-3">Kids Love It</p>
+          <h2 className="text-3xl font-bold mb-4 text-[#1a1512]">Planning a Kids Pool Party?</h2>
+          <p className="text-[#5c5346] max-w-lg mx-auto mb-8">
             We specialise in kids birthday pool parties. Food, drinks, pool time, and a private
             area for your group. We handle everything.
           </p>
           <Link
             to="/events/kids"
-            className="inline-block px-8 py-4 border border-[#c9a84c]/40 text-[#c9a84c] font-bold text-sm tracking-widest uppercase rounded hover:bg-[#c9a84c]/10 transition-colors"
+            className="inline-block px-8 py-4 border border-[#8a6d2f]/40 text-[#8a6d2f] font-bold text-sm tracking-widest uppercase rounded hover:bg-[#c9a84c]/10 transition-colors"
           >
             Kids Party Packages
           </Link>
@@ -168,11 +168,11 @@ export default function Pool() {
       </section>
 
       {/* Enquiry */}
-      <section className="py-24 px-4 bg-[#0a0a0a]">
+      <section className="py-24 px-4 bg-[#f6efe0]">
         <div className="max-w-2xl mx-auto">
           <div className="text-center mb-10">
-            <h2 className="text-2xl font-bold mb-2">Coming With a Group?</h2>
-            <p className="text-gray-500 text-sm">Walk-ins always welcome &mdash; book ahead for groups of 6+</p>
+            <h2 className="text-2xl font-bold mb-2 text-[#1a1512]">Coming With a Group?</h2>
+            <p className="text-[#5c5346] text-sm">Walk-ins always welcome &mdash; book ahead for groups of 6+</p>
           </div>
           <EnquiryForm
             type="pool"

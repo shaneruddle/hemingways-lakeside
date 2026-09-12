@@ -86,30 +86,30 @@ export default function PoolParty() {
       </section>
 
       {/* Packages */}
-      <section id="packages" className="py-24 px-4">
+      <section id="packages" className="py-24 px-4 bg-[#f6efe0]">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <p className="text-[#c9a84c] text-xs tracking-[0.4em] uppercase mb-3">Pick Your Package</p>
-            <h2 className="text-3xl sm:text-4xl font-bold">Three Ways To Do A Pool Day</h2>
+            <p className="text-[#9c7a2e] text-xs tracking-[0.4em] uppercase mb-3">Pick Your Package</p>
+            <h2 className="text-3xl sm:text-4xl font-bold text-[#1a1512]">Three Ways To Do A Pool Day</h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {packages.map(pkg => (
               <div
                 key={pkg.name}
-                className={`bg-[#141414] border rounded-2xl p-8 flex flex-col ${
-                  pkg.popular ? 'border-[#c9a84c]/50' : 'border-white/5'
+                className={`bg-white border rounded-2xl p-8 flex flex-col shadow-sm ${
+                  pkg.popular ? 'border-[#c9a84c]/50' : 'border-black/5'
                 }`}
               >
                 {pkg.popular && (
-                  <span className="text-xs tracking-widest uppercase text-[#c9a84c] font-bold mb-3">Most Popular</span>
+                  <span className="text-xs tracking-widest uppercase text-[#8a6d2f] font-bold mb-3">Most Popular</span>
                 )}
-                <h3 className="text-white font-bold text-xl mb-1">{pkg.name}</h3>
-                <p className="text-[#c9a84c] font-bold text-2xl mb-3">{pkg.price} THB <span className="text-gray-500 text-sm font-normal">/ person</span></p>
-                <p className="text-gray-500 text-sm mb-6">{pkg.desc}</p>
+                <h3 className="text-[#1a1512] font-bold text-xl mb-1">{pkg.name}</h3>
+                <p className="text-[#8a6d2f] font-bold text-2xl mb-3">{pkg.price} THB <span className="text-[#5c5346] text-sm font-normal">/ person</span></p>
+                <p className="text-[#5c5346] text-sm mb-6">{pkg.desc}</p>
                 <ul className="space-y-2 mt-auto">
                   {pkg.includes.map(item => (
-                    <li key={item} className="flex items-start gap-2 text-gray-300 text-sm">
-                      <Check size={16} className="text-[#c9a84c] mt-0.5 shrink-0" />
+                    <li key={item} className="flex items-start gap-2 text-[#3d372e] text-sm">
+                      <Check size={16} className="text-[#8a6d2f] mt-0.5 shrink-0" />
                       {item}
                     </li>
                   ))}
@@ -117,16 +117,16 @@ export default function PoolParty() {
               </div>
             ))}
           </div>
-          <p className="text-gray-600 text-sm text-center mt-8">Prices per person, may vary - confirm with staff when booking. Eating or drinking a la carte instead? The pool is free with any table or bar order.</p>
+          <p className="text-[#5c5346] text-sm text-center mt-8">Prices per person, may vary - confirm with staff when booking. Eating or drinking a la carte instead? The pool is free with any table or bar order.</p>
         </div>
       </section>
 
       {/* Groups */}
-      <section className="py-24 px-4 bg-[#0a0a0a]">
-        <div className="max-w-4xl mx-auto bg-[#141414] border border-white/10 rounded-3xl p-10 sm:p-14 text-center">
-          <Users size={32} className="text-[#c9a84c] mx-auto mb-4" />
-          <h2 className="text-3xl font-bold mb-4">Bringing A Big Group?</h2>
-          <p className="text-gray-400 max-w-lg mx-auto mb-8">
+      <section className="py-24 px-4 bg-white">
+        <div className="max-w-4xl mx-auto bg-[#f6efe0] border border-black/5 rounded-3xl p-10 sm:p-14 text-center">
+          <Users size={32} className="text-[#8a6d2f] mx-auto mb-4" />
+          <h2 className="text-3xl font-bold mb-4 text-[#1a1512]">Bringing A Big Group?</h2>
+          <p className="text-[#5c5346] max-w-lg mx-auto mb-8">
             For groups of 6 or more, or if you want loungers reserved ahead of time, call us or
             send an enquiry and we'll get you sorted.
           </p>
@@ -137,11 +137,11 @@ export default function PoolParty() {
       <FaqMini heading="Pool Party Questions" items={poolPartyFaqs} />
 
       {/* Enquiry */}
-      <section className="py-24 px-4">
+      <section className="py-24 px-4 bg-[#f6efe0]">
         <div className="max-w-2xl mx-auto">
           <div className="text-center mb-10">
-            <h2 className="text-2xl font-bold mb-2">Book A Pool Day</h2>
-            <p className="text-gray-500 text-sm">Tell us your group size and preferred date.</p>
+            <h2 className="text-2xl font-bold mb-2 text-[#1a1512]">Book A Pool Day</h2>
+            <p className="text-[#5c5346] text-sm">Tell us your group size and preferred date.</p>
           </div>
           <EnquiryForm
             type="pool"

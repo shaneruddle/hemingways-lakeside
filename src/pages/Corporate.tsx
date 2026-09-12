@@ -67,20 +67,20 @@ export default function Corporate() {
       </section>
 
       {/* Spaces */}
-      <section className="py-24 px-4">
+      <section className="py-24 px-4 bg-[#f6efe0]">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <p className="text-[#c9a84c] text-xs tracking-[0.4em] uppercase mb-3">Flexible Spaces</p>
-            <h2 className="text-3xl sm:text-4xl font-bold">One Venue, Four Formats</h2>
+            <p className="text-[#9c7a2e] text-xs tracking-[0.4em] uppercase mb-3">Flexible Spaces</p>
+            <h2 className="text-3xl sm:text-4xl font-bold text-[#1a1512]">One Venue, Four Formats</h2>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             {spaces.map(({ icon: Icon, title, desc }) => (
-              <div key={title} className="bg-[#141414] border border-white/5 rounded-2xl p-8">
-                <div className="w-10 h-10 rounded-xl bg-[#c9a84c]/10 flex items-center justify-center mb-4">
-                  <Icon size={20} className="text-[#c9a84c]" />
+              <div key={title} className="bg-white border border-black/5 rounded-2xl p-8 shadow-sm">
+                <div className="w-10 h-10 rounded-xl bg-[#c9a84c]/15 flex items-center justify-center mb-4">
+                  <Icon size={20} className="text-[#8a6d2f]" />
                 </div>
-                <h3 className="text-white font-bold text-lg mb-1">{title}</h3>
-                <p className="text-gray-500 text-sm">{desc}</p>
+                <h3 className="text-[#1a1512] font-bold text-lg mb-1">{title}</h3>
+                <p className="text-[#5c5346] text-sm">{desc}</p>
               </div>
             ))}
           </div>
@@ -88,11 +88,11 @@ export default function Corporate() {
       </section>
 
       {/* Use cases strip */}
-      <section className="py-16 px-4 bg-[#0a0a0a] border-y border-white/5">
+      <section className="py-16 px-4 bg-[#f6efe0] border-y border-black/5">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-wrap justify-center gap-3">
             {useCases.map(uc => (
-              <span key={uc} className="px-5 py-2.5 rounded-full bg-white/5 border border-white/10 text-gray-300 text-sm">
+              <span key={uc} className="px-5 py-2.5 rounded-full bg-white border border-black/10 text-[#3d372e] text-sm shadow-sm">
                 {uc}
               </span>
             ))}
@@ -101,20 +101,20 @@ export default function Corporate() {
       </section>
 
       {/* Practical details */}
-      <section className="py-24 px-4">
+      <section className="py-24 px-4 bg-white">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <p className="text-[#c9a84c] text-xs tracking-[0.4em] uppercase mb-3">The Practical Bits</p>
-            <h2 className="text-3xl sm:text-4xl font-bold">Everything Your Event Needs</h2>
+            <p className="text-[#9c7a2e] text-xs tracking-[0.4em] uppercase mb-3">The Practical Bits</p>
+            <h2 className="text-3xl sm:text-4xl font-bold text-[#1a1512]">Everything Your Event Needs</h2>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {practical.map(({ icon: Icon, title, desc }) => (
-              <div key={title} className="bg-[#141414] border border-white/5 rounded-2xl p-6">
-                <div className="w-10 h-10 rounded-xl bg-[#c9a84c]/10 flex items-center justify-center mb-4">
-                  <Icon size={20} className="text-[#c9a84c]" />
+              <div key={title} className="bg-[#f6efe0] border border-black/5 rounded-2xl p-6">
+                <div className="w-10 h-10 rounded-xl bg-[#c9a84c]/15 flex items-center justify-center mb-4">
+                  <Icon size={20} className="text-[#8a6d2f]" />
                 </div>
-                <h3 className="text-white font-bold mb-1">{title}</h3>
-                <p className="text-gray-500 text-sm">{desc}</p>
+                <h3 className="text-[#1a1512] font-bold mb-1">{title}</h3>
+                <p className="text-[#5c5346] text-sm">{desc}</p>
               </div>
             ))}
           </div>
@@ -131,11 +131,11 @@ export default function Corporate() {
       <FaqMini heading="Corporate Event Questions" items={corporateFaqs} />
 
       {/* Enquiry */}
-      <section id="enquiry" className="py-24 px-4 bg-[#0a0a0a]">
+      <section id="enquiry" className="py-24 px-4 bg-[#f6efe0]">
         <div className="max-w-2xl mx-auto">
           <div className="text-center mb-10">
-            <h2 className="text-2xl font-bold mb-2">Tell Us About Your Event</h2>
-            <p className="text-gray-500 text-sm">
+            <h2 className="text-2xl font-bold mb-2 text-[#1a1512]">Tell Us About Your Event</h2>
+            <p className="text-[#5c5346] text-sm">
               Fully custom, up to 200 guests — no minimum spend. Tell us your headcount and
               budget and we’ll put a proposal together.
             </p>

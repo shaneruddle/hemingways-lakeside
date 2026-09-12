@@ -143,11 +143,11 @@ export default function KidsParties() {
       <FaqMini heading="Kids Party Questions" items={kidsFaqs} />
 
       {/* Enquiry */}
-      <section id="enquiry" className="py-24 px-4">
+      <section id="enquiry" className="py-24 px-4 bg-[#f6efe0]">
         <div className="max-w-2xl mx-auto">
           <div className="text-center mb-10">
-            <h2 className="text-2xl font-bold mb-2">Let’s Plan Their Day</h2>
-            <p className="text-gray-400 text-sm">
+            <h2 className="text-2xl font-bold mb-2 text-[#1a1512]">Let’s Plan Their Day</h2>
+            <p className="text-[#5c5346] text-sm">
               Every party is custom &mdash; tell us the age, the date and the headcount, and we’ll build it around your child.
             </p>
           </div>

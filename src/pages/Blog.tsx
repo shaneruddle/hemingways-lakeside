@@ -42,21 +42,21 @@ export default function Blog() {
 
   return (
     <div>
-      <section className="pt-32 pb-20 px-4 bg-gradient-to-b from-[#0d1a0d] to-[#0d0d0d]">
+      <section className="pt-32 pb-20 px-4 bg-[#f6efe0]">
         <div className="max-w-4xl mx-auto text-center">
-          <p className="text-[#c9a84c] text-xs tracking-[0.4em] uppercase mb-4">News & Stories</p>
-          <h1 className="text-4xl sm:text-6xl font-bold mb-4">The Blog</h1>
-          <p className="text-gray-400 text-lg">Events, news, and stories from Hemingways Lakeside.</p>
+          <p className="text-[#9c7a2e] text-xs tracking-[0.4em] uppercase mb-4">News & Stories</p>
+          <h1 className="text-4xl sm:text-6xl font-bold mb-4 text-[#1a1512]">The Blog</h1>
+          <p className="text-[#5c5346] text-lg">Events, news, and stories from Hemingways Lakeside.</p>
         </div>
       </section>
 
-      <section className="py-20 px-4">
+      <section className="py-20 px-4 bg-white">
         <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
           {posts.map(post => (
             <Link
               key={post.id}
               to={`/blog/${post.slug || post.id}`}
-              className="bg-[#141414] border border-white/5 rounded-2xl overflow-hidden hover:border-[#c9a84c]/20 transition-colors group"
+              className="bg-[#f6efe0] border border-black/5 rounded-2xl overflow-hidden shadow-sm hover:border-[#c9a84c]/40 transition-colors group"
             >
               {post.imageUrl && (
                 <img src={post.imageUrl} alt={post.title} className="w-full h-48 object-cover" />
@@ -64,21 +64,21 @@ export default function Blog() {
               <div className="p-8">
                 <div className="flex flex-wrap gap-2 mb-3">
                   {post.tags.map(tag => (
-                    <span key={tag} className="text-xs text-[#c9a84c] bg-[#c9a84c]/10 px-2 py-0.5 rounded-full">
+                    <span key={tag} className="text-xs text-[#8a6d2f] bg-[#c9a84c]/15 px-2 py-0.5 rounded-full">
                       {tag}
                     </span>
                   ))}
                 </div>
-                <h2 className="text-white font-bold text-lg mb-2 group-hover:text-[#c9a84c] transition-colors">
+                <h2 className="text-[#1a1512] font-bold text-lg mb-2 group-hover:text-[#8a6d2f] transition-colors">
                   {post.title}
                 </h2>
-                <p className="text-gray-500 text-sm mb-4">{post.excerpt}</p>
-                <div className="flex items-center justify-between text-xs text-gray-600">
+                <p className="text-[#5c5346] text-sm mb-4">{post.excerpt}</p>
+                <div className="flex items-center justify-between text-xs text-[#5c5346]">
                   <div className="flex items-center gap-2">
                     <Calendar size={12} />
                     {format(parseISO(post.publishedAt), 'd MMM yyyy')}
                   </div>
-                  <div className="flex items-center gap-1 text-[#c9a84c] group-hover:gap-2 transition-all">
+                  <div className="flex items-center gap-1 text-[#8a6d2f] group-hover:gap-2 transition-all">
                     Read more <ArrowRight size={12} />
                   </div>
                 </div>

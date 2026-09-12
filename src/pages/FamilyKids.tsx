@@ -162,11 +162,11 @@ export default function FamilyKids() {
       <FaqMini heading="Family Day Questions" items={familyFaqs} />
 
       {/* Worth the trip / directions */}
-      <section className="py-24 px-4">
-        <div className="max-w-4xl mx-auto bg-[#141414] border border-white/10 rounded-3xl p-10 sm:p-14 text-center">
-          <p className="text-[#c9a84c] text-xs tracking-[0.4em] uppercase mb-3">Worth The Drive</p>
-          <h2 className="text-3xl font-bold mb-4">30 Minutes From Central Pattaya</h2>
-          <p className="text-gray-400 max-w-lg mx-auto mb-8">
+      <section className="py-24 px-4 bg-white">
+        <div className="max-w-4xl mx-auto bg-[#f6efe0] border border-black/5 rounded-3xl p-10 sm:p-14 text-center">
+          <p className="text-[#9c7a2e] text-xs tracking-[0.4em] uppercase mb-3">Worth The Drive</p>
+          <h2 className="text-3xl font-bold mb-4 text-[#1a1512]">30 Minutes From Central Pattaya</h2>
+          <p className="text-[#5c5346] max-w-lg mx-auto mb-8">
             We&rsquo;re out at Lake Mabprachan in East Pattaya &mdash; away from the traffic and the crowds.
             An easy drive, free parking when you arrive, and a day the kids will ask to repeat.
           </p>
@@ -181,7 +181,7 @@ export default function FamilyKids() {
             </a>
             <a
               href="tel:0642400222"
-              className="inline-flex items-center justify-center gap-2 px-8 py-4 border border-[#c9a84c]/40 text-[#c9a84c] font-bold text-sm tracking-widest uppercase rounded hover:bg-[#c9a84c]/10 transition-colors"
+              className="inline-flex items-center justify-center gap-2 px-8 py-4 border border-[#8a6d2f]/40 text-[#8a6d2f] font-bold text-sm tracking-widest uppercase rounded hover:bg-[#c9a84c]/10 transition-colors"
             >
               <Phone size={16} /> 064-240-0222
             </a>
@@ -190,11 +190,11 @@ export default function FamilyKids() {
       </section>
 
       {/* Enquiry */}
-      <section className="py-24 px-4 bg-[#0a0a0a]">
+      <section className="py-24 px-4 bg-[#f6efe0]">
         <div className="max-w-2xl mx-auto">
           <div className="text-center mb-10">
-            <h2 className="text-2xl font-bold mb-2">Planning A Family Visit?</h2>
-            <p className="text-gray-400 text-sm">Walk-ins always welcome &mdash; let us know ahead for bigger groups or a birthday</p>
+            <h2 className="text-2xl font-bold mb-2 text-[#1a1512]">Planning A Family Visit?</h2>
+            <p className="text-[#5c5346] text-sm">Walk-ins always welcome &mdash; let us know ahead for bigger groups or a birthday</p>
           </div>
           <EnquiryForm
             type="general"
