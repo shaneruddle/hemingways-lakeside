@@ -46,6 +46,11 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://hemingwayslakeside.com/th/family-pool-mabprachan</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://hemingwayslakeside.com/sports</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>

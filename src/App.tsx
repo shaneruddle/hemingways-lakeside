@@ -9,6 +9,7 @@ import Corporate from './pages/Corporate'
 import Pool from './pages/Pool'
 import PoolParty from './pages/PoolParty'
 import FamilyKids from './pages/FamilyKids'
+import ThaiFamilyPool from './pages/ThaiFamilyPool'
 import Sports from './pages/Sports'
 import BeerGarden from './pages/BeerGarden'
 import SundayRoast from './pages/SundayRoast'
@@ -48,6 +49,7 @@ export default function App() {
           <Route path="/pool" element={<Pool />} />
           <Route path="/pool-party" element={<PoolParty />} />
           <Route path="/family-kids" element={<FamilyKids />} />
+          <Route path="/th/family-pool-mabprachan" element={<ThaiFamilyPool />} />
           <Route path="/sports" element={<Sports />} />
           <Route path="/beer-garden" element={<BeerGarden />} />
           <Route path="/sunday-roast" element={<SundayRoast />} />

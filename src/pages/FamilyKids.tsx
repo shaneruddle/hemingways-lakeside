@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { Waves, Gamepad2, UtensilsCrossed, Cake, Check, ArrowRight, MapPin, Phone } from 'lucide-react'
 import EnquiryForm from '../components/EnquiryForm'
@@ -51,6 +52,23 @@ const dayOutPoints = [
 ]
 
 export default function FamilyKids() {
+  // hreflang pair with the Thai landing page (/th/family-pool-mabprachan).
+  useEffect(() => {
+    const links = [
+      { hreflang: 'en', href: 'https://hemingwayslakeside.com/family-kids' },
+      { hreflang: 'th', href: 'https://hemingwayslakeside.com/th/family-pool-mabprachan' },
+      { hreflang: 'x-default', href: 'https://hemingwayslakeside.com/family-kids' },
+    ].map(({ hreflang, href }) => {
+      const el = document.createElement('link')
+      el.rel = 'alternate'
+      el.hreflang = hreflang
+      el.href = href
+      document.head.appendChild(el)
+      return el
+    })
+    return () => links.forEach(el => el.remove())
+  }, [])
+
   return (
     <div>
       <Seo
