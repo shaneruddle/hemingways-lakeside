@@ -59,21 +59,23 @@ export default function Home() {
       </section>
 
       {/* Features */}
-      <section className="py-24 px-4 max-w-7xl mx-auto">
-        <div className="text-center mb-16">
-          <p className="text-[#c9a84c] text-xs tracking-[0.4em] uppercase mb-3">Why Hemingways</p>
-          <h2 className="text-3xl sm:text-4xl font-bold">Everything You Need</h2>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {features.map(({ icon: Icon, label, desc }) => (
-            <div key={label} className="bg-[#141414] border border-white/5 rounded-2xl p-8 hover:border-[#c9a84c]/20 transition-colors group">
-              <div className="w-12 h-12 rounded-xl bg-[#c9a84c]/10 flex items-center justify-center mb-5 group-hover:bg-[#c9a84c]/20 transition-colors">
-                <Icon size={22} className="text-[#c9a84c]" />
+      <section className="py-24 px-4 bg-[#f6efe0]">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <p className="text-[#9c7a2e] text-xs tracking-[0.4em] uppercase mb-3">Why Hemingways</p>
+            <h2 className="text-3xl sm:text-4xl font-bold text-[#1a1512]">Everything You Need</h2>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {features.map(({ icon: Icon, label, desc }) => (
+              <div key={label} className="bg-white border border-black/5 rounded-2xl p-8 shadow-sm hover:border-[#c9a84c]/40 transition-colors group">
+                <div className="w-12 h-12 rounded-xl bg-[#c9a84c]/15 flex items-center justify-center mb-5 group-hover:bg-[#c9a84c]/25 transition-colors">
+                  <Icon size={22} className="text-[#8a6d2f]" />
+                </div>
+                <h3 className="text-[#1a1512] font-bold mb-2">{label}</h3>
+                <p className="text-[#5c5346] text-sm leading-relaxed">{desc}</p>
               </div>
-              <h3 className="text-white font-bold mb-2">{label}</h3>
-              <p className="text-gray-500 text-sm leading-relaxed">{desc}</p>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </section>
 
@@ -102,23 +104,31 @@ export default function Home() {
       </section>
 
       {/* Events CTA */}
-      <section className="py-20 px-4 bg-[#0a0a0a]">
-        <div className="max-w-7xl mx-auto text-center">
-          <p className="text-[#c9a84c] text-xs tracking-[0.4em] uppercase mb-3">Private Hire</p>
-          <h2 className="text-3xl sm:text-4xl font-bold mb-4">Host Your Event Here</h2>
-          <p className="text-gray-400 max-w-xl mx-auto mb-10">
-            Birthday parties, kids pool parties, corporate functions, sports screenings — we handle everything so you can enjoy the day.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link to="/events/birthdays" className="px-6 py-3 bg-white/5 border border-white/10 rounded-lg text-sm hover:border-[#c9a84c]/40 hover:text-[#c9a84c] transition-colors">
-              🎂 Birthday Parties
-            </Link>
-            <Link to="/events/kids" className="px-6 py-3 bg-white/5 border border-white/10 rounded-lg text-sm hover:border-[#c9a84c]/40 hover:text-[#c9a84c] transition-colors">
-              🎉 Kids Parties
-            </Link>
-            <Link to="/events/corporate" className="px-6 py-3 bg-white/5 border border-white/10 rounded-lg text-sm hover:border-[#c9a84c]/40 hover:text-[#c9a84c] transition-colors">
-              🤝 Corporate Events
-            </Link>
+      <section className="py-20 px-4">
+        <div className="max-w-7xl mx-auto">
+          <div className="bg-[#f6efe0] rounded-3xl overflow-hidden flex flex-col md:flex-row items-stretch">
+            <div className="flex-1 p-10 sm:p-16 flex flex-col justify-center">
+              <p className="text-[#9c7a2e] text-xs tracking-[0.4em] uppercase mb-3">Private Hire</p>
+              <h2 className="text-3xl sm:text-4xl font-bold mb-4 text-[#1a1512]">Host Your Event Here</h2>
+              <p className="text-[#5c5346] max-w-xl mb-8">
+                Birthday parties, kids pool parties, corporate functions, sports screenings — we handle everything so you can enjoy the day.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-3">
+                <Link to="/events/birthdays" className="px-6 py-3 bg-white border border-black/10 rounded-lg text-sm text-[#1a1512] text-center hover:border-[#c9a84c] hover:text-[#8a6d2f] transition-colors">
+                  🎂 Birthday Parties
+                </Link>
+                <Link to="/events/kids" className="px-6 py-3 bg-white border border-black/10 rounded-lg text-sm text-[#1a1512] text-center hover:border-[#c9a84c] hover:text-[#8a6d2f] transition-colors">
+                  🎉 Kids Parties
+                </Link>
+                <Link to="/events/corporate" className="px-6 py-3 bg-white border border-black/10 rounded-lg text-sm text-[#1a1512] text-center hover:border-[#c9a84c] hover:text-[#8a6d2f] transition-colors">
+                  🤝 Corporate Events
+                </Link>
+              </div>
+            </div>
+            <div
+              className="flex-1 min-h-[280px] bg-cover bg-center"
+              style={{ backgroundImage: "url('/kids-hero.webp')" }}
+            />
           </div>
         </div>
       </section>
@@ -147,7 +157,7 @@ export default function Home() {
                 <p className="text-gray-300 text-sm leading-relaxed mb-6">"{t.text}"</p>
                 <div>
                   <p className="text-white font-semibold text-sm">{t.name}</p>
-                  <p className="text-gray-600 text-xs">{t.time}</p>
+                  <p className="text-gray-500 text-xs">{t.time}</p>
                 </div>
               </div>
             ))}
@@ -160,7 +170,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
           <div>
             <h3 className="text-white font-bold text-lg mb-1">{HOURS_SUMMARY}</h3>
-            <p className="text-gray-500 text-sm">Pornprapanimit Road, East Pattaya, Thailand · 064-240-0222</p>
+            <p className="text-gray-400 text-sm">Pornprapanimit Road, East Pattaya, Thailand · 064-240-0222</p>
           </div>
           <Link
             to="/location"

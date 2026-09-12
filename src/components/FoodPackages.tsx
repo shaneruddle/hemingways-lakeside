@@ -55,12 +55,12 @@ const sampleFood = [
 
 export default function FoodPackages({ heading = 'Food Packages' }: { heading?: string }) {
   return (
-    <section id="packages" className="py-24 px-4 bg-[#0a0a0a]">
+    <section id="packages" className="py-24 px-4 bg-[#f6efe0]">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-6">
-          <p className="text-[#c9a84c] text-xs tracking-[0.4em] uppercase mb-3">Great Food · Good Company · Memorable Moments</p>
-          <h2 className="text-3xl sm:text-4xl font-bold mb-4">{heading}</h2>
-          <p className="text-gray-400 max-w-2xl mx-auto text-sm sm:text-base leading-relaxed">
+          <p className="text-[#9c7a2e] text-xs tracking-[0.4em] uppercase mb-3">Great Food · Good Company · Memorable Moments</p>
+          <h2 className="text-3xl sm:text-4xl font-bold mb-4 text-[#1a1512]">{heading}</h2>
+          <p className="text-[#5c5346] max-w-2xl mx-auto text-sm sm:text-base leading-relaxed">
             We usually work with a budget of 300–1,000 THB per person, depending on your guest
             count, the amount of food, and the food & drinks you'd like. Already have a budget
             in mind? Tell us and we'll prepare a quotation around it.
@@ -72,24 +72,24 @@ export default function FoodPackages({ heading = 'Food Packages' }: { heading?: 
           {packages.map(pkg => (
             <div
               key={pkg.letter}
-              className={`rounded-2xl p-6 border ${
+              className={`rounded-2xl p-6 border shadow-sm ${
                 pkg.custom
-                  ? 'bg-[#c9a84c]/10 border-[#c9a84c]/30'
-                  : 'bg-[#141414] border-white/5'
+                  ? 'bg-[#c9a84c]/15 border-[#c9a84c]/40'
+                  : 'bg-white border-black/5'
               }`}
             >
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-9 h-9 rounded-lg bg-[#c9a84c]/10 flex items-center justify-center shrink-0">
-                  <span className="text-[#c9a84c] font-bold text-sm">{pkg.letter}</span>
+                <div className="w-9 h-9 rounded-lg bg-[#c9a84c]/15 flex items-center justify-center shrink-0">
+                  <span className="text-[#8a6d2f] font-bold text-sm">{pkg.letter}</span>
                 </div>
-                <h3 className="text-white font-bold">Package {pkg.letter}</h3>
+                <h3 className="text-[#1a1512] font-bold">Package {pkg.letter}</h3>
               </div>
-              <p className="text-2xl font-bold text-[#c9a84c] mb-1">{pkg.price}</p>
-              <p className="text-gray-300 text-sm mb-4">{pkg.items}</p>
+              <p className="text-2xl font-bold text-[#8a6d2f] mb-1">{pkg.price}</p>
+              <p className="text-[#3d372e] text-sm mb-4">{pkg.items}</p>
               <ul className="space-y-2">
                 {pkg.extras.map(extra => (
-                  <li key={extra} className="flex items-start gap-2 text-gray-500 text-xs">
-                    <Check size={14} className="text-[#c9a84c] mt-0.5 shrink-0" />
+                  <li key={extra} className="flex items-start gap-2 text-[#5c5346] text-xs">
+                    <Check size={14} className="text-[#8a6d2f] mt-0.5 shrink-0" />
                     {extra}
                   </li>
                 ))}
@@ -100,24 +100,24 @@ export default function FoodPackages({ heading = 'Food Packages' }: { heading?: 
 
         {/* Roasted pig + sample food */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12">
-          <div className="lg:col-span-1 bg-[#141414] border border-white/5 rounded-2xl p-6 flex flex-col justify-center">
-            <div className="w-10 h-10 rounded-xl bg-[#c9a84c]/10 flex items-center justify-center mb-4">
-              <Flame size={20} className="text-[#c9a84c]" />
+          <div className="lg:col-span-1 bg-white border border-black/5 rounded-2xl p-6 flex flex-col justify-center shadow-sm">
+            <div className="w-10 h-10 rounded-xl bg-[#c9a84c]/15 flex items-center justify-center mb-4">
+              <Flame size={20} className="text-[#8a6d2f]" />
             </div>
-            <h3 className="text-white font-bold text-lg mb-1">Roasted Pig — Special Price</h3>
-            <p className="text-2xl font-bold text-[#c9a84c] mb-2">4,000–6,000 THB / pig</p>
-            <p className="text-gray-500 text-sm">A showstopper for your special event.</p>
+            <h3 className="text-[#1a1512] font-bold text-lg mb-1">Roasted Pig — Special Price</h3>
+            <p className="text-2xl font-bold text-[#8a6d2f] mb-2">4,000–6,000 THB / pig</p>
+            <p className="text-[#5c5346] text-sm">A showstopper for your special event.</p>
           </div>
-          <div className="lg:col-span-2 bg-[#141414] border border-white/5 rounded-2xl p-6">
-            <div className="w-10 h-10 rounded-xl bg-[#c9a84c]/10 flex items-center justify-center mb-4">
-              <UtensilsCrossed size={20} className="text-[#c9a84c]" />
+          <div className="lg:col-span-2 bg-white border border-black/5 rounded-2xl p-6 shadow-sm">
+            <div className="w-10 h-10 rounded-xl bg-[#c9a84c]/15 flex items-center justify-center mb-4">
+              <UtensilsCrossed size={20} className="text-[#8a6d2f]" />
             </div>
-            <h3 className="text-white font-bold text-lg mb-3">Sample Food Options</h3>
+            <h3 className="text-[#1a1512] font-bold text-lg mb-3">Sample Food Options</h3>
             <div className="flex flex-wrap gap-2">
               {sampleFood.map(item => (
                 <span
                   key={item}
-                  className="px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-gray-400 text-xs"
+                  className="px-3 py-1.5 rounded-full bg-black/[0.03] border border-black/10 text-[#5c5346] text-xs"
                 >
                   {item}
                 </span>
@@ -127,24 +127,24 @@ export default function FoodPackages({ heading = 'Food Packages' }: { heading?: 
         </div>
 
         {/* Drinks package */}
-        <div className="bg-[#141414] border border-white/5 rounded-2xl p-6 sm:p-8 mb-8">
+        <div className="bg-white border border-black/5 rounded-2xl p-6 sm:p-8 mb-8 shadow-sm">
           <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 rounded-xl bg-[#c9a84c]/10 flex items-center justify-center">
-              <Beer size={20} className="text-[#c9a84c]" />
+            <div className="w-10 h-10 rounded-xl bg-[#c9a84c]/15 flex items-center justify-center">
+              <Beer size={20} className="text-[#8a6d2f]" />
             </div>
-            <h3 className="text-white font-bold text-lg">Drinks Package</h3>
+            <h3 className="text-[#1a1512] font-bold text-lg">Drinks Package</h3>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <div>
-              <p className="text-[#c9a84c] text-xs tracking-wider uppercase mb-2">Draft Beer</p>
-              <ul className="space-y-1 text-gray-400 text-sm">
+              <p className="text-[#9c7a2e] text-xs tracking-wider uppercase mb-2">Draft Beer</p>
+              <ul className="space-y-1 text-[#3d372e] text-sm">
                 <li>Tiger — 20L 3,500 THB / 30L 4,500 THB</li>
                 <li>Heineken — 20L 4,000 THB / 30L 5,000 THB</li>
               </ul>
             </div>
             <div>
-              <p className="text-[#c9a84c] text-xs tracking-wider uppercase mb-2">Bottled Beer (24 bottles)</p>
-              <ul className="space-y-1 text-gray-400 text-sm">
+              <p className="text-[#9c7a2e] text-xs tracking-wider uppercase mb-2">Bottled Beer (24 bottles)</p>
+              <ul className="space-y-1 text-[#3d372e] text-sm">
                 <li>Tiger / Singha / Chang / Leo — 1,200 THB</li>
                 <li>Heineken / San Miguel — 1,500 THB</li>
               </ul>
@@ -152,7 +152,7 @@ export default function FoodPackages({ heading = 'Food Packages' }: { heading?: 
           </div>
         </div>
 
-        <p className="text-center text-gray-600 text-xs max-w-xl mx-auto">
+        <p className="text-center text-[#5c5346] text-xs max-w-xl mx-auto">
           You can specify the food you want and anything else you require. Prices don't include
           activities and decorations — ask us about those when you enquire.
         </p>
