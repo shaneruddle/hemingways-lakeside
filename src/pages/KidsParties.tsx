@@ -2,6 +2,7 @@ import { Waves, Gamepad2, PartyPopper, Cake, Sparkles, Music, Users, Check } fro
 import EnquiryForm from '../components/EnquiryForm'
 import EventGallery from '../components/EventGallery'
 import FoodPackages from '../components/FoodPackages'
+import EventTestimonials from '../components/EventTestimonials'
 import Seo from '../components/Seo'
 import FaqMini from '../components/FaqMini'
 import { buildFaqSchema, SITE_FAQS } from '../lib/schema'
@@ -116,6 +117,23 @@ export default function KidsParties() {
       {/* Real package pricing — from Shane's Sept 2026 Birthday & Event Food Packages poster */}
       <FoodPackages heading="Party Food Packages" />
 
+      {/* Real Google reviews mentioning birthday parties (pulled Sept 2026) */}
+      <EventTestimonials
+        heading="What Guests Say About Their Parties"
+        items={[
+          {
+            name: 'Mike S.',
+            time: '9 months ago',
+            text: "We celebrated a birthday at Hemingways, highly recommended. We viewed a few other restaurants but after seeing Hemingways we knew it was the place for us. Fred the manager and the rest of the staff were so easy to deal with, the price was right, the food was great, and everything went smoothly.",
+          },
+          {
+            name: 'Marcella C.',
+            time: '1 year ago',
+            text: 'We organized a birthday party brunch for about 20 people. They were very organized and accommodating.',
+          },
+        ]}
+      />
+
       {/* FAQ (also feeds FAQPage schema above) */}
       <FaqMini heading="Kids Party Questions" items={kidsFaqs} />
 
@@ -131,7 +149,7 @@ export default function KidsParties() {
           <EnquiryForm
             type="kids_party"
             title="Kids Party Enquiry"
-            subtitle="We’ll come back to you with ideas and a custom package"
+            subtitle="We’ll come back to you with ideas and a custom package — usually within one business day"
           />
         </div>
       </section>
