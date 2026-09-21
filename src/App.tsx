@@ -10,6 +10,10 @@ import Pool from './pages/Pool'
 import PoolParty from './pages/PoolParty'
 import FamilyKids from './pages/FamilyKids'
 import ThaiFamilyPool from './pages/ThaiFamilyPool'
+import ThaiKidsCafePool from './pages/ThaiKidsCafePool'
+import ThaiCompanyParty from './pages/ThaiCompanyParty'
+import BirthdayClub from './pages/BirthdayClub'
+import HalloweenPoolParty from './pages/HalloweenPoolParty'
 import Sports from './pages/Sports'
 import BeerGarden from './pages/BeerGarden'
 import SundayRoast from './pages/SundayRoast'
@@ -46,10 +50,14 @@ export default function App() {
           <Route path="/events/birthdays" element={<BirthdayParties />} />
           <Route path="/events/kids" element={<KidsParties />} />
           <Route path="/events/corporate" element={<Corporate />} />
+          <Route path="/events/halloween" element={<HalloweenPoolParty />} />
+          <Route path="/birthday-club" element={<BirthdayClub />} />
           <Route path="/pool" element={<Pool />} />
           <Route path="/pool-party" element={<PoolParty />} />
           <Route path="/family-kids" element={<FamilyKids />} />
           <Route path="/th/family-pool-mabprachan" element={<ThaiFamilyPool />} />
+          <Route path="/th/kids-cafe-pool-pattaya" element={<ThaiKidsCafePool />} />
+          <Route path="/th/company-party-pattaya" element={<ThaiCompanyParty />} />
           <Route path="/sports" element={<Sports />} />
           <Route path="/beer-garden" element={<BeerGarden />} />
           <Route path="/sunday-roast" element={<SundayRoast />} />

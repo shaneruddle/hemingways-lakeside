@@ -90,10 +90,13 @@ export interface Enquiry {
   name: string
   phone: string
   email: string
-  type: 'general' | 'birthday' | 'kids_party' | 'pool' | 'corporate' | 'event'
+  type: 'general' | 'birthday' | 'kids_party' | 'pool' | 'corporate' | 'event' | 'birthday_club'
   message: string
   date?: string
   guestCount?: number
+  // Birthday Club sign-ups only (type === 'birthday_club')
+  birthMonth?: number
+  childName?: string
   status: 'new' | 'contacted' | 'booked' | 'closed'
   notes?: string
   createdAt: string
