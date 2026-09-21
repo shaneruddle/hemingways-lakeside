@@ -3,6 +3,7 @@ import EnquiryForm from '../components/EnquiryForm'
 import EventGallery from '../components/EventGallery'
 import FoodPackages from '../components/FoodPackages'
 import PartyBundles from '../components/PartyBundles'
+import FamilyPromoLinks from '../components/FamilyPromoLinks'
 import EventTestimonials from '../components/EventTestimonials'
 import EventAddOns from '../components/EventAddOns'
 import Seo from '../components/Seo'
@@ -17,7 +18,7 @@ const included = [
   { icon: PartyPopper, title: 'Party Area', desc: 'A dedicated party space for your group — cake table, presents corner, room to run around.' },
   { icon: Cake, title: 'Custom Menu & Cake', desc: 'Kids’ favourites done properly, plus a birthday cake made to your theme.' },
   { icon: Sparkles, title: 'Decorations', desc: 'Balloons, banners and theming set up before you arrive. Walk in, it’s done.' },
-  { icon: Music, title: 'Entertainment', desc: 'Games and activities to keep the whole group busy from start to finish.' },
+  { icon: Music, title: 'Entertainment', desc: 'Activities and entertainers are extra - we can quote for them, or you’re welcome to organise your own.' },
 ]
 
 const parentPoints = [
@@ -32,7 +33,7 @@ export default function KidsParties() {
     <div>
       <Seo
         title="Kids Birthday Parties"
-        description="Kids' pool birthday parties at Hemingways Lakeside — pool access, playroom, party area, custom menu and cake, decorations and entertainment all handled for you. All-in party bundles from 5,000 THB, food packages from 250 THB/person."
+        description="Kids' pool birthday parties at Hemingways Lakeside — pool access, playroom, party area, custom menu, cake and decorations handled for you. Entertainment is extra, or bring your own. All-in party bundles from 5,000 THB, food packages from 250 THB/person."
         jsonLd={[buildFaqSchema(kidsFaqs)]}
       />
       {/* Hero */}
@@ -49,7 +50,7 @@ export default function KidsParties() {
               The Party They’ll Talk About All Year
             </h1>
             <p className="text-gray-200 text-lg sm:text-xl max-w-xl mb-8 leading-relaxed">
-              Pool, playroom, food, cake, decorations and entertainment &mdash; all sorted,
+              Pool, playroom, food, cake and decorations &mdash; all sorted,
               all in one lakeside venue. You enjoy the party. We do the work.
             </p>
             <div className="flex flex-wrap items-center gap-4">
@@ -112,6 +113,9 @@ export default function KidsParties() {
           </div>
         </div>
       </section>
+
+      {/* Birthday Club + Halloween internal links */}
+      <FamilyPromoLinks />
 
       {/* Optional add-ons */}
       <EventAddOns heading="Make It Extra Special" />

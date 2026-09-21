@@ -60,8 +60,7 @@ export default function PartyBundles() {
         </div>
 
         <p className="text-center text-[#5c5346] text-sm max-w-2xl mx-auto">
-          Entertainment and activities are quoted separately, and you're welcome to bring your own
-          entertainer. There's no lifeguard on duty, so parents supervise in the pool. A 3,000 THB
+          Activities and entertainment are extra, and you're welcome to organise your own. There's no lifeguard on duty, so parents supervise in the pool. A 3,000 THB
           deposit secures your date. Closed Tuesdays. Bigger group or a set budget? Ask for a custom quote.
         </p>
         <div className="text-center mt-8">

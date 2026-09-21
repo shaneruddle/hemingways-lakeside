@@ -6,6 +6,7 @@ import EventGallery from '../components/EventGallery'
 import Seo from '../components/Seo'
 import FaqMini from '../components/FaqMini'
 import { buildFaqSchema, SITE_FAQS, HOURS_SUMMARY } from '../lib/schema'
+import FamilyPromoLinks from '../components/FamilyPromoLinks'
 
 const MAPS_URL = 'https://maps.google.com/?q=Hemingways+Lakeside+Pattaya'
 
@@ -112,6 +113,9 @@ export default function FamilyKids() {
           </div>
         </div>
       </section>
+
+      {/* Birthday Club + Halloween internal links */}
+      <FamilyPromoLinks />
 
       {/* Free with dining banner */}
       <section className="py-12 px-4 bg-[#c9a84c]">
