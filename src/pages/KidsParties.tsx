@@ -2,6 +2,7 @@ import { Waves, Gamepad2, PartyPopper, Cake, Sparkles, Music, Users, Check } fro
 import EnquiryForm from '../components/EnquiryForm'
 import EventGallery from '../components/EventGallery'
 import FoodPackages from '../components/FoodPackages'
+import PartyBundles from '../components/PartyBundles'
 import EventTestimonials from '../components/EventTestimonials'
 import EventAddOns from '../components/EventAddOns'
 import Seo from '../components/Seo'
@@ -31,7 +32,7 @@ export default function KidsParties() {
     <div>
       <Seo
         title="Kids Birthday Parties"
-        description="Kids' pool birthday parties at Hemingways Lakeside — pool access, playroom, party area, custom menu and cake, decorations and entertainment all handled for you. Food packages from 250 THB/person."
+        description="Kids' pool birthday parties at Hemingways Lakeside — pool access, playroom, party area, custom menu and cake, decorations and entertainment all handled for you. All-in party bundles from 5,000 THB, food packages from 250 THB/person."
         jsonLd={[buildFaqSchema(kidsFaqs)]}
       />
       {/* Hero */}
@@ -59,10 +60,10 @@ export default function KidsParties() {
                 Plan Their Party
               </a>
               <a
-                href="#packages"
+                href="#bundles"
                 className="text-gray-300 text-sm hover:text-[#c9a84c] transition-colors"
               >
-                Packages from <span className="text-[#c9a84c] font-bold">250 THB/person</span> &rarr;
+                All-in parties from <span className="text-[#c9a84c] font-bold">5,000 THB</span> &rarr;
               </a>
             </div>
           </div>
@@ -117,6 +118,9 @@ export default function KidsParties() {
 
       {/* Gallery (admin-managed) */}
       <EventGallery type="kids" label="Past Parties" title="Real Parties, Real Smiles" />
+
+      {/* All-in bundles — 5,000 / 10,000 / 20,000 THB, set by Shane 21 Sept 2026 */}
+      <PartyBundles />
 
       {/* Real package pricing — from Shane's Sept 2026 Birthday & Event Food Packages poster */}
       <FoodPackages heading="Party Food Packages" />

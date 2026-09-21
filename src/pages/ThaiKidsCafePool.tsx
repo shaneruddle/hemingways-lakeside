@@ -39,6 +39,12 @@ const packages = [
   { name: 'แพ็กเกจ D', price: 'ตามงบประมาณ', detail: 'แจ้งจำนวนแขกและงบ เราจัดให้พอดี' },
 ]
 
+const bundles = [
+  { name: 'Splash Party', price: '5,000 บาท', detail: 'สูงสุด 10 ท่าน · อาหารแพ็กเกจ A (5 อย่าง) · เพิ่มท่านละ 300 บาท' },
+  { name: 'Big Splash', price: '10,000 บาท', detail: 'สูงสุด 20 ท่าน · อาหารแพ็กเกจ B (7 อย่าง) · เพิ่มท่านละ 400 บาท' },
+  { name: 'Ultimate Party', price: '20,000 บาท', detail: 'สูงสุด 35 ท่าน · อาหารแพ็กเกจ C (10 อย่าง) · เพิ่มท่านละ 500 บาท' },
+]
+
 const goodToKnow = [
   'ไม่มีค่าเข้า สระว่ายน้ำฟรีสำหรับลูกค้าที่ทานอาหารหรือเครื่องดื่ม',
   'ไม่มีไลฟ์การ์ดประจำสระ ผู้ปกครองต้องดูแลบุตรหลานตลอดเวลา',
@@ -167,9 +173,21 @@ export default function ThaiKidsCafePool() {
             <p className="text-[#9c7a2e] text-xs tracking-[0.3em] uppercase mb-3">งานวันเกิดเด็ก</p>
             <h2 className="text-3xl font-bold text-[#1a1512]">แพ็กเกจอาหารงานวันเกิด</h2>
             <p className="text-[#5c5346] mt-3 max-w-xl mx-auto">
-              บุฟเฟต์หรือฟิงเกอร์ฟู้ด ราคายังไม่รวมของตกแต่งและกิจกรรม แจ้งความต้องการได้ตอนสอบถาม
+              เลือกแพ็กเกจเหมาจ่ายราคาเดียว หรือแพ็กเกจอาหารคิดตามจำนวนท่าน (บุฟเฟต์หรือฟิงเกอร์ฟู้ด ยังไม่รวมของตกแต่งและกิจกรรม)
             </p>
           </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-4">
+            {bundles.map(b => (
+              <div key={b.name} className="bg-[#c9a84c]/15 border border-[#c9a84c]/40 rounded-2xl p-6 text-center">
+                <h3 className="font-bold text-[#1a1512] mb-1">{b.name}</h3>
+                <p className="text-[#8a6d2f] font-bold text-2xl mb-2">{b.price}</p>
+                <p className="text-[#5c5346] text-sm">{b.detail}</p>
+              </div>
+            ))}
+          </div>
+          <p className="text-center text-sm text-[#5c5346] mb-12">
+            แพ็กเกจเหมารวมอาหาร น้ำอัดลม ของตกแต่งตามธีม เค้กวันเกิด และพื้นที่ปาร์ตี้ ยังไม่รวมกิจกรรมและการแสดง
+          </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {packages.map(p => (
               <div key={p.name} className="bg-[#f6efe0] border border-black/5 rounded-2xl p-6 text-center">
