@@ -52,5 +52,6 @@ jobs:
           pip install google-auth requests --quiet
           echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}' > /tmp/sa.json
           python3 .github/scripts/deploy_firestore_rules.py default firestore.rules
+          python3 .github/scripts/deploy_firestore_rules.py --storage "${{ secrets.VITE_FIREBASE_STORAGE_BUCKET }}" storage.rules
           rm -f /tmp/sa.json
 
