@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import Seo from '../components/Seo'
 import { getSpecials } from '../lib/firestore'
 import type { Special } from '../types'
 
@@ -19,6 +20,7 @@ export default function Specials() {
 
   return (
     <div>
+      <Seo title="Daily Specials - Pizza Day, Sunday Roast, Thursday Special" description="Weekly deals at Hemingways Lakeside: Saturday pizza day any pizza 250 THB, Sunday roast carvery from 279 THB, Thursday chicken parma 249 and fajitas 279." />
       {/* Hero */}
       <section className="pt-32 pb-20 px-4 bg-[#f6efe0]">
         <div className="max-w-4xl mx-auto text-center">

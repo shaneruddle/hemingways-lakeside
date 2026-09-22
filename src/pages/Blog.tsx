@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import Seo from '../components/Seo'
 import { Link } from 'react-router-dom'
 import { Calendar, ArrowRight } from 'lucide-react'
 import { getBlogPosts } from '../lib/firestore'
@@ -42,6 +43,7 @@ export default function Blog() {
 
   return (
     <div>
+      <Seo title="Blog - East Pattaya Guides" description="Guides from Hemingways Lakeside: Lake Mabprachan, the Darkside, where to watch football, family days out and party venues in East Pattaya." />
       <section className="pt-32 pb-20 px-4 bg-[#f6efe0]">
         <div className="max-w-4xl mx-auto text-center">
           <p className="text-[#9c7a2e] text-xs tracking-[0.4em] uppercase mb-4">News & Stories</p>

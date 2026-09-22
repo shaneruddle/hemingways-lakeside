@@ -1,10 +1,12 @@
 import { Phone, Mail, MapPin, Clock } from 'lucide-react'
+import Seo from '../components/Seo'
 import EnquiryForm from '../components/EnquiryForm'
 import { HOURS_SUMMARY } from '../lib/schema'
 
 export default function Contact() {
   return (
     <div>
+      <Seo title="Contact & Opening Hours" description="Contact Hemingways Lakeside, East Pattaya - phone 064-240-0222, info@hemingwayslakeside.com. Open from 8am, closed Tuesdays. Pornprapanimit Road by Lake Mabprachan." />
       {/* Hero */}
       <section className="pt-32 pb-20 px-4 bg-[#f6efe0]">
         <div className="max-w-4xl mx-auto text-center">

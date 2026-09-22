@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import Seo from '../components/Seo'
 import { useParams, Link } from 'react-router-dom'
 import { ArrowLeft, Calendar } from 'lucide-react'
 import { getBlogPost, getBlogPostBySlug } from '../lib/firestore'
@@ -55,7 +56,9 @@ export default function BlogPost() {
 
   return (
     <div>
+      <Seo title={post.metaTitle || post.title} description={post.metaDescription || post.excerpt || ''} />
       <section className="pt-32 pb-16 px-4 bg-white">
+
         <div className="max-w-3xl mx-auto">
           <Link to="/blog" className="inline-flex items-center gap-2 text-[#5c5346] hover:text-[#8a6d2f] text-sm mb-8 transition-colors">
             <ArrowLeft size={14} /> Back to Blog

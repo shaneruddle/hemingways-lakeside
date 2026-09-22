@@ -1,10 +1,12 @@
 import { Link } from 'react-router-dom'
+import Seo from '../components/Seo'
 import { MapPin, Clock, Phone, Navigation } from 'lucide-react'
 import { HOURS_SUMMARY } from '../lib/schema'
 
 export default function Location() {
   return (
     <div>
+      <Seo title="Location & Directions - Lake Mabprachan, East Pattaya" description="How to find Hemingways Lakeside on Lake Mabprachan, East Pattaya (the Darkside): map, directions and free parking." />
       <section className="pt-32 pb-20 px-4 bg-[#f6efe0]">
         <div className="max-w-4xl mx-auto text-center">
           <p className="text-[#9c7a2e] text-xs tracking-[0.4em] uppercase mb-4">We're Easy to Find</p>

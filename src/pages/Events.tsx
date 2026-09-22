@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import Seo from '../components/Seo'
 import { Cake, PartyPopper, Briefcase, Waves, ArrowRight } from 'lucide-react'
 import EnquiryForm from '../components/EnquiryForm'
 
@@ -42,6 +43,7 @@ const howItWorks = [
 export default function Events() {
   return (
     <div>
+      <Seo title="Events & Parties - Birthdays, Kids Parties, Corporate" description="Private events by Lake Mabprachan, East Pattaya: kids' pool parties from 5,000 THB all-in, birthdays, corporate functions and pool parties for up to 200 guests." />
       {/* Hero */}
       <section className="pt-32 pb-20 px-4 bg-[#f6efe0]">
         <div className="max-w-4xl mx-auto text-center">

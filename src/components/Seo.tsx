@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { buildBusinessSchema } from '../lib/schema'
+import { buildBusinessSchema, SITE_URL } from '../lib/schema'
 
 interface Props {
   title?: string
@@ -28,6 +28,20 @@ export default function Seo({ title, description, jsonLd = [], businessSchema = 
     const prevDesc = metaDesc?.getAttribute('content') ?? null
     if (metaDesc) metaDesc.setAttribute('content', description || DEFAULT_DESCRIPTION)
 
+    // Self-referencing canonical per route. Without it Google treated at least one blog post
+    // as a "duplicate without user-selected canonical" (GSC, Sept 2026) because every route
+    // serves the same index.html shell.
+    const canonicalHref = `${SITE_URL}${window.location.pathname.replace(/\/$/, '') || '/'}`
+    let canonical = document.querySelector<HTMLLinkElement>('link[rel="canonical"]')
+    const createdCanonical = !canonical
+    if (!canonical) {
+      canonical = document.createElement('link')
+      canonical.rel = 'canonical'
+      document.head.appendChild(canonical)
+    }
+    const prevCanonical = canonical.href
+    canonical.href = canonicalHref
+
     const schemas = [...(businessSchema ? [buildBusinessSchema()] : []), ...jsonLd]
     const scripts = schemas.map(schema => {
       const el = document.createElement('script')
@@ -41,6 +55,10 @@ export default function Seo({ title, description, jsonLd = [], businessSchema = 
       document.title = DEFAULT_TITLE
       if (metaDesc && prevDesc !== null) metaDesc.setAttribute('content', prevDesc)
       scripts.forEach(el => el.remove())
+      if (canonical) {
+        if (createdCanonical) canonical.remove()
+        else canonical.href = prevCanonical
+      }
     }
   }, [title, description, businessSchema, JSON.stringify(jsonLd)])
 
