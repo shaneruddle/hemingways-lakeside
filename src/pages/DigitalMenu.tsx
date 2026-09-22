@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { getDigitalMenuItems, getMenuCategories } from '../lib/firestore'
 import type { DigitalMenuItem, DigitalMenuCategory } from '../types'
+import Seo from '../components/Seo'
 
 export default function DigitalMenu() {
   const [categories, setCategories] = useState<DigitalMenuCategory[]>([])
@@ -37,6 +38,7 @@ export default function DigitalMenu() {
 
   return (
     <div className="min-h-screen bg-[#0d0d0d] text-white">
+      <Seo title="Digital Menu" description="Hemingways Lakeside table menu with prices - scan at your table. Full menu with prices also at hemingwayslakeside.com/menu." />
       {/* Header */}
       <header className="bg-[#0a0a0a] border-b border-white/5 px-6 py-5 flex items-center justify-between">
         <div>

@@ -318,3 +318,40 @@ export function buildEventSchema(opts: {
     url: `${SITE_URL}${opts.path}`,
   }
 }
+
+/**
+ * schema.org Menu built from the digital menu (Firestore digital_menu_categories/_items).
+ * Rendered on /menu so search engines get item names, descriptions and prices as data,
+ * not pixels in the A4 board images.
+ */
+export function buildMenuSchema(
+  categories: { name: string }[],
+  items: { name: string; description?: string; price: string; price2?: string; price2Label?: string; category: string; imageUrl?: string; available: boolean }[],
+) {
+  const toNumber = (p: string) => Number(String(p).replace(/[^0-9.]/g, ''))
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Menu',
+    name: 'Hemingways Lakeside Food Menu',
+    url: `${SITE_URL}/menu`,
+    inLanguage: 'en',
+    hasMenuSection: categories
+      .map(cat => ({
+        '@type': 'MenuSection',
+        name: cat.name,
+        hasMenuItem: items
+          .filter(i => i.available && i.category === cat.name)
+          .map(i => ({
+            '@type': 'MenuItem',
+            name: i.name,
+            ...(i.description ? { description: i.description } : {}),
+            ...(i.imageUrl ? { image: i.imageUrl } : {}),
+            offers: [
+              { '@type': 'Offer', price: toNumber(i.price), priceCurrency: 'THB' },
+              ...(i.price2 ? [{ '@type': 'Offer', name: i.price2Label, price: toNumber(i.price2), priceCurrency: 'THB' }] : []),
+            ],
+          })),
+      }))
+      .filter(s => s.hasMenuItem.length > 0),
+  }
+}
