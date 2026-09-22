@@ -243,7 +243,7 @@ export const SITE_FAQS: FaqItem[] = [
   {
     question: 'Is the Sunday Roast available every week?',
     answer:
-      "Yes, it's a regular weekly special. The exact dishes can vary - ask your server or check the specials board on the day.",
+      'Yes - every Sunday from 12pm until it runs out. It is a carvery: small plate 279 THB or big plate 379 THB, with a choice of porchetta, beef, lamb, chicken or pork, all the trimmings, and a self-service soup included. Weekend happy hour runs all day on Sundays.',
     categories: ['food'],
   },
   {
@@ -255,7 +255,25 @@ export const SITE_FAQS: FaqItem[] = [
   {
     question: 'Do you serve steak?',
     answer:
-      "Our menu leans British pub classics and Thai favourites rather than a dedicated steakhouse cut - think Steak & Ale Pie, burgers, fish & chips and Thai curries. Ask your server what's on the specials board if you're after something heartier.",
+      'Yes - a dedicated steak menu with Australian Black Angus: 250g ribeye 650 THB, 250g sirloin 550 THB, 300g lamb chops 699 THB, plus salmon steak 469 and chicken steak 299. Each comes with a choice of two sides and a sauce (peppercorn or mushroom, gravy or cream).',
+    categories: ['food'],
+  },
+  {
+    question: 'What time is happy hour?',
+    answer:
+      'Weekdays 4pm-7pm and weekends 1pm-9pm. On Sundays the weekend happy hour runs all day alongside the roast carvery.',
+    categories: ['general', 'food', 'beer_garden'],
+  },
+  {
+    question: 'How much is the English breakfast?',
+    answer:
+      'Small English breakfast 165 THB, medium 229 THB, full English 289 THB - all include coffee or tea with one refill. Breakfast sandwiches from 130 THB. Served from 8am (closed Tuesdays).',
+    categories: ['general', 'food'],
+  },
+  {
+    question: 'How much are fish and chips?',
+    answer:
+      'Beer-battered cod and chips is 325 THB, with homemade chips, garden or mushy peas and tartare sauce. Other pub classics: bangers and mash 295, cottage pie 295, ham egg and chips 239, gammon egg and chips 325.',
     categories: ['food'],
   },
 ]

@@ -3,15 +3,38 @@ import { Link } from 'react-router-dom'
 import EnquiryForm from '../components/EnquiryForm'
 import FaqMini from '../components/FaqMini'
 import Seo from '../components/Seo'
-import { buildFaqSchema, SITE_FAQS, HOURS_SUMMARY } from '../lib/schema'
+import { buildFaqSchema, SITE_FAQS, HOURS_SUMMARY, type FaqItem } from '../lib/schema'
+import { SUNDAY_ROAST } from '../data/menuHighlights'
 
-const roastFaqs = SITE_FAQS.filter(f => f.categories.includes('food'))
+const roastFaqs: FaqItem[] = [
+  ...SITE_FAQS.filter(f => f.question.startsWith('Is the Sunday Roast')),
+  {
+    question: 'What time does the Sunday roast start and finish?',
+    answer: `The carvery opens at ${SUNDAY_ROAST.from} every Sunday and runs until it sells out - usually mid-afternoon on a busy weekend, so come early if you want the full choice of meats.`,
+    categories: ['food'],
+  },
+  {
+    question: 'How much is the Sunday roast?',
+    answer: `Small plate ${SUNDAY_ROAST.small} THB, big plate ${SUNDAY_ROAST.big} THB. Both include the self-service soup and all the trimmings. Kids can share a big plate or order from the kids' menu.`,
+    categories: ['food'],
+  },
+  {
+    question: 'Which meats are on the carvery?',
+    answer: `${SUNDAY_ROAST.meats.join(', ')} - choose one or mix. The exact selection can vary week to week.`,
+    categories: ['food'],
+  },
+  {
+    question: 'Do I need to book for Sunday lunch?',
+    answer: 'Walk-ins are always welcome. For groups of six or more, or if you want a table by the lake or poolside, message us and we will hold it.',
+    categories: ['food'],
+  },
+]
 
 const MAPS_URL = 'https://maps.google.com/?q=Hemingways+Lakeside+Pattaya'
 
 const whatToExpect = [
-  { icon: Beef, title: 'A Proper Roast', desc: 'Classic British Sunday roast, done the way it should be - ask your server what the roast of the day is.' },
-  { icon: UtensilsCrossed, title: 'All The Trimmings', desc: 'Roast potatoes, seasonal veg and gravy alongside your main - the full plate, not a cut corner.' },
+  { icon: Beef, title: 'Carvery, Five Meats', desc: `${SUNDAY_ROAST.meats.join(', ')} - carved to order from ${SUNDAY_ROAST.from} until it runs out.` },
+  { icon: UtensilsCrossed, title: 'All The Trimmings', desc: 'Roast potatoes, Yorkshire pudding, seasonal veg and proper gravy - plus a self-service soup to start, included in the price.' },
   { icon: Users, title: 'A Lakeside Sunday', desc: 'Eat inside, outside by the lake, or poolside if the kids want a swim first.' },
 ]
 
@@ -19,8 +42,8 @@ export default function SundayRoast() {
   return (
     <div>
       <Seo
-        title="Sunday Roast"
-        description="A proper British Sunday roast at Hemingways Lakeside, East Pattaya - all the trimmings, served lakeside or poolside on Lake Mabprachan."
+        title="Sunday Roast Carvery, East Pattaya - from 279 THB"
+        description={`Sunday roast carvery at Hemingways Lakeside, East Pattaya - small plate ${SUNDAY_ROAST.small} THB, big plate ${SUNDAY_ROAST.big} THB, choice of porchetta, beef, lamb, chicken or pork, soup included. From ${SUNDAY_ROAST.from} every Sunday by Lake Mabprachan.`}
         jsonLd={[buildFaqSchema(roastFaqs)]}
       />
       {/* Hero */}
@@ -63,7 +86,7 @@ export default function SundayRoast() {
       {/* Hours banner */}
       <section className="py-10 px-4 bg-[#c9a84c]">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-center md:text-left">
-          <h2 className="text-black font-bold text-xl sm:text-2xl">Sundays, 8AM-10PM</h2>
+          <h2 className="text-black font-bold text-xl sm:text-2xl">Every Sunday from {SUNDAY_ROAST.from} until it runs out</h2>
           <span className="flex items-center gap-2 text-black/80 text-sm font-bold tracking-wider uppercase shrink-0">
             <Clock size={16} /> {HOURS_SUMMARY}
           </span>
@@ -88,7 +111,19 @@ export default function SundayRoast() {
               </div>
             ))}
           </div>
-          <p className="text-[#5c5346] text-sm text-center mt-10">The Sunday Roast is a regular weekly special - see the specials board on the day for the exact dish and price.</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-3xl mx-auto mt-14">
+            <div className="bg-white border border-[#c9a84c]/40 rounded-2xl p-8 text-center">
+              <p className="text-[#9c7a2e] text-xs tracking-[0.3em] uppercase mb-2">Small Plate</p>
+              <p className="text-4xl font-bold text-[#1a1512] mb-2">{SUNDAY_ROAST.small} <span className="text-base font-normal text-[#5c5346]">THB</span></p>
+              <p className="text-[#5c5346] text-sm">One meat, all the trimmings, soup included.</p>
+            </div>
+            <div className="bg-white border border-[#c9a84c]/40 rounded-2xl p-8 text-center">
+              <p className="text-[#9c7a2e] text-xs tracking-[0.3em] uppercase mb-2">Big Plate</p>
+              <p className="text-4xl font-bold text-[#1a1512] mb-2">{SUNDAY_ROAST.big} <span className="text-base font-normal text-[#5c5346]">THB</span></p>
+              <p className="text-[#5c5346] text-sm">Bigger portion, mix your meats, soup included.</p>
+            </div>
+          </div>
+          <p className="text-[#5c5346] text-sm text-center mt-8">{SUNDAY_ROAST.note} Meats and prices as printed on the day's board.</p>
         </div>
       </section>
 

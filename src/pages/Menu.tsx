@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { X } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { getMenuPages } from '../lib/firestore'
+import Seo from '../components/Seo'
 import type { MenuPage } from '../types'
 
 export default function Menu() {
@@ -26,13 +27,22 @@ export default function Menu() {
 
   return (
     <div>
+      <Seo
+        title="Lakeside Menu & Prices - Hemingways Lakeside, East Pattaya"
+        description="Full food menu for Hemingways Lakeside (Lake Mabprachan, East Pattaya): English breakfast from 165 THB, fish & chips 325, Australian steaks from 550, Sunday roast carvery from 279, Thai, Indian, pizzas, burgers and kids' meals."
+      />
       {/* Hero */}
       <section className="pt-32 pb-16 px-4 bg-[#f6efe0]">
         <div className="max-w-4xl mx-auto text-center">
           <p className="text-[#9c7a2e] text-xs tracking-[0.4em] uppercase mb-4">Culinary Excellence</p>
-          <h1 className="text-4xl sm:text-6xl font-bold mb-4 text-[#1a1512]">Food Menu</h1>
+          <h1 className="text-4xl sm:text-6xl font-bold mb-4 text-[#1a1512]">Lakeside Food Menu</h1>
           <p className="text-[#5c5346] text-lg max-w-xl mx-auto">
             Authentic British pub favourites, quality Western dishes, and traditional Thai specialties.
+          </p>
+          <p className="text-[#5c5346] text-sm mt-4">
+            Quick prices: <Link to="/food" className="underline hover:text-[#8a6d2f]">pub classics &amp; breakfast</Link> ·{' '}
+            <Link to="/steak" className="underline hover:text-[#8a6d2f]">steaks</Link> ·{' '}
+            <Link to="/sunday-roast" className="underline hover:text-[#8a6d2f]">Sunday roast</Link>
           </p>
         </div>
       </section>

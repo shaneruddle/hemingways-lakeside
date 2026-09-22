@@ -26,6 +26,8 @@ export default function Footer() {
                 { label: 'Food Menu', to: '/menu' },
                 { label: 'Pub Classics', to: '/food' },
                 { label: 'Sunday Roast', to: '/sunday-roast' },
+          { label: 'Steaks', to: '/steak' },
+          { label: 'The Darkside Guide', to: '/east-pattaya-darkside' },
                 { label: 'Beer Garden', to: '/beer-garden' },
                 { label: 'Events', to: '/events' },
                 { label: 'Pool Day', to: '/pool' },
