@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { ref, uploadBytes, getDownloadURL, deleteObject, getBlob } from 'firebase/storage'
 import { storage } from '../../lib/firebase'
 import { getParties, saveParty, updateParty, deleteParty } from '../../lib/firestore'
-import { preparePhoto, prepareFromOriginal, renderBlurred, canvasToJpeg, slugify, type PreparedPhoto } from '../../lib/faceBlur'
+import { preparePhoto, prepareFromOriginal, renderPreview, renderBlurredJpeg, slugify, type PreparedPhoto } from '../../lib/faceBlur'
 import type { Party, PartyPhoto } from '../../types'
 import { toast } from 'sonner'
 import { Plus, Trash2, Upload, Eye, EyeOff, X, Star, ArrowLeft, ArrowRight, ShieldCheck, Loader2, Pencil, ExternalLink } from 'lucide-react'
@@ -191,7 +191,7 @@ function PartyEditor({ party, onClose }: { party: Party | null; onClose: () => v
     for (const file of files) {
       try {
         const prepared = await preparePhoto(file)
-        const previewUrl = renderBlurred(prepared).toDataURL('image/jpeg', 0.7)
+        const previewUrl = await renderPreview(prepared)
         next.push({ id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`, prepared, previewUrl })
       } catch (err: any) {
         console.error('Face detection failed for', file.name, err)
@@ -203,31 +203,27 @@ function PartyEditor({ party, onClose }: { party: Party | null; onClose: () => v
     }
   }
 
-  const rerender = (p: PendingPhoto): PendingPhoto => ({ ...p, previewUrl: renderBlurred(p.prepared).toDataURL('image/jpeg', 0.7) })
-
-  const toggleFace = (photoId: string, faceIdx: number) => {
-    setPending(prev => prev.map(p => {
-      if (p.id !== photoId) return p
-      const faces = p.prepared.faces.map((f, i) => (i === faceIdx ? { ...f, blur: !f.blur } : f))
-      const updated = rerender({ ...p, prepared: { ...p.prepared, faces } })
-      if (inspect?.id === photoId) setInspect(updated)
-      return updated
-    }))
+  // Apply a face-list change to one pending photo and re-render its preview.
+  const updateFaces = async (photoId: string, mutate: (p: PendingPhoto) => PendingPhoto['prepared']['faces']) => {
+    const current = pending.find(p => p.id === photoId)
+    if (!current) return
+    const prepared = { ...current.prepared, faces: mutate(current) }
+    const updated: PendingPhoto = { ...current, prepared, previewUrl: await renderPreview(prepared) }
+    setPending(prev => prev.map(p => (p.id === photoId ? updated : p)))
+    setInspect(cur => (cur?.id === photoId ? updated : cur))
   }
+
+  const toggleFace = (photoId: string, faceIdx: number) =>
+    updateFaces(photoId, p => p.prepared.faces.map((f, i) => (i === faceIdx ? { ...f, blur: !f.blur } : f)))
 
   const removePending = (photoId: string) => setPending(prev => prev.filter(p => p.id !== photoId))
 
   /** Click on empty space in the inspector = add a manual blur circle (for a face the detector missed). */
-  const addManualFace = (photoId: string, relX: number, relY: number) => {
-    setPending(prev => prev.map(p => {
-      if (p.id !== photoId) return p
+  const addManualFace = (photoId: string, relX: number, relY: number) =>
+    updateFaces(photoId, p => {
       const size = Math.round(p.prepared.width * 0.08)
-      const faces = [...p.prepared.faces, { x: relX * p.prepared.width - size / 2, y: relY * p.prepared.height - size / 2, w: size, h: size, blur: true }]
-      const updated = rerender({ ...p, prepared: { ...p.prepared, faces } })
-      if (inspect?.id === photoId) setInspect(updated)
-      return updated
-    }))
-  }
+      return [...p.prepared.faces, { x: relX * p.prepared.width - size / 2, y: relY * p.prepared.height - size / 2, w: size, h: size, blur: true }]
+    })
 
   // Step 2: upload the blurred renders
   const handleUpload = async () => {
@@ -240,13 +236,9 @@ function PartyEditor({ party, onClose }: { party: Party | null; onClose: () => v
         const name = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.jpg`
         // Un-blurred original → admin-only path, so the blurring can be changed later.
         const originalPath = `parties-private/${docId}/${name}`
-        const originalCanvas = document.createElement('canvas')
-        originalCanvas.width = p.prepared.width
-        originalCanvas.height = p.prepared.height
-        originalCanvas.getContext('2d')!.drawImage(p.prepared.bitmap, 0, 0)
-        await uploadBytes(ref(storage, originalPath), await canvasToJpeg(originalCanvas, 0.92), { contentType: 'image/jpeg' })
+        await uploadBytes(ref(storage, originalPath), p.prepared.source, { contentType: 'image/jpeg' })
 
-        const blob = await canvasToJpeg(renderBlurred(p.prepared))
+        const blob = await renderBlurredJpeg(p.prepared)
         const storagePath = `parties/${docId}/${name}`
         const storageRef = ref(storage, storagePath)
         await uploadBytes(storageRef, blob, { contentType: 'image/jpeg', cacheControl: 'public,max-age=3600' })
@@ -287,7 +279,7 @@ function PartyEditor({ party, onClose }: { party: Party | null; onClose: () => v
     try {
       const blob = await getBlob(ref(storage, ph.originalPath))
       const prepared = await prepareFromOriginal(blob, ph.faces ?? [])
-      const p: PendingPhoto = { id: `edit-${idx}-${Date.now()}`, prepared, previewUrl: renderBlurred(prepared).toDataURL('image/jpeg', 0.7), editIndex: idx }
+      const p: PendingPhoto = { id: `edit-${idx}-${Date.now()}`, prepared, previewUrl: await renderPreview(prepared), editIndex: idx }
       setPending(prev => [...prev.filter(x => x.editIndex !== idx), p])
       setInspect(p)
     } catch (e: any) {
@@ -300,7 +292,7 @@ function PartyEditor({ party, onClose }: { party: Party | null; onClose: () => v
     setEditSaving(true)
     try {
       const ph = photos[p.editIndex]
-      const blob = await canvasToJpeg(renderBlurred(p.prepared))
+      const blob = await renderBlurredJpeg(p.prepared)
       const storageRef = ref(storage, ph.storagePath)
       await uploadBytes(storageRef, blob, { contentType: 'image/jpeg', cacheControl: 'public,max-age=3600' })
       const base = (await getDownloadURL(storageRef)).split('&v=')[0]

@@ -21,11 +21,32 @@ export interface FaceBox {
 
 export interface PreparedPhoto {
   file: File
-  /** Downscaled source bitmap used for detection and rendering. */
-  bitmap: ImageBitmap
+  /**
+   * Downscaled source as a JPEG blob. We deliberately do NOT keep a live
+   * ImageBitmap/canvas per photo: with 50+ photos queued, Chrome runs out of
+   * GPU/canvas memory and silently starts painting black — which is exactly
+   * how a batch of solid-black album photos got uploaded. A bitmap is created
+   * from this blob only while rendering, then closed (see withBitmap).
+   */
+  source: Blob
   width: number
   height: number
   faces: FaceBox[]
+}
+
+/** Free a scratch canvas's backing store immediately (don't wait for GC). */
+function release(c: HTMLCanvasElement) {
+  c.width = 0
+  c.height = 0
+}
+
+async function withBitmap<T>(source: Blob | ImageBitmap, fn: (b: ImageBitmap) => Promise<T> | T): Promise<T> {
+  const bitmap = source instanceof ImageBitmap ? source : await createImageBitmap(source)
+  try {
+    return await fn(bitmap)
+  } finally {
+    bitmap.close()
+  }
 }
 
 const MAX_EDGE = 1600
@@ -61,10 +82,14 @@ function detect(bitmap: ImageBitmap): Promise<Results> {
     canvas.width = bitmap.width
     canvas.height = bitmap.height
     canvas.getContext('2d')!.drawImage(bitmap, 0, 0)
-    return new Promise<Results>((resolve, reject) => {
-      pendingResolve = resolve
-      fd.send({ image: canvas }).catch(reject)
-    })
+    try {
+      return await new Promise<Results>((resolve, reject) => {
+        pendingResolve = resolve
+        fd.send({ image: canvas }).catch(reject)
+      })
+    } finally {
+      release(canvas)
+    }
   }
   const p = queue.then(run, run)
   queue = p.catch(() => {})
@@ -78,15 +103,16 @@ export async function preparePhoto(file: File): Promise<PreparedPhoto> {
   const width = Math.round(full.width * scale)
   const height = Math.round(full.height * scale)
 
-  let bitmap = full
-  if (scale < 1) {
-    const c = document.createElement('canvas')
-    c.width = width
-    c.height = height
-    c.getContext('2d')!.drawImage(full, 0, 0, width, height)
-    bitmap = await createImageBitmap(c)
-    full.close()
-  }
+  // Downscale once into a JPEG blob (this is also what gets stored as the
+  // "original" for later re-editing), then work from a short-lived bitmap.
+  const src = document.createElement('canvas')
+  src.width = width
+  src.height = height
+  src.getContext('2d')!.drawImage(full, 0, 0, width, height)
+  full.close()
+  const source = await canvasToJpeg(src, 0.92)
+  release(src)
+  const bitmap = await createImageBitmap(source)
 
   // Pass 1: whole frame. Pass 2: 2x2 overlapping tiles rendered at 2x so small faces in
   // group shots (the common party photo) are big enough for the detector. Merge with NMS.
@@ -109,13 +135,15 @@ export async function preparePhoto(file: File): Promise<PreparedPhoto> {
     c.height = th * 2
     c.getContext('2d')!.drawImage(bitmap, ox, oy, tw, th, 0, 0, tw * 2, th * 2)
     const tile = await createImageBitmap(c)
+    release(c)
     toBoxes(await detect(tile), ox, oy, tw, th)
     tile.close()
   }
+  bitmap.close()
 
   const faces = dedupe(found)
 
-  return { file, bitmap, width, height, faces }
+  return { file, source, width, height, faces }
 }
 
 function iou(a: FaceBox, b: FaceBox) {
@@ -133,9 +161,13 @@ function dedupe(boxes: FaceBox[]): FaceBox[] {
   return out
 }
 
-/** Render the photo with the selected faces blurred. Returns the canvas (for preview) — call toBlob() for upload. */
-export function renderBlurred(photo: PreparedPhoto): HTMLCanvasElement {
-  const { bitmap, width, height, faces } = photo
+/** Render the photo with the selected faces blurred onto a fresh canvas. Caller must release() it. */
+async function renderBlurred(photo: PreparedPhoto): Promise<HTMLCanvasElement> {
+  return withBitmap(photo.source, bitmap => renderBlurredFrom(bitmap, photo))
+}
+
+function renderBlurredFrom(bitmap: ImageBitmap, photo: PreparedPhoto): HTMLCanvasElement {
+  const { width, height, faces } = photo
   const canvas = document.createElement('canvas')
   canvas.width = width
   canvas.height = height
@@ -165,10 +197,45 @@ export function renderBlurred(photo: PreparedPhoto): HTMLCanvasElement {
   return canvas
 }
 
+/** Small JPEG data URL preview of the blurred result (for thumbnails / the inspector). */
+export async function renderPreview(photo: PreparedPhoto): Promise<string> {
+  const c = await renderBlurred(photo)
+  try {
+    return c.toDataURL('image/jpeg', 0.7)
+  } finally {
+    release(c)
+  }
+}
+
+/** True if the canvas is (near) solid black — what Chrome silently paints under canvas-memory pressure. */
+function isBlank(c: HTMLCanvasElement): boolean {
+  const s = document.createElement('canvas')
+  s.width = 16
+  s.height = 16
+  const ctx = s.getContext('2d')!
+  ctx.drawImage(c, 0, 0, 16, 16)
+  const d = ctx.getImageData(0, 0, 16, 16).data
+  release(s)
+  let max = 0
+  for (let i = 0; i < d.length; i += 4) max = Math.max(max, d[i], d[i + 1], d[i + 2])
+  return max < 8
+}
+
+/** Full-size blurred JPEG for upload. Throws instead of returning a black frame. */
+export async function renderBlurredJpeg(photo: PreparedPhoto, quality = 0.85): Promise<Blob> {
+  const c = await renderBlurred(photo)
+  try {
+    if (isBlank(c)) throw new Error('Rendered photo came out blank — reload the page and try again with fewer photos at a time')
+    return await canvasToJpeg(c, quality)
+  } finally {
+    release(c)
+  }
+}
+
 /** Rebuild a PreparedPhoto from a stored original (no re-detection) so blurring can be edited later. */
 export async function prepareFromOriginal(blob: Blob, faces: FaceBox[]): Promise<PreparedPhoto> {
-  const bitmap = await createImageBitmap(blob)
-  return { file: new File([blob], 'original.jpg', { type: 'image/jpeg' }), bitmap, width: bitmap.width, height: bitmap.height, faces: faces.map(f => ({ ...f })) }
+  const { width, height } = await withBitmap(blob, b => ({ width: b.width, height: b.height }))
+  return { file: new File([blob], 'original.jpg', { type: 'image/jpeg' }), source: blob, width, height, faces: faces.map(f => ({ ...f })) }
 }
 
 export function canvasToJpeg(canvas: HTMLCanvasElement, quality = 0.85): Promise<Blob> {
