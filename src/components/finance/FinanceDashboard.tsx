@@ -1,5 +1,3 @@
-import { useEffect, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
 import FinanceOverview from './FinanceOverview';
 import LogExpense from './LogExpense';
 import LogIncome from './LogIncome';
@@ -41,41 +39,14 @@ export const FINANCE_TABS = [
 
 // `user` is the Firebase Auth user (email/uid) — the finance components read
 // user.email for logged_by / updatedBy. `profile` carries the Lakeside role.
-export default function FinanceDashboard({ user, profile }: { user: any; profile: UserProfile | null }) {
+// `tab` is chosen from the Finance group in the Admin sidebar (Admin.tsx).
+export default function FinanceDashboard({ user, profile, tab }: { user: any; profile: UserProfile | null; tab: string }) {
   const financeRole = getFinanceRole(profile);
   const tabs = FINANCE_TABS.filter(t => t.roles.includes(financeRole));
-  const [searchParams, setSearchParams] = useSearchParams();
-  const requestedTab = searchParams.get('tab');
-  const [activeTab, setActiveTab] = useState(tabs.find(t => t.id === requestedTab)?.id || tabs[0]?.id || 'expense');
-
-  useEffect(() => {
-    if (requestedTab && tabs.some(t => t.id === requestedTab)) setActiveTab(requestedTab);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [requestedTab]);
-
-  const select = (id: string) => {
-    setActiveTab(id);
-    setSearchParams(prev => { prev.set('tab', id); return prev; }, { replace: true });
-  };
+  const activeTab = tabs.find(t => t.id === tab)?.id || tabs[0]?.id || 'expense';
 
   return (
     <div className="min-h-screen bg-gray-50 text-gray-900">
-      <div className="bg-white border-b border-gray-200 px-4 sm:px-6 overflow-x-auto">
-        <div className="flex gap-1 min-w-max">
-          {tabs.map(t => (
-            <button
-              key={t.id}
-              onClick={() => select(t.id)}
-              className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
-                activeTab === t.id ? 'border-[#c9a84c] text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-900'
-              }`}
-            >
-              {t.icon}
-              {t.label}
-            </button>
-          ))}
-        </div>
-      </div>
       {activeTab === 'overview'    && <FinanceOverview financeRole={financeRole} />}
       {activeTab === 'expense'     && <LogExpense user={user} financeRole={financeRole} />}
       {activeTab === 'income'      && <LogIncome user={user} financeRole={financeRole} />}

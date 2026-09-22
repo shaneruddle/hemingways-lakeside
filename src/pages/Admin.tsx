@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, Fragment } from 'react'
 import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from 'firebase/auth'
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
 import { auth, storage } from '../lib/firebase'
@@ -12,7 +12,7 @@ import MenuManager from '../components/admin/MenuManager'
 import SystemLogs from '../components/admin/SystemLogs'
 import UserManagement from '../components/admin/UserManagement'
 import LoyaltyManager from '../components/admin/LoyaltyManager'
-import FinanceDashboard from '../components/finance/FinanceDashboard'
+import FinanceDashboard, { FINANCE_TABS, getFinanceRole } from '../components/finance/FinanceDashboard'
 import PartyManager from '../components/admin/PartyManager'
 import { logActivity } from '../utils/logger'
 
@@ -1152,6 +1152,8 @@ export default function Admin() {
   const [user, setUser] = useState<User | null>(null)
   // Firestore users/{uid} profile — carries the role used by Finance (admin/manager/staff).
   const [profile, setProfile] = useState<UserProfile | null>(null)
+  // Finance sub-tab (Overview / Log Expense / …) — shown as a group in the sidebar.
+  const [financeTab, setFinanceTab] = useState<string>('overview')
   const [tab, setTab] = useState<'enquiries' | 'crm' | 'menu' | 'blog' | 'specials' | 'galleries' | 'parties' | 'digital-menu' | 'system-logs' | 'users' | 'loyalty' | 'finance'>('enquiries')
   const [enquiries, setEnquiries] = useState<Enquiry[]>([])
   const [contacts, setContacts] = useState<CRMContact[]>([])
@@ -1212,6 +1214,8 @@ export default function Admin() {
 
   const newCount = enquiries.filter(e => e.status === 'new').length
 
+  const financeTabs = FINANCE_TABS.filter(t => t.roles.includes(getFinanceRole(profile)))
+
   const NAV_ITEMS = [
     { key: 'enquiries', label: 'Enquiries', icon: MessageSquare, badge: newCount > 0 ? newCount : null },
     { key: 'crm', label: 'CRM Contacts', icon: Users },
@@ -1222,7 +1226,6 @@ export default function Admin() {
     { key: 'parties', label: 'Party Albums', icon: Star },
     { key: 'digital-menu', label: 'Digital Menu', icon: UtensilsCrossed },
     { key: 'loyalty', label: 'Loyalty', icon: CreditCard },
-    { key: 'finance', label: 'Finance', icon: TrendingUp },
     { key: 'users', label: 'Users', icon: Users },
     { key: 'system-logs', label: 'System Logs', icon: ScrollText },
   ] as const
@@ -1238,8 +1241,37 @@ export default function Admin() {
 
         <nav className="flex-1 py-4 space-y-0.5 px-2">
           {NAV_ITEMS.map(({ key, label, icon: Icon, badge }: any) => (
+            <Fragment key={key}>
+            {key === 'users' && (
+              <div>
+                <button
+                  onClick={() => { setTab('finance'); setFinanceTab(t => financeTabs.some(x => x.id === t) ? t : (financeTabs[0]?.id ?? 'overview')) }}
+                  className={`w-full flex items-center justify-between gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${
+                    tab === 'finance' ? 'text-[#c9a84c] font-semibold' : 'text-gray-500 hover:text-white hover:bg-white/5'
+                  }`}
+                >
+                  <span className="flex items-center gap-3"><TrendingUp size={15} />Finance</span>
+                  {tab === 'finance' ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                </button>
+                {tab === 'finance' && (
+                  <div className="ml-4 pl-3 border-l border-white/10 space-y-0.5 mt-0.5 mb-1">
+                    {financeTabs.map(ft => (
+                      <button
+                        key={ft.id}
+                        onClick={() => setFinanceTab(ft.id)}
+                        className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-colors ${
+                          financeTab === ft.id ? 'bg-[#c9a84c]/10 text-[#c9a84c] font-semibold' : 'text-gray-500 hover:text-white hover:bg-white/5'
+                        }`}
+                      >
+                        <span className="[&>svg]:w-3.5 [&>svg]:h-3.5">{ft.icon}</span>
+                        {ft.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
             <button
-              key={key}
               onClick={() => setTab(key)}
               className={`w-full flex items-center justify-between gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${
                 tab === key
@@ -1257,6 +1289,7 @@ export default function Admin() {
                 </span>
               )}
             </button>
+            </Fragment>
           ))}
         </nav>
 
@@ -1364,7 +1397,7 @@ export default function Admin() {
           {tab === 'loyalty' && <LoyaltyManager />}
 
           {/* Finance */}
-          {tab === 'finance' && (profile ? <FinanceDashboard user={user} profile={profile} /> : (
+          {tab === 'finance' && (profile ? <FinanceDashboard user={user} profile={profile} tab={financeTab} /> : (
             <div className="p-10 text-center text-gray-500 text-sm">No user profile found for {user.email} — add this account under Users (or register via the Staff Portal) to use Finance.</div>
           ))}
 
