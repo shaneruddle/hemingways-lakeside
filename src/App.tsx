@@ -14,6 +14,7 @@ import ThaiKidsCafePool from './pages/ThaiKidsCafePool'
 import ThaiCompanyParty from './pages/ThaiCompanyParty'
 import LakeMabprachan from './pages/LakeMabprachan'
 import ThaiMabprachanGuide from './pages/ThaiMabprachanGuide'
+import ThaiKidsCafeList from './pages/ThaiKidsCafeList'
 import BirthdayClub from './pages/BirthdayClub'
 import HalloweenPoolParty from './pages/HalloweenPoolParty'
 import Sports from './pages/Sports'
@@ -62,6 +63,7 @@ export default function App() {
           <Route path="/th/company-party-pattaya" element={<ThaiCompanyParty />} />
           <Route path="/lake-mabprachan" element={<LakeMabprachan />} />
           <Route path="/th/mabprachan-reservoir-guide" element={<ThaiMabprachanGuide />} />
+          <Route path="/th/kids-cafe-pattaya-chonburi" element={<ThaiKidsCafeList />} />
           <Route path="/sports" element={<Sports />} />
           <Route path="/beer-garden" element={<BeerGarden />} />
           <Route path="/sunday-roast" element={<SundayRoast />} />
