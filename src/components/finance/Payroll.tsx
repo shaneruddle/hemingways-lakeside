@@ -438,7 +438,7 @@ export default function Payroll({ user }: { user: any; financeRole?: string }) {
   const timeInputClass = 'w-20 bg-gray-50 border-none rounded-lg px-2 py-1.5 text-sm text-center focus:ring-2 focus:ring-terracotta outline-none';
 
   return (
-    <div className="p-6 md:p-10 max-w-6xl mx-auto">
+    <div className="p-6 md:p-10">
       <div className="flex items-center gap-3 mb-8">
         <div className="w-11 h-11 bg-terracotta/10 rounded-2xl flex items-center justify-center text-terracotta">
           <Clock size={22} />

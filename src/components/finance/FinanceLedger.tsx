@@ -358,7 +358,7 @@ export default function FinanceLedger({ user, financeRole = 'owner' }: { user: a
   };
 
   return (
-    <div className="p-6 max-w-6xl mx-auto">
+    <div className="p-6">
       <h1 className="text-2xl font-bold text-ink mb-6">Ledger</h1>
 
       {/* Totals */}

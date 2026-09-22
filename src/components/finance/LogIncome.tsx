@@ -66,7 +66,7 @@ export default function LogIncome({ user, financeRole = 'owner' }: { user: any; 
   const fmt = (n: number) => `฿${n.toLocaleString()}`;
 
   return (
-    <div className="p-6 max-w-2xl mx-auto">
+    <div className="p-6">
       <h1 className="text-2xl font-bold text-ink mb-6">Log Income</h1>
 
       <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-6">

@@ -1154,6 +1154,7 @@ export default function Admin() {
   const [profile, setProfile] = useState<UserProfile | null>(null)
   // Finance sub-tab (Overview / Log Expense / …) — shown as a group in the sidebar.
   const [financeTab, setFinanceTab] = useState<string>('overview')
+  const [financeOpen, setFinanceOpen] = useState(false)
   const [tab, setTab] = useState<'enquiries' | 'crm' | 'menu' | 'blog' | 'specials' | 'galleries' | 'parties' | 'digital-menu' | 'system-logs' | 'users' | 'loyalty' | 'finance'>('enquiries')
   const [enquiries, setEnquiries] = useState<Enquiry[]>([])
   const [contacts, setContacts] = useState<CRMContact[]>([])
@@ -1217,14 +1218,16 @@ export default function Admin() {
   const financeTabs = FINANCE_TABS.filter(t => t.roles.includes(getFinanceRole(profile)))
 
   const NAV_ITEMS = [
+    // Day-to-day first (leads, money, bookings), then content, then admin.
     { key: 'enquiries', label: 'Enquiries', icon: MessageSquare, badge: newCount > 0 ? newCount : null },
     { key: 'crm', label: 'CRM Contacts', icon: Users },
-    { key: 'menu', label: 'Menu Images', icon: ImageIcon },
-    { key: 'blog', label: 'Blog', icon: FileText },
-    { key: 'specials', label: 'Specials', icon: Star },
-    { key: 'galleries', label: 'Galleries', icon: ImageIcon },
+    // (Finance group renders here — see nav below)
     { key: 'parties', label: 'Party Albums', icon: Star },
     { key: 'digital-menu', label: 'Digital Menu', icon: UtensilsCrossed },
+    { key: 'specials', label: 'Specials', icon: Star },
+    { key: 'menu', label: 'Menu Images', icon: ImageIcon },
+    { key: 'galleries', label: 'Galleries', icon: ImageIcon },
+    { key: 'blog', label: 'Blog', icon: FileText },
     { key: 'loyalty', label: 'Loyalty', icon: CreditCard },
     { key: 'users', label: 'Users', icon: Users },
     { key: 'system-logs', label: 'System Logs', icon: ScrollText },
@@ -1242,18 +1245,23 @@ export default function Admin() {
         <nav className="flex-1 py-4 space-y-0.5 px-2">
           {NAV_ITEMS.map(({ key, label, icon: Icon, badge }: any) => (
             <Fragment key={key}>
-            {key === 'users' && (
+            {key === 'parties' && (
               <div>
                 <button
-                  onClick={() => { setTab('finance'); setFinanceTab(t => financeTabs.some(x => x.id === t) ? t : (financeTabs[0]?.id ?? 'overview')) }}
+                  onClick={() => {
+                    if (tab === 'finance') { setFinanceOpen(o => !o); return }
+                    setTab('finance')
+                    setFinanceOpen(true)
+                    setFinanceTab(t => financeTabs.some(x => x.id === t) ? t : (financeTabs[0]?.id ?? 'overview'))
+                  }}
                   className={`w-full flex items-center justify-between gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${
                     tab === 'finance' ? 'text-[#c9a84c] font-semibold' : 'text-gray-500 hover:text-white hover:bg-white/5'
                   }`}
                 >
                   <span className="flex items-center gap-3"><TrendingUp size={15} />Finance</span>
-                  {tab === 'finance' ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                  {tab === 'finance' && financeOpen ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
                 </button>
-                {tab === 'finance' && (
+                {tab === 'finance' && financeOpen && (
                   <div className="ml-4 pl-3 border-l border-white/10 space-y-0.5 mt-0.5 mb-1">
                     {financeTabs.map(ft => (
                       <button
@@ -1328,7 +1336,7 @@ export default function Admin() {
 
       {/* Main content */}
       <main className="flex-1 overflow-y-auto">
-        <div className="max-w-4xl mx-auto px-6 py-8">
+        <div className={tab === 'finance' ? 'w-full' : 'max-w-4xl mx-auto px-6 py-8'}>
           {/* Stats — only on enquiries/crm */}
           {(tab === 'enquiries' || tab === 'crm') && (
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">

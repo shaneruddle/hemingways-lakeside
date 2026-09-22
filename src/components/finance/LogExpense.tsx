@@ -257,7 +257,7 @@ export default function LogExpense({ user, financeRole = 'owner' }: { user: any;
 
   if (step === 'capture') {
     return (
-      <div className="p-6 max-w-lg mx-auto">
+      <div className="p-6">
         <h1 className="text-2xl font-bold text-ink mb-2">Log Expense</h1>
         <p className="text-gray-500 text-sm mb-8">Take a photo of your receipt or upload one to automatically extract the details.</p>
 
@@ -283,7 +283,7 @@ export default function LogExpense({ user, financeRole = 'owner' }: { user: any;
   }
 
   return (
-    <div className="p-6 max-w-2xl mx-auto">
+    <div className="p-6">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-ink">Review Expense</h1>
         {scanning && (

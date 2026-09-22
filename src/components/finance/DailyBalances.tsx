@@ -139,7 +139,7 @@ export default function DailyBalances({ user }: { user: any }) {
   const fmt = (n: number) => `฿${n.toLocaleString('en-US', { maximumFractionDigits: 0 })}`;
 
   return (
-    <div className="p-6 space-y-4 max-w-5xl mx-auto">
+    <div className="p-6 space-y-4">
       <div>
         <h1 className="text-2xl font-bold text-ink">Daily Balances</h1>
         <p className="text-sm text-gray-500 mt-1">
