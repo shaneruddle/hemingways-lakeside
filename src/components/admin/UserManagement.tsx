@@ -42,7 +42,7 @@ export default function UserManagement() {
         <p className="text-gray-500 text-sm">Loading...</p>
       ) : users.length === 0 ? (
         <div className="bg-white/5 rounded-lg p-6 text-center">
-          <p className="text-gray-400 text-sm">No users yet. Users are created automatically on first login.</p>
+          <p className="text-gray-400 text-sm">No users yet. A profile is created automatically the first time someone signs in to Admin or the Staff Portal.</p>
         </div>
       ) : (
         <div className="space-y-3">

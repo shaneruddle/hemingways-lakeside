@@ -2,6 +2,28 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
+    // ── Role helpers (Finance) ──────────────────────────────────────────────
+    // Role comes from users/{uid}.role: admin | manager | staff. Finance maps
+    // admin→owner, manager→manager, staff→cashier (FinanceDashboard.tsx).
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    function getUserRole() {
+      return exists(/databases/$(database)/documents/users/$(request.auth.uid))
+             ? get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role
+             : 'none';
+    }
+    function isAdmin() {
+      return isAuthenticated() && getUserRole() == 'admin';
+    }
+    function isManager() {
+      return isAuthenticated() && (isAdmin() || getUserRole() == 'manager');
+    }
+    // Any finance-capable staff (admin/manager/staff).
+    function isCashier() {
+      return isAuthenticated() && (isManager() || getUserRole() == 'staff');
+    }
+
     // Public read: menu, events, specials, blog, pool
     match /event_galleries/{doc} {
       allow read: if true;
@@ -76,12 +98,37 @@ service cloud.firestore {
       }
     }
 
-    // Finance — auth only
-    match /finance_expenses/{doc} {
-      allow read, write: if request.auth != null;
+    // ── Finance (ported from Cajun Life Cafe) ─────────────────────────────
+    match /finance_expenses/{id} {
+      allow read, write: if isCashier();
     }
-    match /finance_income/{doc} {
-      allow read, write: if request.auth != null;
+    match /finance_income/{id} {
+      allow read, write: if isCashier();
+    }
+    match /finance_ingredients/{id} {
+      allow read, write: if isCashier();
+    }
+    match /ingredient_purchases/{id} {
+      allow read, write: if isCashier();
+    }
+    // Daily Balances — one doc per trading date (doc id = date). `lockAt` is a
+    // client-computed Timestamp written on every update; once request.time
+    // passes it, further updates are rejected. `history` is append-only.
+    match /daily_balances/{date} {
+      allow read: if isCashier();
+      allow create: if isCashier();
+      allow update: if isCashier() && (!('lockAt' in resource.data) || request.time < resource.data.lockAt);
+      allow delete: if false;
+
+      match /history/{id} {
+        allow read: if isCashier();
+        allow create: if isCashier();
+        allow update, delete: if false;
+      }
+    }
+    // Time cards — admin/manager only (excludes staff, unlike finance_expenses).
+    match /payroll_timecards/{id} {
+      allow read, write: if isManager();
     }
   }
 }

@@ -5,6 +5,11 @@
   --color-gold-dark: #b8973d;
   --color-surface: #141414;
   --color-bg: #0d0d0d;
+  /* Finance section (ported from Cajun Life Cafe) uses these light-theme tokens. */
+  --color-terracotta: #8a6d2f;
+  --color-olive: #5A5A40;
+  --color-cream: #F5F5F0;
+  --color-ink: #1A1A1A;
 }
 
 * {

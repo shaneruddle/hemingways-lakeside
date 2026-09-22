@@ -328,37 +328,7 @@ export const addLoyaltyTransaction = async (customerId: string, tx: Omit<import(
 }
 
 // ── Finance ───────────────────────────────────────────────────────────────────
-export const getExpenses = async (month?: string): Promise<import('../types').Expense[]> => {
-  const q = month
-    ? query(collection(db, 'finance_expenses'), where('date', '>=', `${month}-01`), where('date', '<=', `${month}-31`), orderBy('date', 'desc'))
-    : query(collection(db, 'finance_expenses'), orderBy('date', 'desc'))
-  const snap = await getDocs(q)
-  return snap.docs.map((d: any) => ({ id: d.id, ...d.data() } as import('../types').Expense))
-}
-
-export const saveExpense = async (data: Omit<import('../types').Expense, 'id'>) => {
-  return addDoc(collection(db, 'finance_expenses'), data)
-}
-
-export const deleteExpense = async (id: string) => {
-  return deleteDoc(doc(db, 'finance_expenses', id))
-}
-
-export const getIncome = async (month?: string): Promise<import('../types').Income[]> => {
-  const q = month
-    ? query(collection(db, 'finance_income'), where('date', '>=', `${month}-01`), where('date', '<=', `${month}-31`), orderBy('date', 'desc'))
-    : query(collection(db, 'finance_income'), orderBy('date', 'desc'))
-  const snap = await getDocs(q)
-  return snap.docs.map((d: any) => ({ id: d.id, ...d.data() } as import('../types').Income))
-}
-
-export const saveIncome = async (data: Omit<import('../types').Income, 'id'>) => {
-  return addDoc(collection(db, 'finance_income'), data)
-}
-
-export const deleteIncome = async (id: string) => {
-  return deleteDoc(doc(db, 'finance_income', id))
-}
+// Finance reads/writes live in src/components/finance/* (Firestore SDK direct).
 
 // ── Party albums ──────────────────────────────────────────────────────────────
 export const getParties = async (publishedOnly = true): Promise<Party[]> => {

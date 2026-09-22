@@ -150,6 +150,13 @@ export interface UserProfile {
   role: 'admin' | 'manager' | 'staff'
   createdAt: string
   lastLogin?: string
+  // Optional payroll fields, shown read-only in Finance → Payroll.
+  nickname?: string
+  salary?: number
+  ssoDeduction?: number // Social Security deduction, THB/month
+  otHourlyRate?: number // Overtime rate, THB/hour
+  payrollNotes?: string
+  disabled?: boolean
 }
 
 // ── System Logs ───────────────────────────────────────────────────────────────
@@ -191,28 +198,43 @@ export interface LoyaltyTransaction {
 }
 
 // ── Finance ───────────────────────────────────────────────────────────────────
-export type ExpenseCategory = 'food' | 'drinks' | 'utilities' | 'staff' | 'equipment' | 'rent' | 'marketing' | 'repairs' | 'other'
-export type IncomeCategory = 'food' | 'drinks' | 'events' | 'pool' | 'other'
+// Expense / Income / Ingredient / DailyBalance types live in
+// src/components/finance/types.ts (ported from Cajun Life Cafe).
 
-export interface Expense {
-  id: string
-  date: string
-  category: ExpenseCategory
-  description: string
-  amount: number
-  notes?: string
-  loggedBy: string
-  createdAt: string
+// Payroll time cards (Finance → Payroll). One doc per employee per month in
+// `payroll_timecards`, OCR'd from punch-card photos.
+export interface TimeCardDayEntry {
+  day: number // 1-31
+  amIn?: string
+  amOut?: string
+  pmIn?: string
+  pmOut?: string
+  otIn?: string
+  otOut?: string
+  status?: 'CD' | 'OFF' | ''
+  note?: string
+  // Effective "official" shift start used to clip amIn when computing OT
+  // (see computeDayHours in Payroll.tsx). Auto-estimated per month from the
+  // most common amIn time unless shiftStartManual is true.
+  shiftStart?: string
+  shiftStartManual?: boolean
+  // "Paid OT" — the overtime hours a manager decides to pay for the day.
+  // Manual entry, blank by default.
+  otHours?: number
 }
 
-export interface Income {
-  id: string
-  date: string
-  category: IncomeCategory
-  amount: number
-  notes?: string
-  loggedBy: string
+export interface TimeCard {
+  id?: string
+  employeeId: string
+  employeeName: string
+  month: string // 'YYYY-MM'
+  cardNameRaw?: string
+  cardPositionRaw?: string
+  entries: TimeCardDayEntry[]
+  cardImageUrls?: string[]
+  uploadedBy: string
   createdAt: string
+  updatedAt: string
 }
 
 export interface DigitalMenuCategory {

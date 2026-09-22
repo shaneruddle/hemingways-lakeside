@@ -4,16 +4,17 @@ import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
 import { auth, storage } from '../lib/firebase'
 
 type User = { uid: string; email: string | null }
-import { getEnquiries, updateEnquiry, getCRMContacts, enquiryToContact, deleteCRMContact, updateCRMContact, saveCRMContact, getBlogPosts, saveBlogPost, updateBlogPost, deleteBlogPost, getMenuImages, saveMenuImage, deleteMenuImage, getSpecials, saveSpecial, updateSpecial, deleteSpecial, getGalleryImages, addGalleryImage, deleteGalleryImage } from '../lib/firestore'
-import type { Enquiry, CRMContact, BlogPost, Special, GalleryImage } from '../types'
+import { getEnquiries, updateEnquiry, getCRMContacts, enquiryToContact, deleteCRMContact, updateCRMContact, saveCRMContact, getBlogPosts, saveBlogPost, updateBlogPost, deleteBlogPost, getMenuImages, saveMenuImage, deleteMenuImage, getSpecials, saveSpecial, updateSpecial, deleteSpecial, getGalleryImages, addGalleryImage, deleteGalleryImage, getUserProfile, getUsers, saveUserProfile } from '../lib/firestore'
+import type { Enquiry, CRMContact, BlogPost, Special, GalleryImage, UserProfile } from '../types'
 import { toast } from 'sonner'
 import { LogOut, Users, MessageSquare, RefreshCw, UserPlus, Trash2, Phone, Mail, Tag, ChevronDown, ChevronUp, ImageIcon, Upload, ExternalLink, FileText, Edit2, Plus, X, Eye, EyeOff, Star, UtensilsCrossed, ScrollText, CreditCard, TrendingUp, Smartphone } from 'lucide-react'
 import MenuManager from '../components/admin/MenuManager'
 import SystemLogs from '../components/admin/SystemLogs'
 import UserManagement from '../components/admin/UserManagement'
 import LoyaltyManager from '../components/admin/LoyaltyManager'
-import FinanceManager from '../components/admin/FinanceManager'
+import FinanceDashboard from '../components/finance/FinanceDashboard'
 import PartyManager from '../components/admin/PartyManager'
+import { logActivity } from '../utils/logger'
 
 // ── Event Galleries ─────────────────────────────────────────────────────────────
 const GALLERY_TYPES: { key: GalleryImage['type']; label: string }[] = [
@@ -1149,6 +1150,8 @@ function CRMTab({ contacts, onRefresh }: { contacts: CRMContact[]; onRefresh: ()
 // ── Main Admin ─────────────────────────────────────────────────────────────────
 export default function Admin() {
   const [user, setUser] = useState<User | null>(null)
+  // Firestore users/{uid} profile — carries the role used by Finance (admin/manager/staff).
+  const [profile, setProfile] = useState<UserProfile | null>(null)
   const [tab, setTab] = useState<'enquiries' | 'crm' | 'menu' | 'blog' | 'specials' | 'galleries' | 'parties' | 'digital-menu' | 'system-logs' | 'users' | 'loyalty' | 'finance'>('enquiries')
   const [enquiries, setEnquiries] = useState<Enquiry[]>([])
   const [contacts, setContacts] = useState<CRMContact[]>([])
@@ -1176,6 +1179,29 @@ export default function Admin() {
 
   useEffect(() => {
     if (user) loadData()
+  }, [user])
+
+  // Load (or bootstrap) the users/{uid} profile. The very first profile ever
+  // created becomes admin; anyone after that starts as staff until promoted
+  // under Users.
+  useEffect(() => {
+    if (!user) { setProfile(null); return }
+    ;(async () => {
+      try {
+        let p = await getUserProfile(user.uid)
+        if (!p) {
+          const existing = await getUsers()
+          const role: UserProfile['role'] = existing.length === 0 ? 'admin' : 'staff'
+          const data = { uid: user.uid, email: user.email ?? '', role, createdAt: new Date().toISOString(), lastLogin: new Date().toISOString() }
+          await saveUserProfile(user.uid, data)
+          await logActivity('Profile created', `${data.email} → ${role}`, 'user')
+          p = { id: user.uid, ...data }
+        }
+        setProfile(p)
+      } catch {
+        setProfile(null)
+      }
+    })()
   }, [user])
 
   if (!user) return <Login onLogin={setUser} />
@@ -1338,7 +1364,9 @@ export default function Admin() {
           {tab === 'loyalty' && <LoyaltyManager />}
 
           {/* Finance */}
-          {tab === 'finance' && <FinanceManager />}
+          {tab === 'finance' && (profile ? <FinanceDashboard user={user} profile={profile} /> : (
+            <div className="p-10 text-center text-gray-500 text-sm">No user profile found for {user.email} — add this account under Users (or register via the Staff Portal) to use Finance.</div>
+          ))}
 
           {/* Users */}
           {tab === 'users' && <UserManagement />}
