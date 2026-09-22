@@ -4,6 +4,7 @@ import { toast } from 'sonner'
 import { IceCreamCone, Cake, Bell } from 'lucide-react'
 import Seo from '../components/Seo'
 import { submitEnquiry } from '../lib/firestore'
+import { trackEnquirySubmit } from '../lib/analytics'
 
 // Same Cloud Function the EnquiryForm uses — emails the sign-up to info@hemingwayslakeside.com
 const EMAIL_FUNCTION_URL = 'https://asia-southeast1-gen-lang-client-0174805651.cloudfunctions.net/emailEnquiry'
@@ -77,6 +78,7 @@ export default function BirthdayClub() {
         body: JSON.stringify({ name: form.name, phone: form.phone, email: form.email, type: 'birthday_club', message }),
       }).catch(() => {})
 
+      trackEnquirySubmit('birthday_club', { birth_month: month })
       setDone(true)
     } catch {
       toast.error('Something went wrong. Please ask a member of staff.')

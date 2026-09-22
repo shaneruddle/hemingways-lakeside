@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { submitEnquiry } from '../lib/firestore'
+import { trackEnquirySubmit } from '../lib/analytics'
 import type { Enquiry } from '../types'
 
 // Cloud Function that emails each enquiry to info@hemingwayslakeside.com
@@ -59,6 +60,7 @@ export default function EnquiryForm({ type = 'general', title = 'Make an Enquiry
         }),
       }).catch(() => {})
 
+      trackEnquirySubmit(type, { guest_count: form.guestCount ? parseInt(form.guestCount) : undefined })
       toast.success("Thanks! We'll be in touch soon.")
       setForm({ name: '', phone: '', email: '', date: '', guestCount: '', message: '' })
     } catch {
