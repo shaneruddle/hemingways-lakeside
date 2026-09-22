@@ -213,7 +213,7 @@ export default function ThaiKidsCafePool() {
           <p className="text-center text-sm text-[#5c5346] mt-8">
             มัดจำ 3,000 บาทสำหรับการจองพื้นที่ส่วนตัว ·{' '}
             <Link to="/birthday-club" className="underline hover:text-[#8a6d2f]">
-              สมัคร Birthday Club รับของหวานฟรีในเดือนเกิด
+              สมัคร Birthday Club รับของหวานฟรีในวันเกิด
             </Link>
           </p>
         </div>

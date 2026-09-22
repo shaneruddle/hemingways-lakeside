@@ -7,7 +7,7 @@ const promos = [
     icon: IceCreamCone,
     to: '/birthday-club',
     title: 'Join the Birthday Club',
-    desc: 'A free dessert or ice cream for your child in their birthday month. Takes 30 seconds.',
+    desc: 'A free dessert on your birthday - adults and kids. Takes 30 seconds.',
     cta: 'Sign Up Free',
   },
   {

@@ -7,7 +7,7 @@ type User = { uid: string; email: string | null }
 import { getEnquiries, updateEnquiry, getCRMContacts, enquiryToContact, deleteCRMContact, updateCRMContact, saveCRMContact, getBlogPosts, saveBlogPost, updateBlogPost, deleteBlogPost, getMenuImages, saveMenuImage, deleteMenuImage, getSpecials, saveSpecial, updateSpecial, deleteSpecial, getGalleryImages, addGalleryImage, deleteGalleryImage, getUserProfile, getUsers, saveUserProfile, importCRMContacts } from '../lib/firestore'
 import type { Enquiry, CRMContact, BlogPost, Special, GalleryImage, UserProfile } from '../types'
 import { toast } from 'sonner'
-import { LogOut, Users, MessageSquare, RefreshCw, UserPlus, Trash2, Phone, Mail, Tag, ChevronDown, ChevronUp, ImageIcon, Upload, ExternalLink, FileText, Edit2, Plus, X, Eye, EyeOff, Star, UtensilsCrossed, ScrollText, CreditCard, TrendingUp, Smartphone, Download, Search } from 'lucide-react'
+import { Cake, PanelLeftClose, PanelLeftOpen, LogOut, Users, MessageSquare, RefreshCw, UserPlus, Trash2, Phone, Mail, Tag, ChevronDown, ChevronUp, ImageIcon, Upload, ExternalLink, FileText, Edit2, Plus, X, Eye, EyeOff, Star, UtensilsCrossed, ScrollText, CreditCard, TrendingUp, Smartphone, Download, Search } from 'lucide-react'
 import MenuManager from '../components/admin/MenuManager'
 import SystemLogs from '../components/admin/SystemLogs'
 import UserManagement from '../components/admin/UserManagement'
@@ -991,6 +991,7 @@ function ContactCard({ contact, onRefresh }: { contact: CRMContact; onRefresh: (
           <div className="flex flex-wrap items-center gap-3 mt-1 text-sm text-gray-500">
             {contact.phone && <span className="flex items-center gap-1"><Phone size={12} />{contact.phone}</span>}
             {contact.email && <span className="flex items-center gap-1"><Mail size={12} />{contact.email}</span>}
+            {contact.dob && <span className="flex items-center gap-1"><Cake size={12} />{new Date(`${contact.dob}T12:00:00`).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</span>}
           </div>
           <div className="flex flex-wrap items-center gap-1 mt-1.5 text-[11px] text-gray-500">
             <span className="px-1.5 py-0.5 rounded bg-white/5">{contact.source}</span>
@@ -1081,6 +1082,7 @@ function CRMTab({ contacts, onRefresh }: { contacts: CRMContact[]; onRefresh: ()
   const [search, setSearch] = useState('')
   const [segment, setSegment] = useState<'all' | NonNullable<CRMContact['segment']>>('all')
   const [source, setSource] = useState('all')
+  const [birthdaysOnly, setBirthdaysOnly] = useState(false)
   const [limit, setLimit] = useState(60)
   const [importing, setImporting] = useState<string | null>(null)
   const importRef = useRef<HTMLInputElement>(null)
@@ -1089,9 +1091,11 @@ function CRMTab({ contacts, onRefresh }: { contacts: CRMContact[]; onRefresh: ()
 
   const sources = Array.from(new Set(contacts.map(c => c.source))).sort()
   const q = search.trim().toLowerCase()
+  const thisMonth = String(new Date().getMonth() + 1).padStart(2, '0')
   const filtered = contacts.filter(c =>
     (segment === 'all' || (c.segment ?? 'lakeside') === segment) &&
     (source === 'all' || c.source === source) &&
+    (!birthdaysOnly || (c.dob?.slice(5, 7) === thisMonth)) &&
     (!q || `${c.name} ${c.phone} ${c.email ?? ''} ${c.tags.join(' ')}`.toLowerCase().includes(q))
   )
 
@@ -1238,6 +1242,10 @@ function CRMTab({ contacts, onRefresh }: { contacts: CRMContact[]; onRefresh: ()
             </button>
           ))}
         </div>
+        <button onClick={() => { setBirthdaysOnly(b => !b); setLimit(60) }} title="Contacts with a birthday this month"
+          className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold ${birthdaysOnly ? 'bg-[#c9a84c] text-black' : 'bg-white/5 text-gray-400 hover:text-white'}`}>
+          <Cake size={13} /> Birthdays this month ({contacts.filter(c => c.dob?.slice(5, 7) === thisMonth).length})
+        </button>
         <select value={source} onChange={e => { setSource(e.target.value); setLimit(60) }}
           className="bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none">
           <option value="all">All sources</option>
@@ -1303,7 +1311,7 @@ function CRMTab({ contacts, onRefresh }: { contacts: CRMContact[]; onRefresh: ()
       ) : (
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {filtered.slice(0, limit).map(c => <ContactCard key={c.id} contact={c} onRefresh={onRefresh} />)}
+            {(birthdaysOnly ? [...filtered].sort((a, b) => (a.dob ?? '').slice(8).localeCompare((b.dob ?? '').slice(8))) : filtered).slice(0, limit).map(c => <ContactCard key={c.id} contact={c} onRefresh={onRefresh} />)}
           </div>
           {filtered.length > limit && (
             <div className="text-center mt-6">
@@ -1326,6 +1334,9 @@ export default function Admin() {
   // Finance sub-tab (Overview / Log Expense / …) — shown as a group in the sidebar.
   const [financeTab, setFinanceTab] = useState<string>('overview')
   const [financeOpen, setFinanceOpen] = useState(false)
+  // Sidebar collapsed to icons (arrow toggle); remembered per browser.
+  const [collapsed, setCollapsed] = useState<boolean>(() => { try { return localStorage.getItem('admin.sidebarCollapsed') === '1' } catch { return false } })
+  const toggleSidebar = () => setCollapsed(c => { try { localStorage.setItem('admin.sidebarCollapsed', c ? '0' : '1') } catch {} ; return !c })
   const [tab, setTab] = useState<'enquiries' | 'crm' | 'menu' | 'blog' | 'specials' | 'galleries' | 'parties' | 'digital-menu' | 'system-logs' | 'users' | 'loyalty' | 'finance'>('enquiries')
   const [enquiries, setEnquiries] = useState<Enquiry[]>([])
   const [contacts, setContacts] = useState<CRMContact[]>([])
@@ -1407,10 +1418,18 @@ export default function Admin() {
   return (
     <div className="min-h-screen pt-16 flex">
       {/* Sidebar */}
-      <aside className="w-56 shrink-0 border-r border-white/5 bg-[#0a0a0a] flex flex-col">
-        <div className="p-6 border-b border-white/5">
-          <div className="text-[#c9a84c] font-bold text-sm tracking-widest uppercase">Hemingways</div>
-          <div className="text-gray-600 text-xs tracking-wider mt-0.5">Lakeside Admin</div>
+      <aside className={`${collapsed ? 'w-16' : 'w-56'} shrink-0 border-r border-white/5 bg-[#0a0a0a] flex flex-col transition-[width] duration-200`}>
+        <div className={`${collapsed ? 'p-3' : 'p-6'} border-b border-white/5 flex items-center justify-between gap-2`}>
+          {!collapsed && (
+            <div>
+              <div className="text-[#c9a84c] font-bold text-sm tracking-widest uppercase">Hemingways</div>
+              <div className="text-gray-600 text-xs tracking-wider mt-0.5">Lakeside Admin</div>
+            </div>
+          )}
+          <button onClick={toggleSidebar} title={collapsed ? 'Show menu' : 'Hide menu'} aria-label={collapsed ? 'Show menu' : 'Hide menu'}
+            className="p-1.5 rounded-lg text-gray-500 hover:text-white hover:bg-white/5 mx-auto">
+            {collapsed ? <PanelLeftOpen size={18} /> : <PanelLeftClose size={18} />}
+          </button>
         </div>
 
         <nav className="flex-1 py-4 space-y-0.5 px-2">
@@ -1425,14 +1444,15 @@ export default function Admin() {
                     setFinanceOpen(true)
                     setFinanceTab(t => financeTabs.some(x => x.id === t) ? t : (financeTabs[0]?.id ?? 'overview'))
                   }}
-                  className={`w-full flex items-center justify-between gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${
+                  title={collapsed ? 'Finance' : undefined}
+                  className={`w-full flex items-center ${collapsed ? 'justify-center' : 'justify-between'} gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${
                     tab === 'finance' ? 'text-[#c9a84c] font-semibold' : 'text-gray-500 hover:text-white hover:bg-white/5'
                   }`}
                 >
-                  <span className="flex items-center gap-3"><TrendingUp size={15} />Finance</span>
-                  {tab === 'finance' && financeOpen ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                  <span className="flex items-center gap-3"><TrendingUp size={15} />{!collapsed && 'Finance'}</span>
+                  {!collapsed && (tab === 'finance' && financeOpen ? <ChevronUp size={14} /> : <ChevronDown size={14} />)}
                 </button>
-                {tab === 'finance' && financeOpen && (
+                {tab === 'finance' && financeOpen && !collapsed && (
                   <div className="ml-4 pl-3 border-l border-white/10 space-y-0.5 mt-0.5 mb-1">
                     {financeTabs.map(ft => (
                       <button
@@ -1452,7 +1472,8 @@ export default function Admin() {
             )}
             <button
               onClick={() => setTab(key)}
-              className={`w-full flex items-center justify-between gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${
+              title={collapsed ? label : undefined}
+              className={`w-full flex items-center ${collapsed ? 'justify-center' : 'justify-between'} gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors relative ${
                 tab === key
                   ? 'bg-[#c9a84c]/10 text-[#c9a84c] font-semibold'
                   : 'text-gray-500 hover:text-white hover:bg-white/5'
@@ -1460,9 +1481,10 @@ export default function Admin() {
             >
               <span className="flex items-center gap-3">
                 <Icon size={15} />
-                {label}
+                {!collapsed && label}
               </span>
-              {badge && (
+              {badge && collapsed && <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-[#c9a84c]" />}
+              {badge && !collapsed && (
                 <span className="text-xs bg-[#c9a84c] text-black font-bold rounded-full w-5 h-5 flex items-center justify-center">
                   {badge}
                 </span>
@@ -1472,14 +1494,14 @@ export default function Admin() {
           ))}
         </nav>
 
-        <div className="p-4 border-t border-white/5 space-y-2">
+        <div className={`${collapsed ? 'p-2' : 'p-4'} border-t border-white/5 space-y-2`}>
           <a
             href="https://hemingwayslakeside.com"
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-2 px-3 py-2 rounded-lg text-gray-600 hover:text-white text-xs transition-colors hover:bg-white/5 w-full"
           >
-            <ExternalLink size={13} /> Visit Site
+            <ExternalLink size={13} /> {!collapsed && 'Visit Site'}
           </a>
           <a
             href="/staff"
@@ -1487,20 +1509,20 @@ export default function Admin() {
             rel="noopener noreferrer"
             className="flex items-center gap-2 px-3 py-2 rounded-lg text-gray-600 hover:text-[#c9a84c] text-xs transition-colors hover:bg-white/5 w-full"
           >
-            <Smartphone size={13} /> Staff Portal
+            <Smartphone size={13} /> {!collapsed && 'Staff Portal'}
           </a>
           <button
             onClick={loadData}
             disabled={loading}
             className="flex items-center gap-2 px-3 py-2 rounded-lg text-gray-600 hover:text-white text-xs transition-colors hover:bg-white/5 w-full"
           >
-            <RefreshCw size={13} className={loading ? 'animate-spin' : ''} /> Refresh
+            <RefreshCw size={13} className={loading ? 'animate-spin' : ''} /> {!collapsed && 'Refresh'}
           </button>
           <button
             onClick={() => signOut(auth)}
             className="flex items-center gap-2 px-3 py-2 rounded-lg text-gray-600 hover:text-red-400 text-xs transition-colors hover:bg-white/5 w-full"
           >
-            <LogOut size={13} /> Sign Out
+            <LogOut size={13} /> {!collapsed && 'Sign Out'}
           </button>
         </div>
       </aside>

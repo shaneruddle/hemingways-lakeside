@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { MapPin, Phone, Mail, Clock } from 'lucide-react'
 import { HOURS_SUMMARY, HAPPY_HOUR_SUMMARY } from '../lib/schema'
+import NewsletterSignup from './NewsletterSignup'
 
 export default function Footer() {
   return (
@@ -101,6 +102,10 @@ export default function Footer() {
               </li>
             </ul>
           </div>
+        </div>
+
+        <div className="mt-12 pt-10 border-t border-white/10 max-w-md">
+          <NewsletterSignup variant="footer" />
         </div>
 
         <div className="mt-12 pt-8 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-4">

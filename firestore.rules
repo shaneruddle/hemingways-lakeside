@@ -76,8 +76,26 @@ service cloud.firestore {
       allow create: if true;
       allow read, update, delete: if request.auth != null;
     }
+    // Public sign-up forms (newsletter, birthday club) write straight into the
+    // CRM. Doc id is derived from the email/phone in the browser so a repeat
+    // sign-up updates the same contact instead of creating another one.
+    function isPublicSignup() {
+      let d = request.resource.data;
+      return d.source in ['newsletter', 'birthday']
+        && d.keys().hasOnly(['name', 'firstName', 'lastName', 'phone', 'email', 'dob', 'source', 'sources', 'segment', 'consent', 'tags', 'notes', 'lastContact', 'createdAt'])
+        && d.name is string && d.name.size() <= 120
+        && d.phone is string && d.phone.size() <= 40
+        && (!('email' in d) || (d.email is string && d.email.size() <= 120))
+        && (!('dob' in d) || (d.dob is string && d.dob.size() == 10))
+        && (!('notes' in d) || (d.notes is string && d.notes.size() <= 300))
+        && d.tags is list && d.tags.size() <= 5
+        && d.consent == 'opt-in';
+    }
     match /crm_contacts/{doc} {
-      allow read, write: if request.auth != null;
+      allow read, delete: if request.auth != null;
+      allow create: if request.auth != null || isPublicSignup();
+      allow update: if request.auth != null
+        || (resource.data.source in ['newsletter', 'birthday'] && isPublicSignup());
     }
 
     // Users — only auth'd users can read/write their own; admin reads all

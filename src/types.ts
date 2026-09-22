@@ -271,6 +271,7 @@ export interface CRMContact {
   segment?: 'lakeside' | 'other-business'
   consent?: 'opt-in' | 'unknown' | 'opt-out'
   gender?: 'male' | 'female'
+  dob?: string // YYYY-MM-DD, from the birthday form
   tags: string[]
   notes: string
   lastContact: string

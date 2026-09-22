@@ -82,7 +82,7 @@ export default function HalloweenPoolParty() {
           <p className="text-[#5c5346] leading-relaxed mt-4">
             Got a birthday coming up?{' '}
             <Link to="/birthday-club" className="underline hover:text-[#8a6d2f]">Join the Birthday Club</Link> for a
-            free birthday-month treat, or see our{' '}
+            free birthday dessert, or see our{' '}
             <Link to="/events/kids" className="underline hover:text-[#8a6d2f]">kids' party packages</Link>.
           </p>
         </div>

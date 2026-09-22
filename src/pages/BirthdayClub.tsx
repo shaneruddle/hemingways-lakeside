@@ -3,30 +3,21 @@ import { Link } from 'react-router-dom'
 import { toast } from 'sonner'
 import { IceCreamCone, Cake, Bell } from 'lucide-react'
 import Seo from '../components/Seo'
-import { submitEnquiry } from '../lib/firestore'
+import { submitPublicSignup } from '../lib/signup'
 import { trackEnquirySubmit } from '../lib/analytics'
-
-// Same Cloud Function the EnquiryForm uses — emails the sign-up to info@hemingwayslakeside.com
-const EMAIL_FUNCTION_URL = 'https://asia-southeast1-gen-lang-client-0174805651.cloudfunctions.net/emailEnquiry'
-
-const MONTHS = [
-  'January · มกราคม', 'February · กุมภาพันธ์', 'March · มีนาคม', 'April · เมษายน',
-  'May · พฤษภาคม', 'June · มิถุนายน', 'July · กรกฎาคม', 'August · สิงหาคม',
-  'September · กันยายน', 'October · ตุลาคม', 'November · พฤศจิกายน', 'December · ธันวาคม',
-]
 
 const perks = [
   {
     icon: IceCreamCone,
-    title: 'A free birthday treat',
-    th: 'ของหวานหรือไอศกรีมฟรีสำหรับน้อง ๆ ในเดือนเกิด',
-    desc: 'A free dessert or ice cream for your child during their birthday month.',
+    title: 'A free birthday dessert',
+    th: 'ของหวานฟรีในวันเกิดของคุณ',
+    desc: 'A free dessert on us in your birthday week - for you, or for the kids.',
   },
   {
     icon: Bell,
     title: 'First to hear',
     th: 'รับข่าวโปรโมชันจัดงานวันเกิดก่อนใคร',
-    desc: "Kids' party offers and family events, before we post them anywhere else.",
+    desc: 'Events, party offers and specials, before we post them anywhere else.',
   },
   {
     icon: Cake,
@@ -38,20 +29,25 @@ const perks = [
 
 /**
  * Birthday Club sign-up (QR code on the in-venue poster points here).
- * Sign-ups are stored in the existing `enquiries` collection with type 'birthday_club',
- * so they show up in Admin and are emailed like any other enquiry — no new Firestore rules needed.
+ * Anyone can join - adults or kids. Stored straight in the CRM (crm_contacts) with the
+ * full date of birth and a 'birthday' tag, via the public-signup Firestore rule.
  */
 export default function BirthdayClub() {
   const [loading, setLoading] = useState(false)
   const [done, setDone] = useState(false)
-  const [form, setForm] = useState({ name: '', phone: '', email: '', childName: '', birthMonth: '', consent: false })
+  const [form, setForm] = useState({ name: '', phone: '', email: '', dob: '', forWhom: '', consent: false })
 
   const set = (key: string, val: string | boolean) => setForm(f => ({ ...f, [key]: val }))
+  const today = new Date().toISOString().slice(0, 10)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!form.name || !form.phone || !form.birthMonth) {
-      toast.error('Name, phone/LINE and birthday month are required')
+    if (!form.name || !form.phone || !form.dob) {
+      toast.error('Name, phone/LINE and date of birth are required')
+      return
+    }
+    if (form.dob > today || form.dob < '1920-01-01') {
+      toast.error('Please check the date of birth')
       return
     }
     if (!form.consent) {
@@ -59,25 +55,17 @@ export default function BirthdayClub() {
       return
     }
     setLoading(true)
-    const month = parseInt(form.birthMonth)
-    const message = `Birthday Club sign-up. Child: ${form.childName || '-'}. Birthday month: ${MONTHS[month - 1]}.`
+    const month = parseInt(form.dob.slice(5, 7))
     try {
-      await submitEnquiry({
+      await submitPublicSignup({
         name: form.name,
         phone: form.phone,
         email: form.email,
-        type: 'birthday_club',
-        message,
-        birthMonth: month,
-        ...(form.childName ? { childName: form.childName } : {}),
+        dob: form.dob,
+        source: 'birthday',
+        tag: 'birthday',
+        notes: form.forWhom ? `Birthday Club - birthday is for: ${form.forWhom}` : 'Birthday Club',
       })
-
-      fetch(EMAIL_FUNCTION_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: form.name, phone: form.phone, email: form.email, type: 'birthday_club', message }),
-      }).catch(() => {})
-
       trackEnquirySubmit('birthday_club', { birth_month: month })
       setDone(true)
     } catch {
@@ -95,17 +83,17 @@ export default function BirthdayClub() {
     <div>
       <Seo
         title="Birthday Club"
-        description="Join the Hemingways Lakeside Birthday Club - a free dessert or ice cream for your child in their birthday month, and first word on kids' party offers at our lakeside pool venue in East Pattaya."
+        description="Join the Hemingways Lakeside Birthday Club - a free dessert on your birthday, for adults and kids, plus first word on events and offers at our lakeside venue in East Pattaya."
       />
 
       {/* Hero */}
       <section className="px-4 pt-40 pb-16 bg-[#0d0d0d]">
         <div className="max-w-3xl mx-auto text-center">
           <p className="text-[#c9a84c] text-xs tracking-[0.4em] uppercase mb-4">Hemingways Lakeside</p>
-          <h1 className="text-4xl sm:text-6xl font-bold tracking-tight mb-4">Join the Birthday Club</h1>
-          <p className="text-2xl text-gray-200 mb-4">สมัคร Birthday Club ฟรี</p>
+          <h1 className="text-4xl sm:text-6xl font-bold tracking-tight mb-4">Free Dessert On Your Birthday</h1>
+          <p className="text-2xl text-gray-200 mb-4">สมัคร Birthday Club ฟรี · รับของหวานฟรีวันเกิด</p>
           <p className="text-gray-400 text-lg max-w-xl mx-auto">
-            Tell us your child's birthday month and they get a free treat when it comes round. Takes 30 seconds.
+            Tell us your birthday and we'll treat you to a free dessert when it comes round. Adults and kids welcome. Takes 30 seconds.
           </p>
         </div>
       </section>
@@ -133,7 +121,7 @@ export default function BirthdayClub() {
             <div className="text-center py-8">
               <h2 className="text-2xl font-bold text-[#1a1512] mb-3">You're in! · สมัครเรียบร้อยค่ะ</h2>
               <p className="text-[#5c5346] mb-6">
-                We'll message you before the birthday month. Planning a party already?
+                We'll message you in your birthday week with your free dessert. Planning a party already?
               </p>
               <Link
                 to="/events/kids"
@@ -145,7 +133,7 @@ export default function BirthdayClub() {
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className={labelClass}>Your name · ชื่อผู้ปกครอง *</label>
+                <label className={labelClass}>Your name · ชื่อ *</label>
                 <input type="text" value={form.name} onChange={e => set('name', e.target.value)} className={inputClass} />
               </div>
               <div>
@@ -158,17 +146,12 @@ export default function BirthdayClub() {
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className={labelClass}>Child's first name (optional) · ชื่อน้อง</label>
-                  <input type="text" value={form.childName} onChange={e => set('childName', e.target.value)} className={inputClass} />
+                  <label className={labelClass}>Date of birth · วันเกิด *</label>
+                  <input type="date" value={form.dob} min="1920-01-01" max={today} onChange={e => set('dob', e.target.value)} className={inputClass} />
                 </div>
                 <div>
-                  <label className={labelClass}>Birthday month · เดือนเกิด *</label>
-                  <select value={form.birthMonth} onChange={e => set('birthMonth', e.target.value)} className={inputClass}>
-                    <option value="">Select · เลือกเดือน</option>
-                    {MONTHS.map((m, i) => (
-                      <option key={m} value={i + 1}>{m}</option>
-                    ))}
-                  </select>
+                  <label className={labelClass}>Whose birthday? (optional) · วันเกิดของใคร</label>
+                  <input type="text" value={form.forWhom} onChange={e => set('forWhom', e.target.value)} placeholder="Me / my daughter Mia…" className={inputClass} />
                 </div>
               </div>
               <label className="flex items-start gap-3 text-sm text-[#5c5346]">
@@ -179,10 +162,10 @@ export default function BirthdayClub() {
                   className="mt-1 accent-[#c9a84c]"
                 />
                 <span>
-                  I'm happy for Hemingways Lakeside to message me about the Birthday Club and kids' party offers. We only
+                  I'm happy for Hemingways Lakeside to message me about the Birthday Club, events and offers. We only
                   use your details for this, and you can opt out any time.
                   <br />
-                  ยินยอมให้ร้านส่งข่าว Birthday Club และโปรโมชันงานวันเกิด ยกเลิกได้ทุกเมื่อ
+                  ยินยอมให้ร้านส่งข่าว Birthday Club กิจกรรม และโปรโมชัน ยกเลิกได้ทุกเมื่อ
                 </span>
               </label>
               <button
@@ -193,9 +176,9 @@ export default function BirthdayClub() {
                 {loading ? 'Joining...' : 'Join · สมัคร'}
               </button>
               <p className="text-center text-xs text-[#5c5346]">
-                One treat per child per year, with any food or drink purchase.
+                One free dessert per person per year, in your birthday week, with any food or drink purchase.
                 <br />
-                รับสิทธิ์ 1 ครั้งต่อเด็ก 1 คนต่อปี เมื่อสั่งอาหารหรือเครื่องดื่ม
+                รับสิทธิ์ 1 ครั้งต่อคนต่อปี ในสัปดาห์วันเกิด เมื่อสั่งอาหารหรือเครื่องดื่ม
               </p>
             </form>
           )}

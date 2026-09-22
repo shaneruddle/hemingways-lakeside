@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { Tv, Beer, ChefHat, Users, Waves, PartyPopper, Star, ArrowRight } from 'lucide-react'
 import Seo from '../components/Seo'
+import NewsletterSignup from '../components/NewsletterSignup'
 import { HOURS_SUMMARY } from '../lib/schema'
 
 const features = [
@@ -12,10 +13,15 @@ const features = [
   { icon: PartyPopper, label: 'Private Events', desc: 'Birthdays, kids parties, corporate functions — we host it all' },
 ]
 
+// Real Google reviews (5★), copied from the Business Profile on 22 Sept 2026.
+// Rating/count below should be refreshed occasionally - or wire up the Places API.
+const GOOGLE_RATING = '4.4'
+const GOOGLE_REVIEW_COUNT = '395'
+const GOOGLE_REVIEWS_URL = 'https://www.google.com/maps/place/?q=place_id:ChIJWfsfAuyVAjERylWF266iQkY'
 const testimonials = [
-  { name: 'John S.', time: '2 weeks ago', text: 'Fantastic place! Best expat bar in East Pattaya. Food is delicious and staff are amazing.' },
-  { name: 'Yummy Mummy', time: '1 month ago', text: 'Great atmosphere, and the Sunday lunch is the best at The Lake. 10/10' },
-  { name: 'Dave T.', time: '3 weeks ago', text: "Kids loved the pool and we had a great meal. Perfect family day out in Pattaya." },
+  { name: 'Mike Seo', time: 'Google review', text: 'We celebrated a birthday at Hemingways, highly recommended. We viewed a few other restaurants but after seeing Hemingways we knew it was the place for us. Fred the manager and the rest of the staff were so easy to deal with, the price was right, the food was great, and everything went smoothly.' },
+  { name: 'Law Man Ka', time: 'Google review', text: 'A great restaurant for families, with options for children like billiards or swimming. The food is delicious and offers a wide variety of choices. Prices are reasonable.' },
+  { name: 'Nangirl Malila', time: 'Google review', text: 'Great food with excellent service. I also love the play room and big swimming pool that kids and everyone in the family can enjoy. Highly recommend for your next meal.' },
 ]
 
 export default function Home() {
@@ -143,8 +149,9 @@ export default function Home() {
               {[...Array(5)].map((_, i) => (
                 <Star key={i} size={16} className="text-[#c9a84c] fill-[#c9a84c]" />
               ))}
-              <span className="text-[#5c5346] text-sm ml-2">4.8 · 250+ reviews</span>
+              <span className="text-[#5c5346] text-sm ml-2">{GOOGLE_RATING} · {GOOGLE_REVIEW_COUNT} Google reviews</span>
             </div>
+            <a href={GOOGLE_REVIEWS_URL} target="_blank" rel="noopener noreferrer" className="inline-block mt-3 text-xs text-[#8a6d2f] underline underline-offset-2 hover:text-[#1a1512]">Read all reviews on Google</a>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {testimonials.map(t => (
@@ -164,6 +171,8 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      <NewsletterSignup variant="section" />
 
       {/* Location strip */}
       <section className="py-16 px-4 bg-white border-t border-black/5">
