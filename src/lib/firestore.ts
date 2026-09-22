@@ -9,6 +9,7 @@ import {
   doc,
   query,
   where,
+  writeBatch,
   orderBy,
 } from 'firebase/firestore'
 import { db } from './firebase'
@@ -218,6 +219,17 @@ export const updateCRMContact = async (id: string, data: Partial<CRMContact>) =>
 
 export const deleteCRMContact = async (id: string) => {
   return deleteDoc(doc(db, 'crm_contacts', id))
+}
+
+/** Bulk-insert contacts (CSV import). Firestore batches cap at 500 writes. */
+export const importCRMContacts = async (contacts: Omit<import('../types').CRMContact, 'id'>[], onProgress?: (done: number) => void) => {
+  const CHUNK = 400
+  for (let i = 0; i < contacts.length; i += CHUNK) {
+    const batch = writeBatch(db)
+    for (const c of contacts.slice(i, i + CHUNK)) batch.set(doc(collection(db, 'crm_contacts')), c)
+    await batch.commit()
+    onProgress?.(Math.min(i + CHUNK, contacts.length))
+  }
 }
 
 // Convert enquiry to CRM contact

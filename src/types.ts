@@ -260,9 +260,17 @@ export interface DigitalMenuItem {
 export interface CRMContact {
   id: string
   name: string
-  phone: string
+  firstName?: string
+  lastName?: string
+  phone: string // E.164 (+66…) or '' when email-only
   email?: string
-  source: string
+  source: string // primary source, e.g. 'enquiry', 'manual', 'LINE', 'Sign In Sheets'
+  sources?: string[] // every list the contact appeared on
+  // 'lakeside' = gave details to Hemingways Lakeside; 'other-business' = came
+  // from ABPC / Rent a Car lists — kept separate for marketing (PDPA).
+  segment?: 'lakeside' | 'other-business'
+  consent?: 'opt-in' | 'unknown' | 'opt-out'
+  gender?: 'male' | 'female'
   tags: string[]
   notes: string
   lastContact: string

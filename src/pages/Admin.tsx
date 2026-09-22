@@ -4,10 +4,10 @@ import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
 import { auth, storage } from '../lib/firebase'
 
 type User = { uid: string; email: string | null }
-import { getEnquiries, updateEnquiry, getCRMContacts, enquiryToContact, deleteCRMContact, updateCRMContact, saveCRMContact, getBlogPosts, saveBlogPost, updateBlogPost, deleteBlogPost, getMenuImages, saveMenuImage, deleteMenuImage, getSpecials, saveSpecial, updateSpecial, deleteSpecial, getGalleryImages, addGalleryImage, deleteGalleryImage, getUserProfile, getUsers, saveUserProfile } from '../lib/firestore'
+import { getEnquiries, updateEnquiry, getCRMContacts, enquiryToContact, deleteCRMContact, updateCRMContact, saveCRMContact, getBlogPosts, saveBlogPost, updateBlogPost, deleteBlogPost, getMenuImages, saveMenuImage, deleteMenuImage, getSpecials, saveSpecial, updateSpecial, deleteSpecial, getGalleryImages, addGalleryImage, deleteGalleryImage, getUserProfile, getUsers, saveUserProfile, importCRMContacts } from '../lib/firestore'
 import type { Enquiry, CRMContact, BlogPost, Special, GalleryImage, UserProfile } from '../types'
 import { toast } from 'sonner'
-import { LogOut, Users, MessageSquare, RefreshCw, UserPlus, Trash2, Phone, Mail, Tag, ChevronDown, ChevronUp, ImageIcon, Upload, ExternalLink, FileText, Edit2, Plus, X, Eye, EyeOff, Star, UtensilsCrossed, ScrollText, CreditCard, TrendingUp, Smartphone } from 'lucide-react'
+import { LogOut, Users, MessageSquare, RefreshCw, UserPlus, Trash2, Phone, Mail, Tag, ChevronDown, ChevronUp, ImageIcon, Upload, ExternalLink, FileText, Edit2, Plus, X, Eye, EyeOff, Star, UtensilsCrossed, ScrollText, CreditCard, TrendingUp, Smartphone, Download, Search } from 'lucide-react'
 import MenuManager from '../components/admin/MenuManager'
 import SystemLogs from '../components/admin/SystemLogs'
 import UserManagement from '../components/admin/UserManagement'
@@ -988,9 +988,14 @@ function ContactCard({ contact, onRefresh }: { contact: CRMContact; onRefresh: (
       <div className="flex items-start justify-between gap-4 mb-3">
         <div>
           <h3 className="text-white font-semibold">{contact.name}</h3>
-          <div className="flex items-center gap-3 mt-1 text-sm text-gray-500">
-            <span className="flex items-center gap-1"><Phone size={12} />{contact.phone}</span>
+          <div className="flex flex-wrap items-center gap-3 mt-1 text-sm text-gray-500">
+            {contact.phone && <span className="flex items-center gap-1"><Phone size={12} />{contact.phone}</span>}
             {contact.email && <span className="flex items-center gap-1"><Mail size={12} />{contact.email}</span>}
+          </div>
+          <div className="flex flex-wrap items-center gap-1 mt-1.5 text-[11px] text-gray-500">
+            <span className="px-1.5 py-0.5 rounded bg-white/5">{contact.source}</span>
+            {contact.sources && contact.sources.filter(x => x !== contact.source).map(x => <span key={x} className="px-1.5 py-0.5 rounded bg-white/5">{x}</span>)}
+            {contact.segment === 'other-business' && <span className="px-1.5 py-0.5 rounded bg-orange-900/40 text-orange-300">ABPC / Rent a Car</span>}
           </div>
         </div>
         <button onClick={remove} className="text-gray-700 hover:text-red-400 transition-colors p-1">
@@ -1031,14 +1036,134 @@ function ContactCard({ contact, onRefresh }: { contact: CRMContact; onRefresh: (
 }
 
 // ── CRM Tab (with Add Contact) ─────────────────────────────────────────────────
+// ── CSV helpers (CRM import / audience export) ────────────────────────────────
+function parseCsv(text: string): string[][] {
+  const rows: string[][] = []
+  let row: string[] = [], cell = '', q = false
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i]
+    if (q) {
+      if (ch === '"' && text[i + 1] === '"') { cell += '"'; i++ }
+      else if (ch === '"') q = false
+      else cell += ch
+    } else if (ch === '"') q = true
+    else if (ch === ',') { row.push(cell); cell = '' }
+    else if (ch === '\n' || ch === '\r') {
+      if (ch === '\r' && text[i + 1] === '\n') i++
+      row.push(cell); rows.push(row); row = []; cell = ''
+    } else cell += ch
+  }
+  if (cell || row.length) { row.push(cell); rows.push(row) }
+  return rows.filter(r => r.some(c => c.trim()))
+}
+
+function csvEscape(v: string) {
+  return /[",\n]/.test(v) ? `"${v.replace(/"/g, '""')}"` : v
+}
+
+function downloadCsv(filename: string, rows: string[][]) {
+  const blob = new Blob([rows.map(r => r.map(csvEscape).join(',')).join('\n')], { type: 'text/csv' })
+  const a = document.createElement('a')
+  a.href = URL.createObjectURL(blob)
+  a.download = filename
+  a.click()
+  URL.revokeObjectURL(a.href)
+}
+
+const SEGMENT_LABEL: Record<NonNullable<CRMContact['segment']>, string> = { lakeside: 'Lakeside', 'other-business': 'ABPC / Rent a Car' }
+
 function CRMTab({ contacts, onRefresh }: { contacts: CRMContact[]; onRefresh: () => void }) {
   const [showForm, setShowForm] = useState(false)
   const [saving, setSaving] = useState(false)
   const [tagInput, setTagInput] = useState('')
   const emptyForm = { name: '', phone: '', email: '', notes: '', tags: [] as string[] }
   const [form, setForm] = useState(emptyForm)
+  const [search, setSearch] = useState('')
+  const [segment, setSegment] = useState<'all' | NonNullable<CRMContact['segment']>>('all')
+  const [source, setSource] = useState('all')
+  const [limit, setLimit] = useState(60)
+  const [importing, setImporting] = useState<string | null>(null)
+  const importRef = useRef<HTMLInputElement>(null)
 
   const setField = (k: string, v: any) => setForm(f => ({ ...f, [k]: v }))
+
+  const sources = Array.from(new Set(contacts.map(c => c.source))).sort()
+  const q = search.trim().toLowerCase()
+  const filtered = contacts.filter(c =>
+    (segment === 'all' || (c.segment ?? 'lakeside') === segment) &&
+    (source === 'all' || c.source === source) &&
+    (!q || `${c.name} ${c.phone} ${c.email ?? ''} ${c.tags.join(' ')}`.toLowerCase().includes(q))
+  )
+
+  // Import a CSV with columns: firstName,lastName,phone,email,segment,primarySource,sources,gender,notes
+  // (the cleaned "Lakeside Database" export). Skips rows whose phone/email already exist.
+  const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (importRef.current) importRef.current.value = ''
+    if (!file) return
+    try {
+      const rows = parseCsv(await file.text())
+      const header = rows[0].map(h => h.trim())
+      const col = (name: string) => header.indexOf(name)
+      const iFn = col('firstName'), iLn = col('lastName'), iPh = col('phone'), iEm = col('email'), iSeg = col('segment'), iSrc = col('primarySource'), iSrcs = col('sources'), iGen = col('gender'), iNotes = col('notes')
+      if (iPh < 0 || iEm < 0) { toast.error('CSV needs phone and email columns'); return }
+      const seenPhone = new Set(contacts.map(c => c.phone).filter(Boolean))
+      const seenEmail = new Set(contacts.map(c => c.email?.toLowerCase()).filter(Boolean))
+      const now = new Date().toISOString()
+      const toAdd: Omit<CRMContact, 'id'>[] = []
+      let skipped = 0
+      for (const r of rows.slice(1)) {
+        const phone = (r[iPh] || '').trim()
+        const email = (r[iEm] || '').trim().toLowerCase()
+        if (!phone && !email) continue
+        if ((phone && seenPhone.has(phone)) || (email && seenEmail.has(email))) { skipped++; continue }
+        if (phone) seenPhone.add(phone)
+        if (email) seenEmail.add(email)
+        const firstName = iFn >= 0 ? (r[iFn] || '').trim() : ''
+        const lastName = iLn >= 0 ? (r[iLn] || '').trim() : ''
+        const seg = iSeg >= 0 && r[iSeg] === 'other-business' ? 'other-business' : 'lakeside'
+        const gen = iGen >= 0 ? (r[iGen] || '').trim() : ''
+        const c: Omit<CRMContact, 'id'> = {
+          name: [firstName, lastName].filter(Boolean).join(' ') || email || phone,
+          phone,
+          source: (iSrc >= 0 && r[iSrc]) || 'import',
+          segment: seg,
+          consent: 'unknown',
+          tags: [],
+          notes: iNotes >= 0 ? (r[iNotes] || '').trim() : '',
+          lastContact: now,
+          createdAt: now,
+        }
+        if (iSrcs >= 0 && r[iSrcs]) c.sources = r[iSrcs].split('|') // Firestore rejects undefined fields
+        if (firstName) c.firstName = firstName
+        if (lastName) c.lastName = lastName
+        if (email) c.email = email
+        if (gen === 'male' || gen === 'female') c.gender = gen
+        toAdd.push(c)
+      }
+      if (!toAdd.length) { toast.info(`Nothing to import (${skipped} already in CRM)`); return }
+      setImporting(`0 / ${toAdd.length}`)
+      await importCRMContacts(toAdd, done => setImporting(`${done} / ${toAdd.length}`))
+      await logActivity('Contacts imported', `${toAdd.length} added, ${skipped} duplicates skipped (${file.name})`, 'crm')
+      toast.success(`Imported ${toAdd.length} contacts (${skipped} duplicates skipped)`)
+      onRefresh()
+    } catch (err: any) {
+      toast.error(`Import failed: ${err?.message || err}`)
+    } finally {
+      setImporting(null)
+    }
+  }
+
+  // Meta / Google customer-list format for the current filter.
+  const exportAudience = () => {
+    const rows = [['email', 'phone', 'fn', 'ln', 'ct', 'st', 'country', 'source']]
+    for (const c of filtered) {
+      const [fn, ...rest] = (c.firstName || c.lastName) ? [c.firstName ?? '', c.lastName ?? ''] : c.name.split(' ')
+      rows.push([c.email ?? '', c.phone, fn ?? '', rest.join(' '), 'pattaya', 'chonburi', 'th', c.source])
+    }
+    const seg = segment === 'all' ? 'all' : segment
+    downloadCsv(`lakeside-audience-${seg}-${new Date().toISOString().slice(0, 10)}.csv`, rows)
+  }
 
   const addTag = () => {
     const t = tagInput.trim()
@@ -1075,14 +1200,49 @@ function CRMTab({ contacts, onRefresh }: { contacts: CRMContact[]; onRefresh: ()
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
-        <p className="text-gray-500 text-sm">{contacts.length} contact{contacts.length !== 1 ? 's' : ''}</p>
-        <button
-          onClick={() => setShowForm(v => !v)}
-          className="flex items-center gap-2 px-4 py-2 bg-[#c9a84c] text-black font-bold text-sm rounded-lg hover:bg-[#b8973d] transition-colors"
-        >
-          <UserPlus size={14} /> New Contact
-        </button>
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+        <p className="text-gray-500 text-sm">
+          {filtered.length === contacts.length ? `${contacts.length} contact${contacts.length !== 1 ? 's' : ''}` : `${filtered.length} of ${contacts.length} contacts`}
+          {' · '}{contacts.filter(c => c.phone).length} with phone · {contacts.filter(c => c.email).length} with email
+        </p>
+        <div className="flex items-center gap-2">
+          <input ref={importRef} type="file" accept=".csv,text/csv" className="hidden" onChange={handleImport} />
+          <button onClick={() => importRef.current?.click()} disabled={!!importing}
+            className="flex items-center gap-2 px-3 py-2 border border-white/10 text-gray-300 hover:text-white text-sm rounded-lg disabled:opacity-50">
+            <Upload size={14} /> {importing ? `Importing ${importing}` : 'Import CSV'}
+          </button>
+          <button onClick={exportAudience} disabled={!filtered.length}
+            className="flex items-center gap-2 px-3 py-2 border border-white/10 text-gray-300 hover:text-white text-sm rounded-lg disabled:opacity-50" title="Meta / Google customer-list CSV of the contacts currently shown">
+            <Download size={14} /> Export audience
+          </button>
+          <button
+            onClick={() => setShowForm(v => !v)}
+            className="flex items-center gap-2 px-4 py-2 bg-[#c9a84c] text-black font-bold text-sm rounded-lg hover:bg-[#b8973d] transition-colors"
+          >
+            <UserPlus size={14} /> New Contact
+          </button>
+        </div>
+      </div>
+
+      <div className="flex flex-wrap items-center gap-2 mb-6">
+        <div className="relative flex-1 min-w-[200px]">
+          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
+          <input value={search} onChange={e => { setSearch(e.target.value); setLimit(60) }} placeholder="Search name, phone, email, tag"
+            className="w-full bg-black/40 border border-white/10 rounded-lg pl-9 pr-3 py-2 text-white text-sm focus:outline-none focus:border-[#c9a84c]/50" />
+        </div>
+        <div className="flex gap-1">
+          {(['all', 'lakeside', 'other-business'] as const).map(sg => (
+            <button key={sg} onClick={() => { setSegment(sg); setLimit(60) }}
+              className={`px-3 py-2 rounded-lg text-xs font-semibold ${segment === sg ? 'bg-[#c9a84c] text-black' : 'bg-white/5 text-gray-400 hover:text-white'}`}>
+              {sg === 'all' ? 'All' : SEGMENT_LABEL[sg]}
+            </button>
+          ))}
+        </div>
+        <select value={source} onChange={e => { setSource(e.target.value); setLimit(60) }}
+          className="bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none">
+          <option value="all">All sources</option>
+          {sources.map(sc => <option key={sc} value={sc}>{sc} ({contacts.filter(c => c.source === sc).length})</option>)}
+        </select>
       </div>
 
       {showForm && (
@@ -1138,10 +1298,21 @@ function CRMTab({ contacts, onRefresh }: { contacts: CRMContact[]; onRefresh: ()
 
       {contacts.length === 0 ? (
         <div className="text-center text-gray-600 py-16">No contacts yet.</div>
+      ) : filtered.length === 0 ? (
+        <div className="text-center text-gray-600 py-16">No contacts match.</div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {contacts.map(c => <ContactCard key={c.id} contact={c} onRefresh={onRefresh} />)}
-        </div>
+        <>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {filtered.slice(0, limit).map(c => <ContactCard key={c.id} contact={c} onRefresh={onRefresh} />)}
+          </div>
+          {filtered.length > limit && (
+            <div className="text-center mt-6">
+              <button onClick={() => setLimit(l => l + 120)} className="px-4 py-2 border border-white/10 text-gray-300 hover:text-white text-sm rounded-lg">
+                Show more ({filtered.length - limit} remaining)
+              </button>
+            </div>
+          )}
+        </>
       )}
     </div>
   )
