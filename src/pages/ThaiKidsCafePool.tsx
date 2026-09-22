@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { Waves, Gamepad2, UtensilsCrossed, Cake, Check, MapPin, Phone, MessageCircle } from 'lucide-react'
 import Seo from '../components/Seo'
+import PartyStrip from '../components/PartyStrip'
 import { buildFaqSchema, BUSINESS } from '../lib/schema'
 
 const MAPS_URL = 'https://maps.google.com/?q=Hemingways+Lakeside+Pattaya'
@@ -235,6 +236,8 @@ export default function ThaiKidsCafePool() {
           </ul>
         </div>
       </section>
+
+      <PartyStrip type="kids" lang="th" />
 
       {/* FAQ */}
       <section className="py-24 px-4 bg-[#f6efe0]">

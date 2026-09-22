@@ -12,7 +12,7 @@ import {
   orderBy,
 } from 'firebase/firestore'
 import { db } from './firebase'
-import type { MenuItem, Event, Special, BlogPost, SportsFixture, PoolPackage, Enquiry, CRMContact, GalleryImage, MenuPage, DigitalMenuCategory, DigitalMenuItem } from '../types'
+import type { MenuItem, Event, Special, BlogPost, SportsFixture, PoolPackage, Enquiry, CRMContact, GalleryImage, MenuPage, DigitalMenuCategory, DigitalMenuItem, Party } from '../types'
 
 // ── Menu Images ───────────────────────────────────────────────────────────────
 export const getMenuImages = async (): Promise<Record<string, string>> => {
@@ -358,4 +358,33 @@ export const saveIncome = async (data: Omit<import('../types').Income, 'id'>) =>
 
 export const deleteIncome = async (id: string) => {
   return deleteDoc(doc(db, 'finance_income', id))
+}
+
+// ── Party albums ──────────────────────────────────────────────────────────────
+export const getParties = async (publishedOnly = true): Promise<Party[]> => {
+  const snap = await getDocs(collection(db, 'parties'))
+  return snap.docs
+    .map((d: any) => ({ id: d.id, ...d.data() } as Party))
+    .filter((p: Party) => !publishedOnly || p.published)
+    .sort((a: Party, b: Party) => b.date.localeCompare(a.date))
+}
+
+export const getPartyBySlug = async (slug: string): Promise<Party | null> => {
+  const snap = await getDocs(query(collection(db, 'parties'), where('slug', '==', slug)))
+  const d = snap.docs[0]
+  if (!d) return null
+  const party = { id: d.id, ...d.data() } as Party
+  return party.published ? party : null
+}
+
+export const saveParty = async (party: Omit<Party, 'id'>) => {
+  return addDoc(collection(db, 'parties'), party)
+}
+
+export const updateParty = async (id: string, data: Partial<Party>) => {
+  return updateDoc(doc(db, 'parties', id), data)
+}
+
+export const deleteParty = async (id: string) => {
+  return deleteDoc(doc(db, 'parties', id))
 }

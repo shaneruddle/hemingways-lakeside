@@ -1,6 +1,7 @@
 import { Waves, Gamepad2, PartyPopper, Cake, Sparkles, Music, Users, Check } from 'lucide-react'
 import EnquiryForm from '../components/EnquiryForm'
 import EventGallery from '../components/EventGallery'
+import PartyStrip from '../components/PartyStrip'
 import FoodPackages from '../components/FoodPackages'
 import PartyBundles from '../components/PartyBundles'
 import FamilyPromoLinks from '../components/FamilyPromoLinks'
@@ -121,6 +122,7 @@ export default function KidsParties() {
       <EventAddOns heading="Make It Extra Special" />
 
       {/* Gallery (admin-managed) */}
+      <PartyStrip type="kids" />
       <EventGallery type="kids" label="Past Parties" title="Real Parties, Real Smiles" />
 
       {/* All-in bundles — 5,000 / 10,000 / 20,000 THB, set by Shane 21 Sept 2026 */}

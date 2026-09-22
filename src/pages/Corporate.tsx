@@ -1,6 +1,7 @@
 import { Building2, Trees, Waves, Users, ChefHat, Monitor, Wifi, Car } from 'lucide-react'
 import EnquiryForm from '../components/EnquiryForm'
 import EventGallery from '../components/EventGallery'
+import PartyStrip from '../components/PartyStrip'
 import EventAddOns from '../components/EventAddOns'
 import Seo from '../components/Seo'
 import FaqMini from '../components/FaqMini'
@@ -125,6 +126,7 @@ export default function Corporate() {
       <EventAddOns heading="Make It A Bigger Event" />
 
       {/* Gallery (admin-managed) */}
+      <PartyStrip type="corporate" />
       <EventGallery type="corporate" label="Past Events" title="How Companies Use the Lake" />
 
       {/* FAQ (also feeds FAQPage schema above) */}

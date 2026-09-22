@@ -13,6 +13,7 @@ import SystemLogs from '../components/admin/SystemLogs'
 import UserManagement from '../components/admin/UserManagement'
 import LoyaltyManager from '../components/admin/LoyaltyManager'
 import FinanceManager from '../components/admin/FinanceManager'
+import PartyManager from '../components/admin/PartyManager'
 
 // ── Event Galleries ─────────────────────────────────────────────────────────────
 const GALLERY_TYPES: { key: GalleryImage['type']; label: string }[] = [
@@ -1148,7 +1149,7 @@ function CRMTab({ contacts, onRefresh }: { contacts: CRMContact[]; onRefresh: ()
 // ── Main Admin ─────────────────────────────────────────────────────────────────
 export default function Admin() {
   const [user, setUser] = useState<User | null>(null)
-  const [tab, setTab] = useState<'enquiries' | 'crm' | 'menu' | 'blog' | 'specials' | 'galleries' | 'digital-menu' | 'system-logs' | 'users' | 'loyalty' | 'finance'>('enquiries')
+  const [tab, setTab] = useState<'enquiries' | 'crm' | 'menu' | 'blog' | 'specials' | 'galleries' | 'parties' | 'digital-menu' | 'system-logs' | 'users' | 'loyalty' | 'finance'>('enquiries')
   const [enquiries, setEnquiries] = useState<Enquiry[]>([])
   const [contacts, setContacts] = useState<CRMContact[]>([])
   const [loading, setLoading] = useState(false)
@@ -1192,6 +1193,7 @@ export default function Admin() {
     { key: 'blog', label: 'Blog', icon: FileText },
     { key: 'specials', label: 'Specials', icon: Star },
     { key: 'galleries', label: 'Galleries', icon: ImageIcon },
+    { key: 'parties', label: 'Party Albums', icon: Star },
     { key: 'digital-menu', label: 'Digital Menu', icon: UtensilsCrossed },
     { key: 'loyalty', label: 'Loyalty', icon: CreditCard },
     { key: 'finance', label: 'Finance', icon: TrendingUp },
@@ -1327,6 +1329,7 @@ export default function Admin() {
 
           {/* Event Galleries */}
           {tab === 'galleries' && <GalleryManager />}
+          {tab === 'parties' && <PartyManager />}
 
           {/* Digital Menu */}
           {tab === 'digital-menu' && <MenuManager />}

@@ -78,6 +78,32 @@ export interface MenuPage {
   order: number
 }
 
+export interface PartyPhoto {
+  url: string
+  storagePath: string
+  width: number
+  height: number
+  /** Number of faces blurred in this photo (for the admin list; not shown publicly). */
+  blurred: number
+}
+
+/** A published party album — the proof/trust section at /parties. */
+export interface Party {
+  id: string
+  slug: string
+  title: string
+  titleTh?: string
+  /** ISO date (YYYY-MM-DD) of the party. */
+  date: string
+  type: 'kids' | 'birthday' | 'corporate' | 'other'
+  summary?: string
+  photos: PartyPhoto[]
+  coverIndex: number
+  hostConsent: boolean
+  published: boolean
+  createdAt: string
+}
+
 export interface GalleryImage {
   id: string
   type: 'kids' | 'birthday' | 'corporate'

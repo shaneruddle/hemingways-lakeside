@@ -53,6 +53,7 @@ export default function Footer() {
               {[
                 { label: 'Birthday Parties', to: '/events/birthdays' },
                 { label: 'Kids Parties', to: '/events/kids' },
+          { label: 'Real Party Photos', to: '/parties' },
                 { label: 'Corporate Functions', to: '/events/corporate' },
                 { label: 'Pool Parties', to: '/pool-party' },
                 { label: 'Christmas & New Year', to: '/christmas' },

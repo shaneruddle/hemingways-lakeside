@@ -18,6 +18,8 @@ import ThaiKidsCafeList from './pages/ThaiKidsCafeList'
 import Steak from './pages/Steak'
 import ThaiWesternFood from './pages/ThaiWesternFood'
 import EastPattayaDarkside from './pages/EastPattayaDarkside'
+import Parties from './pages/Parties'
+import PartyAlbum from './pages/PartyAlbum'
 import BirthdayClub from './pages/BirthdayClub'
 import HalloweenPoolParty from './pages/HalloweenPoolParty'
 import Sports from './pages/Sports'
@@ -70,6 +72,8 @@ export default function App() {
           <Route path="/steak" element={<Steak />} />
           <Route path="/th/western-food-pattaya" element={<ThaiWesternFood />} />
           <Route path="/east-pattaya-darkside" element={<EastPattayaDarkside />} />
+          <Route path="/parties" element={<Parties />} />
+          <Route path="/parties/:slug" element={<PartyAlbum />} />
           <Route path="/sports" element={<Sports />} />
           <Route path="/beer-garden" element={<BeerGarden />} />
           <Route path="/sunday-roast" element={<SundayRoast />} />

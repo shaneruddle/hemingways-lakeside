@@ -1,6 +1,7 @@
 import { UtensilsCrossed, Trees, Waves, Building2, Martini, Users } from 'lucide-react'
 import EnquiryForm from '../components/EnquiryForm'
 import EventGallery from '../components/EventGallery'
+import PartyStrip from '../components/PartyStrip'
 import FoodPackages from '../components/FoodPackages'
 import EventTestimonials from '../components/EventTestimonials'
 import EventAddOns from '../components/EventAddOns'
@@ -112,6 +113,7 @@ export default function BirthdayParties() {
       <EventAddOns heading="Make Your Night Bigger" />
 
       {/* Gallery (admin-managed) */}
+      <PartyStrip type="birthday" />
       <EventGallery type="birthday" label="Past Celebrations" title="Nights We’ve Hosted" />
 
       {/* Real package pricing — from Shane's Sept 2026 Birthday & Event Food Packages poster */}
