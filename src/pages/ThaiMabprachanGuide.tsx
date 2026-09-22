@@ -113,7 +113,7 @@ export default function ThaiMabprachanGuide() {
       {/* Hero */}
       <section className="relative min-h-[80vh] flex items-end overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-[#0d0d0d] z-10" />
-        <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: "url('/hero-evening.webp')" }} />
+        <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: "url('/lake-mabprachan.webp')" }} />
         <div className="relative z-20 px-4 pb-20 pt-48 w-full">
           <div className="max-w-7xl mx-auto">
             <p className="text-[#c9a84c] text-xs tracking-[0.3em] uppercase mb-4">พัทยาตะวันออก · ตำบลโป่ง · บางละมุง</p>
@@ -195,6 +195,14 @@ export default function ThaiMabprachanGuide() {
             <p className="text-[#5c5346] mt-4 max-w-2xl mx-auto">
               ร้านอยู่ริมอ่างพอดี จบรอบที่นี่ได้เลย ลงสระ อาบน้ำ แล้วนั่งทานอาหารเช้าหรือมื้อค่ำมองวิวทะเลสาบ
             </p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-12">
+            {[['/pool-lounge.webp','สระว่ายน้ำ ฟรีเมื่อทานอาหาร'],['/games-room.webp','ห้องเล่นเด็กในร่ม'],['/terrace.webp','ระเบียงริมสระ']].map(([src, cap]) => (
+              <figure key={src} className="bg-white rounded-2xl overflow-hidden border border-black/5 shadow-sm">
+                <img src={src} alt={`Hemingways Lakeside - ${cap}`} loading="lazy" className="w-full aspect-[4/3] object-cover" />
+                <figcaption className="text-sm text-[#5c5346] px-4 py-3">{cap}</figcaption>
+              </figure>
+            ))}
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {afterwards.map(({ icon: Icon, title, desc }) => (

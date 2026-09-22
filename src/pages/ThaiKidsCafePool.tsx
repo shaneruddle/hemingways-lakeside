@@ -166,6 +166,18 @@ export default function ThaiKidsCafePool() {
         </div>
       </section>
 
+      {/* Gallery */}
+      <section className="px-4 pb-8 bg-[#f6efe0]">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {[['/pool-lounge.webp','สระว่ายน้ำ ฟรีเมื่อทานอาหาร'],['/games-room.webp','ห้องเล่นเด็กในร่ม โต๊ะโกล ฮอกกี้ พูล ปิงปอง'],['/terrace.webp','ระเบียงนั่งทานอาหารริมสระ']].map(([src,cap]) => (
+            <figure key={src} className="bg-white rounded-2xl overflow-hidden border border-black/5 shadow-sm">
+              <img src={src} alt={`Hemingways Lakeside - ${cap}`} loading="lazy" className="w-full aspect-[4/3] object-cover" />
+              <figcaption className="text-sm text-[#5c5346] px-4 py-3">{cap}</figcaption>
+            </figure>
+          ))}
+        </div>
+      </section>
+
       {/* Party packages */}
       <section className="py-24 px-4 bg-white">
         <div className="max-w-5xl mx-auto">

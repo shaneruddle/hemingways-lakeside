@@ -193,6 +193,13 @@ export default function ThaiKidsCafeList() {
                   </div>
                   <p className="text-[#5c5346] leading-relaxed mb-2">{v.desc}</p>
                   <p className="text-sm text-[#5c5346]"><span className="font-bold text-[#1a1512]">เหมาะกับ:</span> {v.bestFor}</p>
+                  {v.ours && (
+                    <div className="grid grid-cols-3 gap-2 mt-4">
+                      {[['/pool-lounge.webp','สระว่ายน้ำริมทะเลสาบ'],['/games-room.webp','ห้องเล่นเด็กในร่ม'],['/terrace.webp','โซนนั่งทานอาหาร']].map(([src,alt]) => (
+                        <img key={src} src={src} alt={`Hemingways Lakeside - ${alt}`} loading="lazy" className="rounded-xl aspect-[4/3] object-cover w-full" />
+                      ))}
+                    </div>
+                  )}
                   {v.ours && v.url && (
                     <Link to={v.url} className="inline-block mt-4 text-sm font-bold text-[#8a6d2f] underline hover:text-[#1a1512]">
                       ดูรายละเอียดสระว่ายน้ำและแพ็กเกจวันเกิด →

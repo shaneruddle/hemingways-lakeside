@@ -99,7 +99,7 @@ export default function LakeMabprachan() {
       {/* Hero */}
       <section className="relative min-h-[80vh] flex items-end overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-[#0d0d0d] z-10" />
-        <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: "url('/hero-evening.webp')" }} />
+        <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: "url('/lake-mabprachan.webp')" }} />
         <div className="relative z-20 px-4 pb-20 pt-48 w-full">
           <div className="max-w-7xl mx-auto">
             <p className="text-[#c9a84c] text-xs tracking-[0.4em] uppercase mb-4">East Pattaya · Pong · The Darkside</p>
@@ -182,6 +182,14 @@ export default function LakeMabprachan() {
               We're on the shore of the reservoir, so finish your loop here: a swim in the pool, a shower, then breakfast
               or dinner looking back over the water.
             </p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-12">
+            {[['/pool-lounge.webp','The pool, free with your meal'],['/games-room.webp','Indoor games room for the kids'],['/terrace.webp','Covered terrace by the pool']].map(([src, cap]) => (
+              <figure key={src} className="bg-white rounded-2xl overflow-hidden border border-black/5 shadow-sm">
+                <img src={src} alt={`Hemingways Lakeside - ${cap}`} loading="lazy" className="w-full aspect-[4/3] object-cover" />
+                <figcaption className="text-sm text-[#5c5346] px-4 py-3">{cap}</figcaption>
+              </figure>
+            ))}
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {afterwards.map(({ icon: Icon, title, desc }) => (
