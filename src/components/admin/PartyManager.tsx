@@ -5,7 +5,7 @@ import { getParties, saveParty, updateParty, deleteParty } from '../../lib/fires
 import { preparePhoto, prepareFromOriginal, renderBlurred, canvasToJpeg, slugify, type PreparedPhoto } from '../../lib/faceBlur'
 import type { Party, PartyPhoto } from '../../types'
 import { toast } from 'sonner'
-import { Plus, Trash2, Upload, Eye, EyeOff, X, Star, ArrowLeft, ArrowRight, ShieldCheck, Loader2, Pencil } from 'lucide-react'
+import { Plus, Trash2, Upload, Eye, EyeOff, X, Star, ArrowLeft, ArrowRight, ShieldCheck, Loader2, Pencil, ExternalLink } from 'lucide-react'
 
 const TYPES: { key: Party['type']; label: string }[] = [
   { key: 'kids', label: 'Kids party' },
@@ -49,9 +49,14 @@ export default function PartyManager() {
           <h2 className="text-white font-bold text-lg">Party albums</h2>
           <p className="text-gray-500 text-sm">Published albums appear at /parties. Faces are blurred before upload.</p>
         </div>
-        <button onClick={() => setCreating(true)} className="inline-flex items-center gap-2 px-4 py-2 bg-[#c9a84c] text-black font-bold text-sm rounded-lg">
-          <Plus size={16} /> New party
-        </button>
+        <div className="flex items-center gap-2">
+          <a href="/parties" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-4 py-2 border border-white/15 text-gray-300 hover:text-white hover:border-[#c9a84c]/50 text-sm rounded-lg">
+            <ExternalLink size={14} /> View page
+          </a>
+          <button onClick={() => setCreating(true)} className="inline-flex items-center gap-2 px-4 py-2 bg-[#c9a84c] text-black font-bold text-sm rounded-lg">
+            <Plus size={16} /> New party
+          </button>
+        </div>
       </div>
 
       {loading ? (
@@ -63,7 +68,8 @@ export default function PartyManager() {
           {parties.map(p => {
             const cover = p.photos[p.coverIndex] ?? p.photos[0]
             return (
-              <button key={p.id} onClick={() => setEditing(p)} className="w-full text-left bg-[#141414] border border-white/5 hover:border-[#c9a84c]/40 rounded-2xl p-4 flex gap-4 items-center transition-colors">
+              <div key={p.id} className="bg-[#141414] border border-white/5 hover:border-[#c9a84c]/40 rounded-2xl p-4 flex gap-4 items-center transition-colors">
+              <button onClick={() => setEditing(p)} className="flex-1 min-w-0 text-left flex gap-4 items-center">
                 <div className="w-20 h-20 rounded-xl bg-black overflow-hidden shrink-0">
                   {cover && <img src={cover.url} alt="" className="w-full h-full object-cover" />}
                 </div>
@@ -71,11 +77,17 @@ export default function PartyManager() {
                   <div className="text-white font-bold truncate">{p.title}</div>
                   <div className="text-gray-500 text-sm">{p.date} · {TYPES.find(t => t.key === p.type)?.label} · {p.photos.length} photos</div>
                 </div>
+              </button>
                 <div className="flex items-center gap-2 shrink-0 text-xs">
                   {p.hostConsent && <span className="inline-flex items-center gap-1 text-green-400"><ShieldCheck size={14} /> consent</span>}
                   <span className={`px-2 py-1 rounded ${p.published ? 'bg-green-500/15 text-green-400' : 'bg-white/5 text-gray-500'}`}>{p.published ? 'Published' : 'Draft'}</span>
+                  {p.published && (
+                    <a href={`/parties/${p.slug}`} target="_blank" rel="noopener noreferrer" title="View on site" className="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-white/5">
+                      <ExternalLink size={14} />
+                    </a>
+                  )}
                 </div>
-              </button>
+              </div>
             )
           })}
         </div>
@@ -324,6 +336,9 @@ function PartyEditor({ party, onClose }: { party: Party | null; onClose: () => v
       <div className="flex items-center justify-between mb-6">
         <button onClick={onClose} className="text-gray-400 hover:text-white text-sm inline-flex items-center gap-1"><ArrowLeft size={14} /> All parties</button>
         <div className="flex gap-2">
+          {party?.published && (
+            <a href={`/parties/${slug}`} target="_blank" rel="noopener noreferrer" className="px-3 py-2 text-sm text-gray-300 hover:text-white inline-flex items-center gap-1 border border-white/15 rounded-lg"><ExternalLink size={14} /> View</a>
+          )}
           {id && <button onClick={handleDelete} className="px-3 py-2 text-sm text-red-400 hover:bg-red-500/10 rounded-lg inline-flex items-center gap-1"><Trash2 size={14} /> Delete</button>}
           <button onClick={handleSave} disabled={saving} className="px-4 py-2 bg-[#c9a84c] text-black font-bold text-sm rounded-lg disabled:opacity-50">
             {saving ? 'Saving…' : published ? 'Save & publish' : 'Save draft'}
