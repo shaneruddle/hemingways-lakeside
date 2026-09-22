@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
-"""Deploy Firestore security rules to a named database via Firebase Rules REST API."""
+"""Deploy Firestore or Storage security rules via the Firebase Rules REST API.
+
+Usage:
+  deploy_firestore_rules.py <database_id> firestore.rules              (Firestore)
+  deploy_firestore_rules.py --storage <bucket-name> storage.rules      (Storage)
+"""
 import json, sys, requests
 from google.oauth2 import service_account
 from google.auth.transport.requests import Request
@@ -7,10 +12,16 @@ from google.auth.transport.requests import Request
 with open('/tmp/sa.json') as f:
     sa = json.load(f)
 project_id = sa['project_id']
-database_id = sys.argv[1] if len(sys.argv) > 1 else 'default'
-rules_file = sys.argv[2] if len(sys.argv) > 2 else 'firestore.rules'
-
-print(f'Project: {project_id}, Database: {database_id}')
+if len(sys.argv) > 1 and sys.argv[1] == '--storage':
+    bucket = sys.argv[2]
+    rules_file = sys.argv[3] if len(sys.argv) > 3 else 'storage.rules'
+    release_id = f'firebase.storage/{bucket}'
+    print(f'Project: {project_id}, Storage bucket: {bucket}')
+else:
+    database_id = sys.argv[1] if len(sys.argv) > 1 else 'default'
+    rules_file = sys.argv[2] if len(sys.argv) > 2 else 'firestore.rules'
+    release_id = f'cloud.firestore/{database_id}'
+    print(f'Project: {project_id}, Database: {database_id}')
 
 creds = service_account.Credentials.from_service_account_info(
     sa, scopes=['https://www.googleapis.com/auth/firebase'])
@@ -29,9 +40,7 @@ r.raise_for_status()
 ruleset_name = r.json()['name']
 print(f'Created ruleset: {ruleset_name}')
 
-# 2. Release for the named database
-# Release name format: cloud.firestore/{database_id}
-release_id = f'cloud.firestore/{database_id}'
+# 2. Release (cloud.firestore/{database_id} or firebase.storage/{bucket})
 release_full_name = f'projects/{project_id}/releases/{release_id}'
 release_body = {'name': release_full_name, 'rulesetName': ruleset_name}
 

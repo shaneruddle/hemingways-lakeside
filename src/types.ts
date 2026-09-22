@@ -78,9 +78,22 @@ export interface MenuPage {
   order: number
 }
 
+export interface PartyFace {
+  x: number
+  y: number
+  w: number
+  h: number
+  blur: boolean
+}
+
 export interface PartyPhoto {
+  /** Public, face-blurred JPEG. */
   url: string
   storagePath: string
+  /** Un-blurred original (resized), admin-only Storage path — lets us re-edit the blurring later. */
+  originalPath?: string
+  /** Detected/manual face boxes and their blur state (pixel coords in width×height). */
+  faces?: PartyFace[]
   width: number
   height: number
   /** Number of faces blurred in this photo (for the admin list; not shown publicly). */

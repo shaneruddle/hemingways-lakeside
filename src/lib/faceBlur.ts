@@ -165,6 +165,12 @@ export function renderBlurred(photo: PreparedPhoto): HTMLCanvasElement {
   return canvas
 }
 
+/** Rebuild a PreparedPhoto from a stored original (no re-detection) so blurring can be edited later. */
+export async function prepareFromOriginal(blob: Blob, faces: FaceBox[]): Promise<PreparedPhoto> {
+  const bitmap = await createImageBitmap(blob)
+  return { file: new File([blob], 'original.jpg', { type: 'image/jpeg' }), bitmap, width: bitmap.width, height: bitmap.height, faces: faces.map(f => ({ ...f })) }
+}
+
 export function canvasToJpeg(canvas: HTMLCanvasElement, quality = 0.85): Promise<Blob> {
   return new Promise((resolve, reject) => {
     canvas.toBlob(b => (b ? resolve(b) : reject(new Error('toBlob failed'))), 'image/jpeg', quality)

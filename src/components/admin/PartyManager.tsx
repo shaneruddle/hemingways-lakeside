@@ -1,11 +1,11 @@
 import { useState, useEffect, useRef } from 'react'
-import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage'
+import { ref, uploadBytes, getDownloadURL, deleteObject, getBlob } from 'firebase/storage'
 import { storage } from '../../lib/firebase'
 import { getParties, saveParty, updateParty, deleteParty } from '../../lib/firestore'
-import { preparePhoto, renderBlurred, canvasToJpeg, slugify, type PreparedPhoto } from '../../lib/faceBlur'
+import { preparePhoto, prepareFromOriginal, renderBlurred, canvasToJpeg, slugify, type PreparedPhoto } from '../../lib/faceBlur'
 import type { Party, PartyPhoto } from '../../types'
 import { toast } from 'sonner'
-import { Plus, Trash2, Upload, Eye, EyeOff, X, Star, ArrowLeft, ArrowRight, ShieldCheck, Loader2 } from 'lucide-react'
+import { Plus, Trash2, Upload, Eye, EyeOff, X, Star, ArrowLeft, ArrowRight, ShieldCheck, Loader2, Pencil } from 'lucide-react'
 
 const TYPES: { key: Party['type']; label: string }[] = [
   { key: 'kids', label: 'Kids party' },
@@ -90,6 +90,8 @@ interface PendingPhoto {
   id: string
   prepared: PreparedPhoto
   previewUrl: string
+  /** Set when re-editing an already-uploaded photo: index into `photos`. */
+  editIndex?: number
 }
 
 function PartyEditor({ party, onClose }: { party: Party | null; onClose: () => void }) {
@@ -109,6 +111,8 @@ function PartyEditor({ party, onClose }: { party: Party | null; onClose: () => v
   const [uploading, setUploading] = useState(false)
   const [saving, setSaving] = useState(false)
   const [inspect, setInspect] = useState<PendingPhoto | null>(null)
+  const [editSaving, setEditSaving] = useState(false)
+  const [editLoading, setEditLoading] = useState<number | null>(null)
   const fileRef = useRef<HTMLInputElement | null>(null)
 
   const slug = party?.slug ?? `${date}-${slugify(title) || 'party'}`
@@ -155,7 +159,10 @@ function PartyEditor({ party, onClose }: { party: Party | null; onClose: () => v
     if (!id) { onClose(); return }
     if (!confirm('Delete this party and all its photos? This cannot be undone.')) return
     try {
-      await Promise.all(photos.map(p => deleteObject(ref(storage, p.storagePath)).catch(() => {})))
+      await Promise.all(photos.flatMap(p => [
+        deleteObject(ref(storage, p.storagePath)).catch(() => {}),
+        ...(p.originalPath ? [deleteObject(ref(storage, p.originalPath)).catch(() => {})] : []),
+      ]))
       await deleteParty(id)
       toast.success('Party deleted')
       onClose()
@@ -217,18 +224,32 @@ function PartyEditor({ party, onClose }: { party: Party | null; onClose: () => v
     try {
       const docId = await ensureSaved()
       const uploaded: PartyPhoto[] = []
-      for (const p of pending) {
+      for (const p of pending.filter(x => x.editIndex === undefined)) {
+        const name = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.jpg`
+        // Un-blurred original → admin-only path, so the blurring can be changed later.
+        const originalPath = `parties-private/${docId}/${name}`
+        const originalCanvas = document.createElement('canvas')
+        originalCanvas.width = p.prepared.width
+        originalCanvas.height = p.prepared.height
+        originalCanvas.getContext('2d')!.drawImage(p.prepared.bitmap, 0, 0)
+        await uploadBytes(ref(storage, originalPath), await canvasToJpeg(originalCanvas, 0.92), { contentType: 'image/jpeg' })
+
         const blob = await canvasToJpeg(renderBlurred(p.prepared))
-        const storagePath = `parties/${docId}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.jpg`
+        const storagePath = `parties/${docId}/${name}`
         const storageRef = ref(storage, storagePath)
-        await uploadBytes(storageRef, blob, { contentType: 'image/jpeg', cacheControl: 'public,max-age=31536000' })
+        await uploadBytes(storageRef, blob, { contentType: 'image/jpeg', cacheControl: 'public,max-age=3600' })
         const url = await getDownloadURL(storageRef)
-        uploaded.push({ url, storagePath, width: p.prepared.width, height: p.prepared.height, blurred: p.prepared.faces.filter(f => f.blur).length })
+        uploaded.push({
+          url, storagePath, originalPath,
+          faces: p.prepared.faces,
+          width: p.prepared.width, height: p.prepared.height,
+          blurred: p.prepared.faces.filter(f => f.blur).length,
+        })
       }
       const nextPhotos = [...photos, ...uploaded]
       setPhotos(nextPhotos)
       await updateParty(docId, { photos: nextPhotos })
-      setPending([])
+      setPending(prev => prev.filter(x => x.editIndex !== undefined))
       toast.success(`${uploaded.length} photo${uploaded.length > 1 ? 's' : ''} uploaded`)
     } catch (e: any) {
       toast.error(e?.message || 'Upload failed')
@@ -242,7 +263,50 @@ function PartyEditor({ party, onClose }: { party: Party | null; onClose: () => v
     setPhotos(next)
     if (coverIndex >= next.length) setCoverIndex(0)
     deleteObject(ref(storage, p.storagePath)).catch(() => {})
+    if (p.originalPath) deleteObject(ref(storage, p.originalPath)).catch(() => {})
     if (id) await updateParty(id, { photos: next, coverIndex: Math.min(coverIndex, Math.max(0, next.length - 1)) })
+  }
+
+  /** Re-edit the blurring on an already-uploaded photo (needs its private original). */
+  const editUploaded = async (idx: number) => {
+    const ph = photos[idx]
+    if (!ph.originalPath) { toast.error('This photo was uploaded before re-editing existed - remove it and upload again.'); return }
+    setEditLoading(idx)
+    try {
+      const blob = await getBlob(ref(storage, ph.originalPath))
+      const prepared = await prepareFromOriginal(blob, ph.faces ?? [])
+      const p: PendingPhoto = { id: `edit-${idx}-${Date.now()}`, prepared, previewUrl: renderBlurred(prepared).toDataURL('image/jpeg', 0.7), editIndex: idx }
+      setPending(prev => [...prev.filter(x => x.editIndex !== idx), p])
+      setInspect(p)
+    } catch (e: any) {
+      toast.error(e?.message || 'Could not load the original')
+    } finally { setEditLoading(null) }
+  }
+
+  const saveEdit = async (p: PendingPhoto) => {
+    if (p.editIndex === undefined || !id) return
+    setEditSaving(true)
+    try {
+      const ph = photos[p.editIndex]
+      const blob = await canvasToJpeg(renderBlurred(p.prepared))
+      const storageRef = ref(storage, ph.storagePath)
+      await uploadBytes(storageRef, blob, { contentType: 'image/jpeg', cacheControl: 'public,max-age=3600' })
+      const base = (await getDownloadURL(storageRef)).split('&v=')[0]
+      const updated: PartyPhoto = { ...ph, url: `${base}&v=${Date.now()}`, faces: p.prepared.faces, blurred: p.prepared.faces.filter(f => f.blur).length }
+      const next = photos.map((x, i) => (i === p.editIndex ? updated : x))
+      setPhotos(next)
+      await updateParty(id, { photos: next })
+      setPending(prev => prev.filter(x => x.id !== p.id))
+      setInspect(null)
+      toast.success('Blurring updated')
+    } catch (e: any) {
+      toast.error(e?.message || 'Save failed')
+    } finally { setEditSaving(false) }
+  }
+
+  const cancelEdit = (p: PendingPhoto) => {
+    setPending(prev => prev.filter(x => x.id !== p.id))
+    setInspect(null)
   }
 
   const movePhoto = (idx: number, dir: -1 | 1) => {
@@ -315,14 +379,14 @@ function PartyEditor({ party, onClose }: { party: Party | null; onClose: () => v
               <input ref={fileRef} type="file" accept="image/*" multiple className="hidden" disabled={detecting > 0 || uploading} onChange={handleFiles} />
             </label>
 
-            {pending.length > 0 && (
+            {pending.some(p => p.editIndex === undefined) && (
               <>
                 <p className="text-gray-400 text-sm mt-5 mb-3">
                   <ShieldCheck size={14} className="inline mr-1 text-green-400" />
                   Review before upload — click a photo to see the faces, then tap a face to un-blur it (adults only, or with the parents' OK).
                 </p>
                 <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 gap-3">
-                  {pending.map(p => (
+                  {pending.filter(p => p.editIndex === undefined).map(p => (
                     <div key={p.id} className="relative group">
                       <button onClick={() => setInspect(p)} className="block w-full aspect-square rounded-xl overflow-hidden bg-black border border-white/10">
                         <img src={p.previewUrl} alt="" className="w-full h-full object-cover" />
@@ -335,7 +399,7 @@ function PartyEditor({ party, onClose }: { party: Party | null; onClose: () => v
                   ))}
                 </div>
                 <button onClick={handleUpload} disabled={uploading} className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-[#c9a84c] text-black font-bold text-sm rounded-lg disabled:opacity-50">
-                  {uploading ? <><Loader2 size={14} className="animate-spin" /> Uploading…</> : <><Upload size={14} /> Upload {pending.length} blurred photo{pending.length > 1 ? 's' : ''}</>}
+                  {uploading ? <><Loader2 size={14} className="animate-spin" /> Uploading…</> : <><Upload size={14} /> Upload {pending.filter(p => p.editIndex === undefined).length} blurred photo{pending.filter(p => p.editIndex === undefined).length > 1 ? 's' : ''}</>}
                 </button>
               </>
             )}
@@ -344,14 +408,17 @@ function PartyEditor({ party, onClose }: { party: Party | null; onClose: () => v
           {/* Uploaded */}
           {photos.length > 0 && (
             <div className="bg-[#141414] border border-white/5 rounded-2xl p-5">
-              <p className="text-gray-400 text-sm mb-3">{photos.length} photos in this album · star = cover · arrows reorder</p>
+              <p className="text-gray-400 text-sm mb-3">{photos.length} photos in this album · star = cover · pencil = change blurring · arrows reorder</p>
               <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 gap-3">
                 {photos.map((ph, i) => (
                   <div key={ph.storagePath} className={`relative group aspect-square rounded-xl overflow-hidden bg-black border ${i === coverIndex ? 'border-[#c9a84c]' : 'border-white/10'}`}>
                     <img src={ph.url} alt="" loading="lazy" className="w-full h-full object-cover" />
+                    {editLoading === i && <div className="absolute inset-0 bg-black/60 flex items-center justify-center"><Loader2 size={18} className="text-[#c9a84c] animate-spin" /></div>}
+                    <span className="absolute top-1 left-1 text-[10px] bg-black/70 text-gray-200 px-1.5 py-0.5 rounded">{ph.blurred} blurred</span>
                     <div className="absolute inset-x-0 bottom-0 flex justify-between items-center p-1 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
                       <button onClick={() => movePhoto(i, -1)} className="p-1 text-white/80" aria-label="Move left"><ArrowLeft size={12} /></button>
                       <button onClick={() => setCoverIndex(i)} className={`p-1 ${i === coverIndex ? 'text-[#c9a84c]' : 'text-white/80'}`} aria-label="Set as cover"><Star size={12} /></button>
+                      <button onClick={() => editUploaded(i)} className="p-1 text-white/80" aria-label="Change blurring" title="Change which faces are blurred"><Pencil size={12} /></button>
                       <button onClick={() => removePhoto(i)} className="p-1 text-red-400" aria-label="Remove"><Trash2 size={12} /></button>
                       <button onClick={() => movePhoto(i, 1)} className="p-1 text-white/80" aria-label="Move right"><ArrowRight size={12} /></button>
                     </div>
@@ -365,8 +432,8 @@ function PartyEditor({ party, onClose }: { party: Party | null; onClose: () => v
 
       {/* Face inspector */}
       {inspect && (
-        <div className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-4" onClick={() => setInspect(null)}>
-          <button onClick={() => setInspect(null)} className="absolute top-6 right-6 text-white/70 hover:text-white" aria-label="Close"><X size={28} /></button>
+        <div className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-4" onClick={() => (inspect.editIndex !== undefined ? cancelEdit(inspect) : setInspect(null))}>
+          <button onClick={() => (inspect.editIndex !== undefined ? cancelEdit(inspect) : setInspect(null))} className="absolute top-6 right-6 text-white/70 hover:text-white" aria-label="Close"><X size={28} /></button>
           <div className="relative max-w-[95vw] max-h-[90vh]" onClick={e => e.stopPropagation()}>
             <img
               src={inspect.previewUrl}
@@ -394,6 +461,18 @@ function PartyEditor({ party, onClose }: { party: Party | null; onClose: () => v
             <p className="text-center text-gray-400 text-xs mt-3">
               {inspect.prepared.faces.length} face{inspect.prepared.faces.length === 1 ? '' : 's'} found · gold = blurred, red = visible · click a box to toggle · click anywhere else to add a blur
             </p>
+            {inspect.editIndex !== undefined ? (
+              <div className="flex justify-center gap-3 mt-4">
+                <button onClick={() => cancelEdit(inspect)} className="px-4 py-2 text-sm text-gray-300 border border-white/20 rounded-lg">Cancel</button>
+                <button onClick={() => saveEdit(inspect)} disabled={editSaving} className="px-4 py-2 text-sm bg-[#c9a84c] text-black font-bold rounded-lg disabled:opacity-50 inline-flex items-center gap-2">
+                  {editSaving ? <><Loader2 size={14} className="animate-spin" /> Saving…</> : 'Save blurring'}
+                </button>
+              </div>
+            ) : (
+              <div className="flex justify-center mt-4">
+                <button onClick={() => setInspect(null)} className="px-4 py-2 text-sm bg-[#c9a84c] text-black font-bold rounded-lg">Done</button>
+              </div>
+            )}
           </div>
         </div>
       )}
