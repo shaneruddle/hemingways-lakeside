@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import { MapPin, Clock, Phone, Navigation } from 'lucide-react'
 import { HOURS_SUMMARY } from '../lib/schema'
 
@@ -8,7 +9,7 @@ export default function Location() {
         <div className="max-w-4xl mx-auto text-center">
           <p className="text-[#9c7a2e] text-xs tracking-[0.4em] uppercase mb-4">We're Easy to Find</p>
           <h1 className="text-4xl sm:text-6xl font-bold mb-4 text-[#1a1512]">Location</h1>
-          <p className="text-[#5c5346] text-lg">East Pattaya, right by the lake.</p>
+          <p className="text-[#5c5346] text-lg">East Pattaya, right by <Link to="/lake-mabprachan" className="underline hover:text-[#8a6d2f]">Lake Mabprachan</Link>.</p>
         </div>
       </section>
 
